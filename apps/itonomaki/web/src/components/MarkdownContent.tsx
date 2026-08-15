@@ -155,7 +155,7 @@ export function MarkdownContent({ blocks }: { blocks: Block[] }) {
                     className={
                       "mt-[0.4em] flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[4px] border " +
                       (item.checked
-                        ? "border-teal-500 bg-teal-500/90"
+                        ? "border-[var(--accent)] bg-[var(--accent)]/90"
                         : "border-[var(--muted)]")
                     }
                     aria-hidden

@@ -219,7 +219,7 @@ export default function SettingsScreen() {
       <Card>
         <CardContent className="space-y-2 p-4">
           <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
-            <ClipboardList className="h-4 w-4 text-indigo-500" />
+            <ClipboardList className="h-4 w-4 text-[#8a6d1f]" />
             寮費清算のルール（メモ）
           </div>
           <p className="text-xs text-slate-400">

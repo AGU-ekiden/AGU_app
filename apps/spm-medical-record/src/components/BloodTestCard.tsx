@@ -70,7 +70,7 @@ export default function BloodTestCard({
                       {isOutOfRange && (
                         <span
                           className={`text-[9px] font-bold shrink-0 ${
-                            isLow ? "text-blue-500" : "text-red-500"
+                            isLow ? "text-[#8a6d1f]" : "text-red-500"
                           }`}
                         >
                           {isLow ? "▼" : "▲"}

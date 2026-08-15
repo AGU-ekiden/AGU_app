@@ -45,7 +45,7 @@ export default function ObogListPage() {
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-2">
           <Link
             href="/"
-            className="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-600 transition-colors shrink-0"
+            className="flex items-center gap-1 text-sm text-gray-400 hover:text-[#10254a] transition-colors shrink-0"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -90,12 +90,12 @@ export default function ObogListPage() {
                       onClick={() => setSelectedYear(year)}
                       className={`text-sm px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1.5 ${
                         isActive
-                          ? "bg-blue-600 text-white border-blue-600 font-semibold"
-                          : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600"
+                          ? "bg-[#10254a] text-white border-[#10254a] font-semibold"
+                          : "bg-white text-gray-600 border-gray-200 hover:border-[#dbbd57] hover:text-[#10254a]"
                       }`}
                     >
                       {year}年
-                      <span className={`text-[10px] ${isActive ? "text-blue-100" : "text-gray-400"}`}>
+                      <span className={`text-[10px] ${isActive ? "text-[#f4e6bd]" : "text-gray-400"}`}>
                         {count}
                       </span>
                     </button>
@@ -116,10 +116,10 @@ export default function ObogListPage() {
                   href={`/player/${player.id}`}
                   className="bg-white border border-gray-100 rounded-xl px-4 py-3.5 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between gap-2 group min-w-0"
                 >
-                  <p className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors truncate">
+                  <p className="font-semibold text-gray-800 group-hover:text-[#10254a] transition-colors truncate">
                     {player.name}
                   </p>
-                  <svg className="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-gray-300 group-hover:text-[#c9a227] transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>

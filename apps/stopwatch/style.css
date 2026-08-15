@@ -11,10 +11,10 @@
   --text: #f1ede4;
   --text-dim: #a89f92;
   --ink-dim: #8a8072;
-  --accent: #3d8b85;
-  --accent-dim: #1b3f3c;
-  --danger: #3d8b85;
-  --danger-dim: #16332f;
+  --accent: #c9a227;
+  --accent-dim: #5a4715;
+  --danger: #c9a227;
+  --danger-dim: #5a4715;
   --lcd-bg: #c7cfbd;
   --lcd-ink: #383f31;
   --lcd-ink-dim: #6b7263;
@@ -631,9 +631,8 @@ html, body {
   height: 36px;
   padding: 0 10px;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--panel-2);
-  color: var(--text);
+  background: #c9a227;
+  color: #10254a;
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;

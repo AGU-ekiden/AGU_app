@@ -23,8 +23,8 @@ const API_URL = 'https://script.google.com/macros/s/XXXXX_REPLACE_WITH_YOUR_NEW_
 const TOKEN   = 'DXSKg8eg1kiMs6ysGC5hee2sCm8a';
 // タップで開くアプリ（Vercel）のURL（この新インスタンスの Vercel URL に置き換え）
 const APP_URL = 'https://XXXXX_REPLACE_WITH_YOUR_NEW_VERCEL_URL_XXXXX.vercel.app';
-// アクセントカラー（アプリと同じ緑）
-const ACCENT  = '#068c89';
+// アクセントカラー（アプリと同じ紺）
+const ACCENT  = '#10254a';
 // 何分ごとに更新を試みるか
 const REFRESH_MINUTES = 30;
 

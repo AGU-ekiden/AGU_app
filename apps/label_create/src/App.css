@@ -130,16 +130,16 @@ select {
 }
 
 .tab.active {
-  background: #1c1d21;
+  background: #10254a;
   color: #fff;
-  border-color: #1c1d21;
+  border-color: #10254a;
 }
 
 .primary-button {
   padding: 9px 14px;
   border: none;
   border-radius: 7px;
-  background: #1c1d21;
+  background: #10254a;
   color: #fff;
   font-size: 13px;
   font-weight: 600;

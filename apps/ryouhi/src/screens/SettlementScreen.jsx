@@ -286,7 +286,7 @@ export default function SettlementScreen() {
                         className={cn(
                           'border-b border-slate-100 hover:bg-slate-50/60',
                           i % 2 === 1 && 'bg-slate-50/30',
-                          isOpen && 'bg-blue-50/40'
+                          isOpen && 'bg-[#fdf8ec]/40'
                         )}
                       >
                         <td className="px-2 py-2">
@@ -531,7 +531,7 @@ function BreakdownDetail({ row }) {
       {row.otherRows.length > 0 && (
         <div className="rounded-lg border border-slate-200 bg-white p-3">
           <div className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-700">
-            <Tag className="h-4 w-4 text-sky-500" />
+            <Tag className="h-4 w-4 text-[#8a6d1f]" />
             その他費用明細
           </div>
           <table className="w-full text-xs">
@@ -553,7 +553,7 @@ function BreakdownDetail({ row }) {
                   <td className="py-1 text-right tabular-nums text-slate-500">
                     −{formatYen(o.subsidy)}
                   </td>
-                  <td className="py-1 text-right font-semibold tabular-nums text-sky-600">
+                  <td className="py-1 text-right font-semibold tabular-nums text-[#10254a]">
                     {formatYen(o.net)}
                   </td>
                 </tr>
@@ -566,7 +566,7 @@ function BreakdownDetail({ row }) {
                 <td className="py-1 text-right tabular-nums text-slate-400">
                   −{formatYen(row.otherSubsidy)}
                 </td>
-                <td className="py-1 text-right tabular-nums text-sky-600">
+                <td className="py-1 text-right tabular-nums text-[#10254a]">
                   {formatYen(row.other)}
                 </td>
               </tr>
@@ -580,7 +580,7 @@ function BreakdownDetail({ row }) {
 
 function SummaryCard({ icon: Icon, label, value, tone }) {
   const tones = {
-    blue: 'bg-blue-50 text-blue-600',
+    blue: 'bg-[#fdf8ec] text-[#10254a]',
     green: 'bg-green-50 text-green-600',
     violet: 'bg-violet-50 text-violet-600',
   }

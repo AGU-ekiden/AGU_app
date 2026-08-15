@@ -80,7 +80,7 @@ export default function PlayerListPage() {
         <h2 className="text-lg font-bold text-gray-800">選手一覧</h2>
         <Link
           href="/obog"
-          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-blue-600 bg-white border border-gray-200 hover:border-blue-300 rounded-full pl-3 pr-2.5 py-1.5 transition-colors shrink-0"
+          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#10254a] bg-white border border-gray-200 hover:border-[#dbbd57] rounded-full pl-3 pr-2.5 py-1.5 transition-colors shrink-0"
         >
           OB・OG
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,10 +106,10 @@ export default function PlayerListPage() {
                     href={`/player/${player.id}`}
                     className="bg-white border border-gray-100 rounded-xl px-5 py-3.5 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between group"
                   >
-                    <p className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+                    <p className="font-semibold text-gray-800 group-hover:text-[#10254a] transition-colors">
                       {player.name}
                     </p>
-                    <svg className="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 text-gray-300 group-hover:text-[#c9a227] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
@@ -158,7 +158,7 @@ export default function PlayerListPage() {
                   </span>
                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${
                     item.kind === "physical"
-                      ? "bg-blue-50 text-blue-600 border-blue-100"
+                      ? "bg-[#fdf8ec] text-[#10254a] border-[#f4e6bd]"
                       : "bg-green-50 text-green-600 border-green-100"
                   }`}>
                     {item.kind === "physical" ? "フィジカル" : "メディカル"}
@@ -177,7 +177,7 @@ export default function PlayerListPage() {
                   {item.data.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-1.5">
                       {item.data.tags.map((tag) => (
-                        <span key={tag} className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full font-medium border border-blue-100">
+                        <span key={tag} className="text-[10px] bg-[#fdf8ec] text-[#10254a] px-1.5 py-0.5 rounded-full font-medium border border-[#f4e6bd]">
                           {tag}
                         </span>
                       ))}
@@ -209,7 +209,7 @@ export default function PlayerListPage() {
                     {item.data.treatmentScope && (
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${
                         item.data.treatmentScope === "全身治療"
-                          ? "bg-blue-50 text-blue-600 border-blue-200"
+                          ? "bg-[#fdf8ec] text-[#10254a] border-[#e9d38f]"
                           : "bg-yellow-50 text-yellow-700 border-yellow-200"
                       }`}>
                         {item.data.treatmentScope}
@@ -228,7 +228,7 @@ export default function PlayerListPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-3 shadow-sm">
-        <div className="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold">S</div>
+        <div className="bg-[#10254a] text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold">S</div>
         <div>
           <h1 className="text-base font-bold text-gray-800 leading-tight">SPM カルテシステム</h1>
           <p className="text-xs text-gray-400">青山学院陸上部</p>
@@ -239,7 +239,7 @@ export default function PlayerListPage() {
         <button
           onClick={() => setActiveTab("players")}
           className={`flex-1 py-3 text-sm font-semibold transition-colors border-b-2 ${
-            activeTab === "players" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-400"
+            activeTab === "players" ? "border-[#10254a] text-[#10254a]" : "border-transparent text-gray-400"
           }`}
         >
           選手一覧
@@ -247,13 +247,13 @@ export default function PlayerListPage() {
         <button
           onClick={() => setActiveTab("recent")}
           className={`flex-1 py-3 text-sm font-semibold transition-colors border-b-2 flex items-center justify-center gap-1.5 ${
-            activeTab === "recent" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-400"
+            activeTab === "recent" ? "border-[#10254a] text-[#10254a]" : "border-transparent text-gray-400"
           }`}
         >
           最新の記録
           {allRecent.length > 0 && (
             <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
-              activeTab === "recent" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-400"
+              activeTab === "recent" ? "bg-[#f4e6bd] text-[#10254a]" : "bg-gray-100 text-gray-400"
             }`}>
               {allRecent.length}
             </span>
@@ -287,7 +287,7 @@ export default function PlayerListPage() {
                   <p className="text-sm font-bold text-gray-800">{quickViewItem.data.clientName}</p>
                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${
                     quickViewItem.kind === "physical"
-                      ? "bg-blue-50 text-blue-600 border-blue-100"
+                      ? "bg-[#fdf8ec] text-[#10254a] border-[#f4e6bd]"
                       : "bg-green-50 text-green-600 border-green-100"
                   }`}>
                     {quickViewItem.kind === "physical" ? "フィジカル" : "メディカル"}
@@ -328,7 +328,7 @@ export default function PlayerListPage() {
                       <p className="text-xs font-semibold text-gray-500 mb-1">タグ</p>
                       <div className="flex flex-wrap gap-1">
                         {quickViewItem.data.tags.map((tag) => (
-                          <span key={tag} className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium border border-blue-100">
+                          <span key={tag} className="text-[10px] bg-[#fdf8ec] text-[#10254a] px-2 py-0.5 rounded-full font-medium border border-[#f4e6bd]">
                             {tag}
                           </span>
                         ))}
@@ -338,7 +338,7 @@ export default function PlayerListPage() {
 
                   {quickViewItem.data.trainingContent && (
                     <div>
-                      <p className="text-xs font-semibold text-blue-500 mb-0.5">トレーニング内容</p>
+                      <p className="text-xs font-semibold text-[#8a6d1f] mb-0.5">トレーニング内容</p>
                       <p className="text-xs text-gray-600 whitespace-pre-wrap leading-relaxed">
                         {quickViewItem.data.trainingContent}
                       </p>
@@ -439,7 +439,7 @@ export default function PlayerListPage() {
                       <p className="text-xs font-semibold text-gray-500 mb-0.5">治療範囲</p>
                       <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${
                         quickViewItem.data.treatmentScope === "全身治療"
-                          ? "bg-blue-50 text-blue-600 border-blue-200"
+                          ? "bg-[#fdf8ec] text-[#10254a] border-[#e9d38f]"
                           : "bg-yellow-50 text-yellow-700 border-yellow-200"
                       }`}>
                         {quickViewItem.data.treatmentScope}
@@ -461,7 +461,7 @@ export default function PlayerListPage() {
               {quickViewItem.data.playerId && (
                 <Link
                   href={`/player/${quickViewItem.data.playerId}`}
-                  className="mt-1 text-center text-sm text-blue-600 font-semibold hover:underline"
+                  className="mt-1 text-center text-sm text-[#10254a] font-semibold hover:underline"
                 >
                   選手ページを開く →
                 </Link>

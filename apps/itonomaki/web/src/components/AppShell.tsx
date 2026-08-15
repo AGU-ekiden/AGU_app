@@ -63,7 +63,7 @@ export function AppShell({
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-[var(--border)] bg-[var(--surface)]/90 px-4 py-3 backdrop-blur md:px-8 print:hidden">
           <a
             href="https://agu-portal.pages.dev/"
-            className="hidden sm:inline-flex items-center rounded-md border border-[var(--border)] px-2 py-1 text-xs font-bold text-[var(--fg)] hover:bg-[var(--surface-2)]"
+            className="hidden sm:inline-flex items-center rounded-md bg-[#c9a227] px-2 py-1 text-xs font-bold text-[#10254a] hover:bg-[#dbbd57]"
           >
             ← ポータル
           </a>

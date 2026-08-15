@@ -84,7 +84,7 @@ export default function MiniCalendar({
           <span className="w-1.5 h-1.5 rounded-full bg-green-500" />メディカル
         </span>
         <span className="flex items-center gap-1 text-[9px] text-gray-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />パーソナル
+          <span className="w-1.5 h-1.5 rounded-full bg-[#8a6d1f]" />パーソナル
         </span>
         <span className="flex items-center gap-1 text-[9px] text-gray-400">
           <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />大会
@@ -101,7 +101,7 @@ export default function MiniCalendar({
         {DAY_NAMES.map((d, i) => (
           <div
             key={d}
-            className={`text-center text-[10px] font-medium py-0.5 ${i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-gray-400"}`}
+            className={`text-center text-[10px] font-medium py-0.5 ${i === 0 ? "text-red-400" : i === 6 ? "text-[#c9a227]" : "text-gray-400"}`}
           >
             {d}
           </div>
@@ -146,7 +146,7 @@ export default function MiniCalendar({
           const textColor = col === 0
             ? "text-red-400"
             : col === 6
-            ? "text-blue-500"
+            ? "text-[#8a6d1f]"
             : hasActivity
             ? "text-gray-700"
             : "text-gray-300";
@@ -171,7 +171,7 @@ export default function MiniCalendar({
                   </span>
                 )}
                 {hasPersonal && (
-                  <span className="text-[6px] font-bold text-center px-0.5 rounded leading-tight w-full truncate bg-blue-100 text-blue-600">
+                  <span className="text-[6px] font-bold text-center px-0.5 rounded leading-tight w-full truncate bg-[#f4e6bd] text-[#10254a]">
                     パーソナル
                   </span>
                 )}
