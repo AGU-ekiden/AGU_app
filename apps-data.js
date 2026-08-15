@@ -62,16 +62,6 @@ window.APPS = [
     stack: 'Vanilla JS + GAS(スプレッドシートDB)',
   },
   {
-    id: 'task',
-    name: 'タスク管理',
-    description: 'taskkyoyu と同系統のタスク管理アプリ(優先度ラベルの構成が異なる別デプロイ)。',
-    category: 'ops',
-    icon: '📝',
-    repoUrl: `${REPO_TREE}/apps/task`,
-    liveUrl: 'https://task-ochre-one-88.vercel.app',
-    stack: 'Vanilla JS + GAS(スプレッドシートDB)',
-  },
-  {
     id: 'ryouhi',
     name: '寮費・食費清算',
     description: '寮生の会費・食費の月次清算管理システム。集金用PDFの一括出力に対応。',

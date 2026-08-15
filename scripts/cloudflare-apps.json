@@ -35,14 +35,6 @@
       "envVars": []
     },
     {
-      "id": "task",
-      "projectName": "agu-task",
-      "rootDir": "apps/task",
-      "buildCommand": "",
-      "destinationDir": "",
-      "envVars": []
-    },
-    {
       "id": "meal_traker",
       "projectName": "agu-meal-traker",
       "rootDir": "apps/meal_traker",

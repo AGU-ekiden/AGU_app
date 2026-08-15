@@ -94,7 +94,6 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 | Joy-Con ストップウォッチ / レーシングウォッチ (tokei) | 計測・トレーニング | https://joycontimer.vercel.app (推定・要確認) |
 | ストップウォッチ(タバタ/補強/ストレッチ/山試走/ペース計算/点呼を含む) | 計測・トレーニング | 未確認 |
 | タスク共有 (taskkyoyu) | チーム運営・事務 | 未確認 |
-| タスク管理 (task) | チーム運営・事務 | https://task-ochre-one-88.vercel.app |
 | 寮費・食費清算 (ryouhi) | チーム運営・事務 | 未確認 |
 | 食数管理 (meal_traker) | チーム運営・事務 | 未確認 |
 | 会員ラベル作成 (label_create) | チーム運営・事務 | https://label-create-alpha.vercel.app |
