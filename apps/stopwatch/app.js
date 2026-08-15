@@ -108,16 +108,19 @@ function selectTab(tabName) {
   Object.entries(el.tabPanels).forEach(([name, panel]) => {
     panel.hidden = name !== tabName;
   });
-  el.appTopbarTitle.textContent = TAB_LABELS[tabName] || '';
+  const label = TAB_LABELS[tabName] || '';
+  el.appTopbarTitle.textContent = label;
+  // 複数の機能(タバタ・点呼・補強など)が同じアプリを指しているため、
+  // ブラウザのタブ名でも見分けられるようにタブごとに document.title を変える。
+  document.title = label ? `${label} | ストップウォッチ` : 'ストップウォッチ';
   return true;
 }
 
 // ポータルなど外部からの直リンク用: URLの #タブ名 (例: #tabata) で
-// 該当タブを開いた状態にする。存在しないタブ名や指定なしのときは
-// HTML側の初期状態(計測タブ)のまま。
+// 該当タブを開いた状態にする。指定が無い/存在しないタブ名のときは計測タブ。
 (function openTabFromUrlHash() {
   const tabName = location.hash.replace(/^#/, '');
-  if (tabName) selectTab(tabName);
+  if (!selectTab(tabName)) selectTab('timer');
 })();
 
 /* ---------- Pace calculator ---------- */
