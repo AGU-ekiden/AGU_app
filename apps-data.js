@@ -97,7 +97,7 @@ window.APPS = [
     category: 'medical',
     icon: '🩺',
     repoUrl: `${REPO_TREE}/apps/tiryou-karte`,
-    liveUrl: 'https://tiryou-karte.vercel.app',
+    liveUrl: 'https://agu-tiryou-karte.aoyamagakuin-shimoda.workers.dev',
     stack: 'Next.js + Notion API',
   },
   {
