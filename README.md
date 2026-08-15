@@ -20,12 +20,11 @@ AGU_app/
     ├── meal_traker/       静的HTML(単一ファイル)
     ├── label_create/      React (Vite) + TypeScript
     ├── tiryou-karte/      Next.js + Notion API
-    └── itonomaki/
-        ├── web/           ← デプロイ対象はこちら(Next.js)
-        └── notion_sync/   Notion同期用スクリプト(Python、非デプロイ)
+    ├── itonomaki/
+    │   ├── web/           ← デプロイ対象はこちら(Next.js)
+    │   └── notion_sync/   Notion同期用スクリプト(Python、非デプロイ)
+    └── spm-medical-record/ Next.js + Notion API
 ```
-
-`spm-medical-record`(フィジカルカルテ)のみ、まだこのモノレポに取り込んでおらず別リポジトリ(`ekidenagustaff-debug/SPM-medical-record`)のままです。取り込む場合は同様に `apps/spm-medical-record/` を作成してください。
 
 ## Vercelへのデプロイ(アプリごとに別プロジェクト)
 
@@ -48,6 +47,7 @@ AGU_app/
 | label_create | `apps/label_create` | Vite(自動検出) |
 | tiryou-karte | `apps/tiryou-karte` | Next.js(自動検出) |
 | itonomaki | `apps/itonomaki/web` | Next.js(自動検出) |
+| spm-medical-record | `apps/spm-medical-record` | Next.js(自動検出) |
 
 ポータル自体(ルート直下)は `Root Directory` を空(リポジトリルート)にして、`Other` プリセットでデプロイします。
 
@@ -91,18 +91,20 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 
 ## 現在掲載しているアプリ
 
-| アプリ | カテゴリ | 状態 | デプロイURL |
-| --- | --- | --- | --- |
-| Joy-Con ストップウォッチ / レーシングウォッチ (tokei) | 計測・トレーニング | モノレポ内 | https://joycontimer.vercel.app (推定・要確認) |
-| ストップウォッチ(タバタ/補強/ストレッチ/山試走/ペース計算/点呼を含む) | 計測・トレーニング | モノレポ内 | 未確認 |
-| タスク共有 (taskkyoyu) | チーム運営・事務 | モノレポ内 | 未確認 |
-| タスク管理 (task) | チーム運営・事務 | モノレポ内 | https://task-ochre-one-88.vercel.app |
-| 寮費・食費清算 (ryouhi) | チーム運営・事務 | モノレポ内 | 未確認 |
-| 食数管理 (meal_traker) | チーム運営・事務 | モノレポ内 | 未確認 |
-| 会員ラベル作成 (label_create) | チーム運営・事務 | モノレポ内 | https://label-create-alpha.vercel.app |
-| メディカルカルテ (tiryou-karte) | メディカル | モノレポ内 | https://tiryou-karte.vercel.app |
-| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | モノレポ内 | 未確認 |
-| フィジカルカルテ(SPM) (spm-medical-record) | メディカル | **別リポジトリのまま** | https://spm-medical-record.vercel.app |
+すべて `apps/` 以下にモノレポとして取り込み済みです。
+
+| アプリ | カテゴリ | デプロイURL |
+| --- | --- | --- |
+| Joy-Con ストップウォッチ / レーシングウォッチ (tokei) | 計測・トレーニング | https://joycontimer.vercel.app (推定・要確認) |
+| ストップウォッチ(タバタ/補強/ストレッチ/山試走/ペース計算/点呼を含む) | 計測・トレーニング | 未確認 |
+| タスク共有 (taskkyoyu) | チーム運営・事務 | 未確認 |
+| タスク管理 (task) | チーム運営・事務 | https://task-ochre-one-88.vercel.app |
+| 寮費・食費清算 (ryouhi) | チーム運営・事務 | 未確認 |
+| 食数管理 (meal_traker) | チーム運営・事務 | 未確認 |
+| 会員ラベル作成 (label_create) | チーム運営・事務 | https://label-create-alpha.vercel.app |
+| メディカルカルテ (tiryou-karte) | メディカル | https://tiryou-karte.vercel.app |
+| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | 未確認 |
+| フィジカルカルテ(SPM) (spm-medical-record) | メディカル | https://spm-medical-record.vercel.app |
 
 「未確認」のアプリは実際のデプロイURLが分かり次第 `apps-data.js` の `liveUrl` を埋めてください。`tokei` の URL は同名アプリ("Joy-Con Stopwatch")のものと推測していますが未検証のため、確認後は `urlConfidence: 'guess'` の行を削除してください。
 

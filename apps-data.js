@@ -127,12 +127,11 @@ window.APPS = [
   {
     id: 'spm-medical-record',
     name: 'フィジカルカルテ(SPM)',
-    description: 'フィジカルトレーナーがフィジカルカルテを記録するアプリ。記録内容は tiryou-karte の選手ページにも統合表示される。このモノレポにはまだ取り込まれておらず、別リポジトリ(ekidenagustaff-debug/SPM-medical-record)のまま。',
+    description: 'フィジカルトレーナーがフィジカルカルテを記録するアプリ。記録内容は tiryou-karte の選手ページにも統合表示される。',
     category: 'medical',
     icon: '💊',
-    repoUrl: 'https://github.com/ekidenagustaff-debug/SPM-medical-record',
+    repoUrl: `${REPO_TREE}/apps/spm-medical-record`,
     liveUrl: 'https://spm-medical-record.vercel.app',
-    stack: 'React + TypeScript',
-    external: true,
+    stack: 'Next.js + Notion API',
   },
 ];
