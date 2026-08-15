@@ -3,7 +3,12 @@ import { KarteRecord, KarteFormData, PlayerInfo, RaceResult, PersonalKarteRecord
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { ALL_BLOOD_TEST_ITEMS } from "@/lib/bloodTestItems";
 
-const notion = new Client({ auth: process.env.NOTION_TOKEN });
+// @notionhq/client はデフォルトで node-fetch(Node の http モジュール実装)を
+// 使うが、Cloudflare Workers の nodejs_compat 互換レイヤーではこれが
+// 壊れる(TypeError: Cannot read properties of null (reading 'has')が
+// ClientRequest._storeHeader 内で発生する)。Workers/ブラウザ標準の
+// グローバル fetch を明示的に渡すことで node-fetch経由の呼び出しを回避する。
+const notion = new Client({ auth: process.env.NOTION_TOKEN, fetch: globalThis.fetch });
 const DATABASE_ID = process.env.NOTION_MEDICAL_KARTE_DATABASE_ID!;
 const MEMBERS_DATABASE_ID = process.env.NOTION_MEMBERS_DATABASE_ID!;
 const RACE_RESULTS_DATABASE_ID = process.env.NOTION_RACE_RESULTS_DATABASE_ID!;
