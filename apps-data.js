@@ -37,8 +37,7 @@ window.APPS = [
     category: 'measure',
     icon: '⏱️',
     repoUrl: `${REPO_TREE}/apps/tokei`,
-    liveUrl: 'https://joycontimer.vercel.app',
-    urlConfidence: 'guess',
+    liveUrl: 'https://agu-tokei.pages.dev',
     stack: '静的HTML(単一ファイル)',
   },
   {
@@ -48,7 +47,7 @@ window.APPS = [
     category: 'measure',
     icon: '⏲️',
     repoUrl: `${REPO_TREE}/apps/stopwatch`,
-    liveUrl: null,
+    liveUrl: 'https://agu-stopwatch.pages.dev',
     stack: 'Vanilla JS / PWA',
   },
   {
@@ -58,7 +57,7 @@ window.APPS = [
     category: 'ops',
     icon: '✅',
     repoUrl: `${REPO_TREE}/apps/taskkyoyu`,
-    liveUrl: null,
+    liveUrl: 'https://agu-taskkyoyu.pages.dev',
     stack: 'Vanilla JS + GAS(スプレッドシートDB)',
   },
   {
@@ -68,7 +67,7 @@ window.APPS = [
     category: 'ops',
     icon: '🧾',
     repoUrl: `${REPO_TREE}/apps/ryouhi`,
-    liveUrl: null,
+    liveUrl: 'https://agu-ryouhi.pages.dev',
     stack: 'React (Vite) + Tailwind + GAS',
   },
   {
@@ -78,7 +77,7 @@ window.APPS = [
     category: 'ops',
     icon: '🍚',
     repoUrl: `${REPO_TREE}/apps/meal_traker`,
-    liveUrl: null,
+    liveUrl: 'https://agu-meal-traker.pages.dev',
     stack: '静的HTML(単一ファイル)',
   },
   {
@@ -88,7 +87,7 @@ window.APPS = [
     category: 'ops',
     icon: '🏷️',
     repoUrl: `${REPO_TREE}/apps/label_create`,
-    liveUrl: 'https://label-create-alpha.vercel.app',
+    liveUrl: 'https://agu-label-create.pages.dev',
     stack: 'React (Vite) + TypeScript',
   },
   {
