@@ -83,6 +83,29 @@ npm run cf:deploy       # = opennextjs-cloudflare build && wrangler deploy
 `wrangler login` の代わりに `CLOUDFLARE_API_TOKEN` 環境変数(Workers編集権限
 付き)を設定しておいても実行できます。
 
+### 自動デプロイ(GitHub Actions)
+
+`.github/workflows/deploy-tiryou-karte.yml`・`deploy-spm-medical-record.yml`・
+`deploy-itonomaki.yml` を用意済みです。各アプリのディレクトリに変更を
+push(`main`ブランチ)すると、GitHub Actionsが自動で `npm run cf:deploy` を
+実行します。手元でコマンドを打たなくても、コードを変更してpushするだけで
+デプロイされるようになります。
+
+利用するには、GitHubリポジトリの **Settings → Secrets and variables →
+Actions** で以下の2つを登録してください。
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+
+登録されていない場合、ワークフローはエラーで失敗します(手動での
+`npm run cf:deploy` には影響しません)。Secrets登録後の最初の1回は、
+GitHubの「Actions」タブから該当ワークフローを開き「Run workflow」で
+手動実行することもできます(`workflow_dispatch` に対応済み)。
+
+環境変数(Notionトークンなど)はこのワークフローでは設定されません。
+`wrangler secret put` で事前にCloudflare側に設定しておいた値がそのまま
+使われます(secretsはデプロイのたびに消えたりしません)。
+
 ### 各アプリで必要な環境変数(Secrets)
 
 Workerの環境変数(Secrets)は `wrangler secret put` で1つずつ設定します
