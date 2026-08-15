@@ -106,16 +106,31 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') setTabDrawerOpen(false);
 });
 
+function selectTab(tabName) {
+  const btn = Array.from(el.tabButtons).find((b) => b.dataset.tab === tabName);
+  if (!btn) return false;
+  el.tabButtons.forEach((b) => b.classList.toggle('is-active', b === btn));
+  Object.entries(el.tabPanels).forEach(([name, panel]) => {
+    panel.hidden = name !== tabName;
+  });
+  el.appTopbarTitle.textContent = btn.textContent;
+  return true;
+}
+
 el.tabButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
-    el.tabButtons.forEach((b) => b.classList.toggle('is-active', b === btn));
-    Object.entries(el.tabPanels).forEach(([name, panel]) => {
-      panel.hidden = name !== btn.dataset.tab;
-    });
-    el.appTopbarTitle.textContent = btn.textContent;
+    selectTab(btn.dataset.tab);
     setTabDrawerOpen(false);
   });
 });
+
+// ポータルなど外部からの直リンク用: URLの #タブ名 (例: #tabata) で
+// 該当タブを開いた状態にする。存在しないタブ名や指定なしのときは
+// HTML側の初期状態(計測タブ)のまま。
+(function openTabFromUrlHash() {
+  const tabName = location.hash.replace(/^#/, '');
+  if (tabName) selectTab(tabName);
+})();
 
 /* ---------- Pace calculator ---------- */
 // Accepts plain seconds ("270", "83.5") or minute:second ("4:30", "1:23.4",

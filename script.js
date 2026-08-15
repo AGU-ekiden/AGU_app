@@ -112,6 +112,9 @@
     if (!feature) return '';
     const app = feature.target ? getApp(feature.target) : null;
     const link = feature.target ? resolveAppLink(app) : null;
+    if (link && feature.hash && link.kind !== 'repo') {
+      link.url = `${link.url}#${feature.hash}`;
+    }
 
     const noteHtml = feature.note ? `<span class="feature-note">${escapeHtml(feature.note)}</span>` : '';
 

@@ -5,16 +5,18 @@
 //   icon:   絵文字アイコン
 //   target: apps-data.js の APPS[].id への参照。まだアプリが無い機能は null にする
 //   note:   アプリ内のどの画面/タブを指すかの補足(無ければ null)
+//   hash:   指定するとリンクURLの末尾に #hash を付ける(stopwatchアプリの
+//           URLハッシュによるタブ直リンクに対応。apps/stopwatch/app.js 参照)
 //
 // ROLES: 役割の一覧。features は上記 FEATURES のキーを、表示したい順番で並べた配列。
 window.FEATURES = {
-  stopwatch_main: { name: 'ストップウォッチ', icon: '⏱️', target: 'stopwatch', note: null },
-  tabata: { name: 'タバタ', icon: '🔥', target: 'stopwatch', note: '「TABATA」タブ' },
-  reinforce: { name: '補強カウント', icon: '💪', target: 'stopwatch', note: '「補強フル/コアA/コアB/ループ/下肢」タブ' },
-  stretch: { name: 'ストレッチ', icon: '🧘', target: 'stopwatch', note: '「ストレッチ」タブ' },
-  pace: { name: 'ペース計算', icon: '📏', target: 'stopwatch', note: '「距離」タブ' },
-  crossing: { name: '山試走', icon: '⛰️', target: 'stopwatch', note: '「山試走」タブ' },
-  rollcall: { name: '点呼', icon: '🙋', target: 'stopwatch', note: '「点呼」タブ' },
+  stopwatch_main: { name: 'ストップウォッチ', icon: '⏱️', target: 'stopwatch', hash: 'timer', note: null },
+  tabata: { name: 'タバタ', icon: '🔥', target: 'stopwatch', hash: 'tabata', note: '「TABATA」タブ' },
+  reinforce: { name: '補強カウント', icon: '💪', target: 'stopwatch', hash: 'reinforceFull', note: '「補強フル」タブを開く(コアA/コアB/ループ/下肢はアプリ内メニューから切替)' },
+  stretch: { name: 'ストレッチ', icon: '🧘', target: 'stopwatch', hash: 'stretch', note: '「ストレッチ」タブ' },
+  pace: { name: 'ペース計算', icon: '📏', target: 'stopwatch', hash: 'pace', note: '「距離」タブ' },
+  crossing: { name: '山試走', icon: '⛰️', target: 'stopwatch', hash: 'crossing', note: '「山試走」タブ' },
+  rollcall: { name: '点呼', icon: '🙋', target: 'stopwatch', hash: 'rollcall', note: '「点呼」タブ' },
   racing_watch: { name: 'レーシングウォッチ', icon: '📷', target: 'tokei', note: 'カメラ同期ストップウォッチ' },
   aotore: { name: '青トレデータフォルダ', icon: '📚', target: 'itonomaki', note: null },
   blood: { name: '血液検査確認', icon: '🩸', target: 'tiryou-karte', note: null },

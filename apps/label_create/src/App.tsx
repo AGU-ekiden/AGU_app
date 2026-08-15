@@ -38,7 +38,19 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <header className="app-header no-print">
+      <header className="app-header no-print" style={{ position: 'relative' }}>
+        <a
+          href="https://agu-portal.pages.dev/"
+          style={{
+            position: 'absolute', top: 16, right: 28,
+            display: 'inline-flex', alignItems: 'center',
+            height: 28, padding: '0 10px', borderRadius: 8,
+            border: '1px solid #d8d9de', background: '#f5f5f7',
+            color: '#333', fontSize: 12, fontWeight: 700, textDecoration: 'none',
+          }}
+        >
+          ← ポータル
+        </a>
         <h1>会員ラベル作成</h1>
         <p>スプレッドシートの会員データから、印刷用のラベルシートを作成します。</p>
       </header>

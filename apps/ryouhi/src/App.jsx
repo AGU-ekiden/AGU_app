@@ -86,6 +86,12 @@ function AppShell() {
         <div className="mx-auto max-w-7xl px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
+              <a
+                href="https://agu-portal.pages.dev/"
+                className="hidden sm:inline-flex items-center rounded-md border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+              >
+                ← ポータル
+              </a>
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
                 <Building2 className="h-5 w-5" />
               </div>
