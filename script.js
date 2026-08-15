@@ -133,7 +133,7 @@
 
     const statusClass = link.kind === 'repo' ? 'repo' : (link.kind === 'guess' ? 'guess' : 'live');
     return `
-      <a class="feature-item" href="${link.url}" target="_blank" rel="noopener noreferrer">
+      <a class="feature-item" href="${link.url}">
         <span class="feature-icon">${feature.icon}</span>
         <span class="feature-body">
           <span class="feature-name">${escapeHtml(feature.name)}</span>
@@ -174,7 +174,7 @@
     const link = resolveAppLink(app);
     const statusClass = link.kind === 'repo' ? 'repo' : (link.kind === 'guess' ? 'guess' : 'live');
     return `
-      <a class="card" href="${link.url}" target="_blank" rel="noopener noreferrer">
+      <a class="card" href="${link.url}">
         <div class="card-top">
           <span class="card-icon">${app.icon}</span>
           <span class="card-name">${escapeHtml(app.name)}</span>
