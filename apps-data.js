@@ -2,9 +2,9 @@
 //
 // このリポジトリはモノレポ構成で、各アプリの実体は apps/<id>/ 以下に
 // コピーされている(元のリポジトリとは切り離し済み。以後の改良はこの
-// リポジトリの apps/<id>/ で行う)。Vercel には apps/<id>/ (rootDir が
-// 指定されている場合はそちら)を Root Directory にしたプロジェクトを
-// アプリごとに1つずつ作成してデプロイする。
+// リポジトリの apps/<id>/ で行う)。デプロイ先はCloudflare
+// (静的/Viteアプリ→Cloudflare Pages、Next.jsアプリ→Cloudflare Workers)。
+// 詳細は scripts/README.md 参照。
 //
 // 新しいアプリを追加するときは、apps/<id>/ にコードを置いた上で、この
 // 配列にオブジェクトを1つ足してください。
@@ -16,13 +16,11 @@
 // category:    "measure" | "ops" | "medical" のいずれか(下の CATEGORIES に対応)
 // icon:        絵文字アイコン
 // repoUrl:     コード参照先URL(通常はこのリポジトリの apps/<id> フォルダ)
-// rootDir:     Vercelプロジェクト作成時に Root Directory に指定するパス。
-//               省略時は `apps/<id>` と同じ
+// rootDir:     デプロイ設定のRoot Directoryに指定するパス。省略時は `apps/<id>` と同じ
+//               (itonomakiのみ apps/itonomaki/web)
 // liveUrl:     デプロイ済みアプリのURL。未確認/未デプロイの場合は null にしておく
 // urlConfidence: "guess"(推定、要確認) | undefined(確認済みとして扱う)
 // stack:       技術スタックの短い説明
-// external:    true の場合、このモノレポには取り込まれておらず、別リポジトリの
-//               ままであることを示す(現状 spm-medical-record のみ)
 const REPO_TREE = 'https://github.com/AGU-ekiden/AGU_app/tree/main';
 
 window.CATEGORIES = [

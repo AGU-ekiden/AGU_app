@@ -1,0 +1,73 @@
+{
+  "repo": { "owner": "AGU-ekiden", "name": "AGU_app" },
+  "productionBranch": "main",
+  "apps": [
+    {
+      "id": "portal",
+      "projectName": "agu-portal",
+      "rootDir": "",
+      "buildCommand": "",
+      "destinationDir": "",
+      "envVars": []
+    },
+    {
+      "id": "tokei",
+      "projectName": "agu-tokei",
+      "rootDir": "apps/tokei",
+      "buildCommand": "",
+      "destinationDir": "",
+      "envVars": []
+    },
+    {
+      "id": "stopwatch",
+      "projectName": "agu-stopwatch",
+      "rootDir": "apps/stopwatch",
+      "buildCommand": "",
+      "destinationDir": "",
+      "envVars": []
+    },
+    {
+      "id": "taskkyoyu",
+      "projectName": "agu-taskkyoyu",
+      "rootDir": "apps/taskkyoyu",
+      "buildCommand": "",
+      "destinationDir": "",
+      "envVars": []
+    },
+    {
+      "id": "task",
+      "projectName": "agu-task",
+      "rootDir": "apps/task",
+      "buildCommand": "",
+      "destinationDir": "",
+      "envVars": []
+    },
+    {
+      "id": "meal_traker",
+      "projectName": "agu-meal-traker",
+      "rootDir": "apps/meal_traker",
+      "buildCommand": "",
+      "destinationDir": "",
+      "envVars": []
+    },
+    {
+      "id": "ryouhi",
+      "projectName": "agu-ryouhi",
+      "rootDir": "apps/ryouhi",
+      "buildCommand": "npm run build",
+      "destinationDir": "dist",
+      "envVars": [
+        { "key": "VITE_GAS_API_URL", "required": false, "note": "未設定でもダミーデータで動作" },
+        { "key": "VITE_USE_DUMMY_DATA", "required": false, "note": "true/false" }
+      ]
+    },
+    {
+      "id": "label_create",
+      "projectName": "agu-label-create",
+      "rootDir": "apps/label_create",
+      "buildCommand": "npm run build",
+      "destinationDir": "dist",
+      "envVars": []
+    }
+  ]
+}

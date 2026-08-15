@@ -12,6 +12,8 @@ node_modules/
 dist/
 .next/
 build/
+.open-next/
+.wrangler/
 
 # OS/エディタ
 .DS_Store

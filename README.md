@@ -26,34 +26,26 @@ AGU_app/
     └── spm-medical-record/ Next.js + Notion API
 ```
 
-## Vercelへのデプロイ(アプリごとに別プロジェクト)
+## デプロイ先: Cloudflare
 
-各アプリは**別々のVercelプロジェクト**として、このリポジトリを共通のソースにしつつ `Root Directory` だけを変えてデプロイします。
+このリポジトリは **Cloudflare** に統一してデプロイします。アプリの種類で2つの経路に分かれます。
 
-1. Vercelで「Add New Project」→ このリポジトリ(`AGU-ekiden/AGU_app`)を選択
-2. `Root Directory` に対象アプリのパスを指定(下表)
-3. `Framework Preset` は基本 `Other`(Vite/Next.jsのアプリは自動検出されるのでそのままでOK)
-4. アプリごとに必要な環境変数(GASのURL、Notionトークンなど)を設定
-5. プロジェクト名はアプリ名にしておくと分かりやすい(例: `agu-stopwatch`)
-
-| アプリ | Root Directory | Framework Preset |
+| 種類 | 対象アプリ | デプロイ先 |
 | --- | --- | --- |
-| tokei | `apps/tokei` | Other |
-| stopwatch | `apps/stopwatch` | Other |
-| taskkyoyu | `apps/taskkyoyu` | Other |
-| task | `apps/task` | Other |
-| ryouhi | `apps/ryouhi` | Vite(自動検出) |
-| meal_traker | `apps/meal_traker` | Other |
-| label_create | `apps/label_create` | Vite(自動検出) |
-| tiryou-karte | `apps/tiryou-karte` | Next.js(自動検出) |
-| itonomaki | `apps/itonomaki/web` | Next.js(自動検出) |
-| spm-medical-record | `apps/spm-medical-record` | Next.js(自動検出) |
+| 静的サイト・Viteアプリ | tokei, stopwatch, taskkyoyu, task, meal_traker, ryouhi, label_create, ポータル本体 | **Cloudflare Pages** |
+| Next.js(SSR/API Routes) | tiryou-karte, spm-medical-record, itonomaki | **Cloudflare Workers**(`@opennextjs/cloudflare`) |
 
-ポータル自体(ルート直下)は `Root Directory` を空(リポジトリルート)にして、`Other` プリセットでデプロイします。
+セットアップ手順・スクリプトは `scripts/README.md` にまとめています。要点:
+
+- 静的/Viteアプリは `scripts/setup_cloudflare.py` でPagesプロジェクトを一括作成
+- Next.jsアプリは各ディレクトリで `npm run cf:deploy`(= `opennextjs-cloudflare build && wrangler deploy`)を実行してWorkerとしてデプロイ
+- Next.jsアプリのうち、Cloudflareでは動かない機能(FTP経由の写真/音声アップロード、`@vercel/blob`)については `scripts/README.md` の「既知の制限」を参照
+
+(以前はVercelでの運用を試していた名残として `scripts/setup_vercel.py` / `vercel-apps.json` も残っていますが、現在はCloudflareが正の方針です)
 
 ## アプリを改良する
 
-各アプリのコードは `apps/<アプリID>/` の下にあります。中の `README.md` に元々のセットアップ手順が書かれているので参考にしつつ、通常のコード変更と同じように編集してください。変更後、対応するVercelプロジェクトが自動で再デプロイされます。
+各アプリのコードは `apps/<アプリID>/` の下にあります。中の `README.md` に元々のセットアップ手順が書かれているので参考にしつつ、通常のコード変更と同じように編集してください。Next.jsアプリはCloudflare向けに `next` を `16.3.1` 以上に、`@opennextjs/cloudflare` と `wrangler` を追加済みです。
 
 ## ポータルにアプリを追加・編集する
 
@@ -91,9 +83,13 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 
 ## 現在掲載しているアプリ
 
-すべて `apps/` 以下にモノレポとして取り込み済みです。
+すべて `apps/` 以下にモノレポとして取り込み済みです。デプロイURL欄は
+**Cloudflareへの移行前の旧URL(主にVercel)** で、まだ生きている可能性は
+ありますが今後の正とはしません。Cloudflareへのデプロイが完了次第、
+`apps-data.js` の `liveUrl` を新しいURL(`*.pages.dev` / `*.workers.dev` など)
+に更新してください。
 
-| アプリ | カテゴリ | デプロイURL |
+| アプリ | カテゴリ | 旧デプロイURL(参考) |
 | --- | --- | --- |
 | Joy-Con ストップウォッチ / レーシングウォッチ (tokei) | 計測・トレーニング | https://joycontimer.vercel.app (推定・要確認) |
 | ストップウォッチ(タバタ/補強/ストレッチ/山試走/ペース計算/点呼を含む) | 計測・トレーニング | 未確認 |
@@ -103,32 +99,22 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 | 食数管理 (meal_traker) | チーム運営・事務 | 未確認 |
 | 会員ラベル作成 (label_create) | チーム運営・事務 | https://label-create-alpha.vercel.app |
 | メディカルカルテ (tiryou-karte) | メディカル | https://tiryou-karte.vercel.app |
-| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | https://itonomaki-55ve.vercel.app (旧リポジトリのデプロイ。stopwatchのコード内に直書きされていたURL) |
+| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | https://itonomaki-55ve.vercel.app (旧リポジトリのデプロイ) |
 | フィジカルカルテ(SPM) (spm-medical-record) | メディカル | https://spm-medical-record.vercel.app |
 
 「未確認」のアプリは実際のデプロイURLが分かり次第 `apps-data.js` の `liveUrl` を埋めてください。`tokei` の URL は同名アプリ("Joy-Con Stopwatch")のものと推測していますが未検証のため、確認後は `urlConfidence: 'guess'` の行を削除してください。
 
 「故障者報告確認」はまだどのアプリにも実装されていない機能のため、メニュー上は「準備中」と表示されます。実装後に `roles-data.js` の `injury_report.target` を設定してください。
 
-## Vercelプロジェクトの一括作成
+## itonomakiについて
 
-`scripts/setup_vercel.py` でアプリごとのVercelプロジェクト作成・Root Directory
-設定・環境変数投入を自動化できます。手順は `scripts/README.md` を参照してくだ
-さい。
-
-### itonomakiは既存プロジェクトを繋ぎ直す
-
-`itonomaki-55ve` が本番で稼働中の実体で、`stopwatch` のコードにもこのURLが
-直書きされています。そのため `itonomaki` だけは新規Vercelプロジェクトを
-作らず、既存の `itonomaki-55ve` プロジェクトのGit連携をこのリポジトリに
-張り替える方式にしています(URL・既存の環境変数を維持するため)。手順は
-`scripts/README.md` の「itonomaki: 既存プロジェクトの繋ぎ直し」を参照して
-ください。この方式なら `stopwatch` 側の修正は不要です。
-
+旧本番環境 `itonomaki-55ve`(Vercel)からCloudflareへ移行しました。
 `src/lib/github.ts` はWeb編集機能(`/edit`)の保存先として旧リポジトリ
 `itoaogaku/itonomaki` を直書きしていましたが、このモノレポ
 (`AGU-ekiden/AGU_app`、パス `apps/itonomaki/notion_sync/content`)向けに
-修正済みです。
+修正済みです。`stopwatch` のコード内に残っている `itonomaki-55ve` のURL
+参照、およびFTP依存機能(写真/音声アップロード・点呼名簿)については
+`scripts/README.md` の「既知の制限」を参照してください。
 
 ## ローカルで確認する(ポータル)
 
