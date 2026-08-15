@@ -16,33 +16,9 @@
   <button type="button" id="lockToggleBtn" class="lock-toggle" title="ONの間は画面のあらゆる操作をロックし、誤タップを防ぎます">固定</button>
   <div id="lockOverlay" class="lock-overlay" hidden></div>
 
-  <div id="tabDrawerOverlay" class="tab-drawer-overlay"></div>
-  <nav id="tabDrawer" class="tab-drawer" aria-label="タブメニュー">
-    <div class="tab-drawer-header">
-      <span class="tab-drawer-heading">メニュー</span>
-      <button type="button" id="tabDrawerCloseBtn" class="tab-drawer-close" aria-label="メニューを閉じる">✕</button>
-    </div>
-    <div class="tab-bar">
-      <button type="button" class="tab-btn is-active" data-tab="timer">計測</button>
-      <button type="button" class="tab-btn" data-tab="pace">距離</button>
-      <button type="button" class="tab-btn" data-tab="crossing">山試走</button>
-      <button type="button" class="tab-btn" data-tab="stretch">ストレッチ</button>
-      <button type="button" class="tab-btn" data-tab="reinforceFull">補強フル</button>
-      <button type="button" class="tab-btn" data-tab="reinforceCoreA">補強コアA</button>
-      <button type="button" class="tab-btn" data-tab="reinforceCoreB">補強コアB</button>
-      <button type="button" class="tab-btn" data-tab="reinforceLoop">補強ループ</button>
-      <button type="button" class="tab-btn" data-tab="reinforceLower">補強下肢</button>
-      <button type="button" class="tab-btn" data-tab="tabata">TABATA</button>
-      <button type="button" class="tab-btn" data-tab="rollcall">点呼</button>
-    </div>
-  </nav>
-
   <div class="app">
     <div class="app-topbar">
       <a href="https://agu-portal.pages.dev/" class="portal-back-link" aria-label="ポータルに戻る">← ポータル</a>
-      <button type="button" id="tabMenuToggle" class="tab-menu-toggle" aria-label="メニューを開く">
-        <span></span><span></span><span></span>
-      </button>
       <div class="app-topbar-title" id="appTopbarTitle">計測</div>
     </div>
 
@@ -384,6 +360,14 @@
        (要素はすべて class で参照するので id は付けない)。 -->
   <template id="reinforceMenuTabTemplate">
     <div class="stretch-app">
+      <div class="reinforce-subnav">
+        <button type="button" class="reinforce-subnav-btn" data-tab="reinforceFull">フル</button>
+        <button type="button" class="reinforce-subnav-btn" data-tab="reinforceCoreA">コアA</button>
+        <button type="button" class="reinforce-subnav-btn" data-tab="reinforceCoreB">コアB</button>
+        <button type="button" class="reinforce-subnav-btn" data-tab="reinforceLoop">ループ</button>
+        <button type="button" class="reinforce-subnav-btn" data-tab="reinforceLower">下肢</button>
+      </div>
+
       <div class="stretch-header-row">
         <button type="button" class="btn btn-ghost btn-sm reinforce-voice-toggle">🔊 音声</button>
         <button type="button" class="btn btn-ghost btn-sm reinforce-recordings-toggle">🎙 録音する</button>

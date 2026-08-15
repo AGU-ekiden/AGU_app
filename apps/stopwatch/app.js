@@ -19,12 +19,7 @@ const el = {
   exportAllBtn: document.getElementById('exportAllBtn'),
   lockToggleBtn: document.getElementById('lockToggleBtn'),
   lockOverlay: document.getElementById('lockOverlay'),
-  tabButtons: document.querySelectorAll('.tab-btn'),
-  tabMenuToggle: document.getElementById('tabMenuToggle'),
   appTopbarTitle: document.getElementById('appTopbarTitle'),
-  tabDrawer: document.getElementById('tabDrawer'),
-  tabDrawerOverlay: document.getElementById('tabDrawerOverlay'),
-  tabDrawerCloseBtn: document.getElementById('tabDrawerCloseBtn'),
   tabPanels: {
     timer: document.getElementById('timerTab'),
     pace: document.getElementById('paceTab'),
@@ -94,35 +89,28 @@ const el = {
 };
 
 /* ---------- Tabs ---------- */
-function setTabDrawerOpen(open) {
-  el.tabDrawer.classList.toggle('is-open', open);
-  el.tabDrawerOverlay.classList.toggle('is-open', open);
-  document.body.style.overflow = open ? 'hidden' : '';
-}
-el.tabMenuToggle.addEventListener('click', () => setTabDrawerOpen(true));
-el.tabDrawerCloseBtn.addEventListener('click', () => setTabDrawerOpen(false));
-el.tabDrawerOverlay.addEventListener('click', () => setTabDrawerOpen(false));
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') setTabDrawerOpen(false);
-});
+// アプリ内のハンバーガーメニューは廃止し、タブ間の移動はポータル側の
+// 直リンク(#timer, #tabata 等)経由に一本化した。補強フル/コアA/コアB/
+// ループ/下肢の5つだけは1つの「補強カウント」リンクにまとまっているため、
+// createReinforceTab() が差し込む .reinforce-subnav から相互に切り替える。
+const TAB_LABELS = {
+  timer: '計測',
+  pace: '距離',
+  crossing: '山試走',
+  stretch: 'ストレッチ',
+  tabata: 'TABATA',
+  rollcall: '点呼',
+  ...Object.fromEntries(REINFORCE_MENU_TABS.map((t) => [t.id, t.tabLabel])),
+};
 
 function selectTab(tabName) {
-  const btn = Array.from(el.tabButtons).find((b) => b.dataset.tab === tabName);
-  if (!btn) return false;
-  el.tabButtons.forEach((b) => b.classList.toggle('is-active', b === btn));
+  if (!el.tabPanels[tabName]) return false;
   Object.entries(el.tabPanels).forEach(([name, panel]) => {
     panel.hidden = name !== tabName;
   });
-  el.appTopbarTitle.textContent = btn.textContent;
+  el.appTopbarTitle.textContent = TAB_LABELS[tabName] || '';
   return true;
 }
-
-el.tabButtons.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    selectTab(btn.dataset.tab);
-    setTabDrawerOpen(false);
-  });
-});
 
 // ポータルなど外部からの直リンク用: URLの #タブ名 (例: #tabata) で
 // 該当タブを開いた状態にする。存在しないタブ名や指定なしのときは
@@ -2605,6 +2593,11 @@ function createReinforceTab(tab) {
   const panel = document.getElementById(`${tab.id}Tab`);
   if (!panel) return;
   panel.appendChild(el.reinforceMenuTabTemplate.content.cloneNode(true));
+
+  panel.querySelectorAll('.reinforce-subnav-btn').forEach((btn) => {
+    btn.classList.toggle('is-active', btn.dataset.tab === tab.id);
+    btn.addEventListener('click', () => selectTab(btn.dataset.tab));
+  });
 
   const elLocal = {
     voiceToggle: panel.querySelector('.reinforce-voice-toggle'),
