@@ -3,9 +3,9 @@
 // database — a commit to this repo *is* the save. Requires a GITHUB_TOKEN
 // with contents:write on this repo.
 const GITHUB_API = "https://api.github.com";
-const OWNER = "itoaogaku";
-const REPO = "itonomaki";
-const CONTENT_PREFIX = "notion_sync/content";
+const OWNER = "AGU-ekiden";
+const REPO = "AGU_app";
+const CONTENT_PREFIX = "apps/itonomaki/notion_sync/content";
 
 /** The branch Vercel deployed this instance from, so edits land wherever the
  *  site itself is being served from (production branch in prod, the preview

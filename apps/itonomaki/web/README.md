@@ -41,7 +41,7 @@ http://localhost:3000 を開きます。
 
 ## ストップウォッチアプリ向け音声API(`/api/stretch-audio`)
 
-別リポジトリ `itoaogaku/stopwatch` のストレッチ・補強タイマーが、セリフの録音をチームで共有するために呼び出すAPIです。このNext.jsアプリのページとは無関係で、ストップウォッチ側のJavaScriptからこのドメインへ直接(クロスオリジンで)fetchされます。
+同じモノレポ内の `apps/stopwatch` のストレッチ・補強タイマーが、セリフの録音をチームで共有するために呼び出すAPIです。このNext.jsアプリのページとは無関係で、ストップウォッチ側のJavaScriptからこのドメインへ直接(クロスオリジンで)fetchされます。
 
 ストップウォッチ側にはセリフを読み上げるタイマーが「ストレッチ」「補強」の2つ独立してあり、録音は必ず `category`(`stretch` または `reinforce`、省略時は `stretch`)で区別されます。同じ「反対」という言葉でもストレッチ用と補強用は別の録音として扱われ、混ざりません。各カテゴリの中でさらに、名前付きの「セット」(例:コーチごとの読み上げ一式)にまとめられます。
 
@@ -57,8 +57,8 @@ http://localhost:3000 を開きます。
 
 ## Vercel へのデプロイ
 
-1. [vercel.com](https://vercel.com) で GitHub リポジトリ `itoaogaku/itonomaki` をインポート
-2. プロジェクト設定で **Root Directory** を `web` に設定
+1. [vercel.com](https://vercel.com) で GitHub リポジトリ `AGU-ekiden/AGU_app` をインポート
+2. プロジェクト設定で **Root Directory** を `apps/itonomaki/web` に設定
 3. Framework Preset は Next.js が自動検出されます
 4. **Environment Variables** に `SITE_USER` / `SITE_PASSWORD`(限定公開にする場合)、`EDIT_PASSWORD` / `GITHUB_TOKEN`(ウェブ編集機能を使う場合)、`FTP_HOST` / `FTP_USER` / `FTP_PASSWORD`(写真アップロード・ストップウォッチ音声共有機能を使う場合)、`STRETCH_AUDIO_TOKEN`(ストップウォッチ音声共有のアップロード・削除を有効にする場合)を設定
 5. Deploy
