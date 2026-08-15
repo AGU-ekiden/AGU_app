@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+:root {
+  --font-body: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", Meiryo,
+    "Segoe UI", Roboto, sans-serif;
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --surface-2: #f3f1ec;
+  --border: #e7e3da;
+  --fg: #2b2a27;
+  --fg-strong: #17160f;
+  --muted: #8a8578;
+  --accent: #2f7f6f;
+  --accent-fg: #ffffff;
+  --code-bg: #efece3;
+  --code-fg: #4a4638;
+  --shadow-color: 30 25 10;
+  --callout-info-bg: #f0fdfa;
+  --callout-info-border: rgba(94, 234, 212, 0.6);
+  --callout-info-fg: #042f2e;
+  --callout-warn-bg: #fffbeb;
+  --callout-warn-border: rgba(252, 211, 77, 0.6);
+  --callout-warn-fg: #451a03;
+}
+
+[data-theme="dark"] {
+  --bg: #16150f;
+  --surface: #1d1c15;
+  --surface-2: #24231b;
+  --border: #34321f;
+  --fg: #eae7db;
+  --fg-strong: #fbfaf5;
+  --muted: #a4a08c;
+  --accent: #5fc0a8;
+  --accent-fg: #0c1a16;
+  --code-bg: #2a2818;
+  --code-fg: #d8d3bd;
+  --shadow-color: 0 0 0;
+  --callout-info-bg: rgba(45, 212, 191, 0.1);
+  --callout-info-border: rgba(45, 212, 191, 0.25);
+  --callout-info-fg: #ccfbf1;
+  --callout-warn-bg: rgba(251, 191, 36, 0.1);
+  --callout-warn-border: rgba(251, 191, 36, 0.25);
+  --callout-warn-fg: #fef3c7;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16150f;
+    --surface: #1d1c15;
+    --surface-2: #24231b;
+    --border: #34321f;
+    --fg: #eae7db;
+    --fg-strong: #fbfaf5;
+    --muted: #a4a08c;
+    --accent: #5fc0a8;
+    --accent-fg: #0c1a16;
+    --code-bg: #2a2818;
+    --code-fg: #d8d3bd;
+    --shadow-color: 0 0 0;
+    --callout-info-bg: rgba(45, 212, 191, 0.1);
+    --callout-info-border: rgba(45, 212, 191, 0.25);
+    --callout-info-fg: #ccfbf1;
+    --callout-warn-bg: rgba(251, 191, 36, 0.1);
+    --callout-warn-border: rgba(251, 191, 36, 0.25);
+    --callout-warn-fg: #fef3c7;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-fg: var(--fg);
+  --color-fg-strong: var(--fg-strong);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-body);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: light dark;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+/* Briefly flashed on the block scrolled to from a body-text search match
+   (see ScrollToMatch.tsx), then removed — not a persistent style. */
+.search-match-flash {
+  animation: search-match-flash 2.2s ease-out;
+}
+@keyframes search-match-flash {
+  0%, 40% {
+    background: color-mix(in oklab, var(--accent) 30%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+/* ThemeToggle: both icons are always in the DOM, only one is shown, chosen
+   purely by CSS so no client JS state/effect is needed to pick the icon. */
+.theme-icon-dark-visible {
+  display: none;
+}
+.theme-icon-light-visible {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-dark-visible {
+    display: block;
+  }
+  :root:not([data-theme="light"]) .theme-icon-light-visible {
+    display: none;
+  }
+}
+[data-theme="dark"] .theme-icon-dark-visible {
+  display: block;
+}
+[data-theme="dark"] .theme-icon-light-visible {
+  display: none;
+}
+[data-theme="light"] .theme-icon-dark-visible {
+  display: none;
+}
+[data-theme="light"] .theme-icon-light-visible {
+  display: block;
+}
+
+/* Printing a topic page (see PrintButton.tsx): force a light, ink-friendly
+   palette regardless of the on-screen theme, and make sure callout tints
+   actually print (browsers drop background colors by default). Layout
+   chrome (sidebar/header/nav) is hidden per-element with Tailwind's
+   print:hidden utility instead of listed here. */
+@media print {
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f3f1ec;
+    --border: #d8d3c5;
+    --fg: #2b2a27;
+    --fg-strong: #17160f;
+    --muted: #6b675a;
+    --accent: #2f7f6f;
+    --accent-fg: #ffffff;
+    --callout-info-bg: #f0fdfa;
+    --callout-info-border: #99e6d9;
+    --callout-info-fg: #042f2e;
+    --callout-warn-bg: #fffbeb;
+    --callout-warn-border: #fcd34d;
+    --callout-warn-fg: #451a03;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body {
+    background: #ffffff;
+  }
+  /* Wide reference tables rely on horizontal *scrolling* on screen
+     (overflow-x-auto + a min-width on <table>), which doesn't exist on a
+     printed page — without this they'd just get clipped. Let them shrink
+     and wrap instead. */
+  .overflow-x-auto {
+    overflow: visible !important;
+  }
+  table {
+    min-width: 0 !important;
+  }
+  th {
+    white-space: normal !important;
+  }
+}
+
+/* thin, unobtrusive scrollbar for the sidebar */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.thin-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}

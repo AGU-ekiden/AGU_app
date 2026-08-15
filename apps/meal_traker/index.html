@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>寮の食数管理</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+  :root {
+    --green: #1D9E75;
+    --green-light: #E1F5EE;
+    --green-dark: #0F6E56;
+    --text: #1a1a1a;
+    --text-sub: #666;
+    --text-hint: #aaa;
+    --border: rgba(0,0,0,0.1);
+    --border-hover: rgba(0,0,0,0.2);
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --surface2: #f2f2f0;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .app { max-width: 480px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Header */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .logo {
+    font-size: 16px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+  .week-chip {
+    font-size: 12px; color: var(--text-sub); background: var(--surface2);
+    padding: 4px 10px; border-radius: 20px;
+  }
+
+  h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .sub { font-size: 13px; color: var(--text-sub); margin-bottom: 1.5rem; line-height: 1.6; }
+
+  /* User grid */
+  .user-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
+  .ucard {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; text-align: left; transition: all .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ucard:hover { border-color: var(--border-hover); background: #fafaf8; }
+  .ucard.done { border-color: var(--green); }
+  .av {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .av0{background:#EEEDFE;color:#3C3489;} .av1{background:#E1F5EE;color:#085041;}
+  .av2{background:#FAECE7;color:#712B13;} .av3{background:#FBEAF0;color:#72243E;}
+  .av4{background:#E6F1FB;color:#0C447C;} .av5{background:#EAF3DE;color:#27500A;}
+  .uname { font-size: 14px; font-weight: 500; }
+  .done-chip {
+    margin-left: auto; font-size: 11px; background: var(--green-light);
+    color: var(--green-dark); padding: 2px 7px; border-radius: 20px; white-space: nowrap;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    width: 100%; padding: 13px; background: var(--green); color: #fff;
+    border: none; border-radius: var(--radius); font-size: 14px; font-weight: 700;
+    font-family: inherit; cursor: pointer; transition: background .15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--green-dark); }
+  .btn-secondary {
+    width: 100%; padding: 11px; background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px;
+    font-family: inherit; cursor: pointer; transition: all .15s; margin-top: 8px;
+  }
+  .btn-secondary:hover { border-color: var(--border-hover); }
+
+  /* Back */
+  .back-btn {
+    display: flex; align-items: center; gap: 6px; font-size: 13px;
+    color: var(--text-sub); background: none; border: none; cursor: pointer;
+    margin-bottom: 1.25rem; font-family: inherit; padding: 0;
+  }
+  .back-btn:hover { color: var(--text); }
+
+  /* Input screen */
+  .user-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
+  .user-header .av { width: 44px; height: 44px; font-size: 16px; }
+
+  /* Quick buttons */
+  .quick-wrap { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .qbtn {
+    font-size: 12px; padding: 5px 11px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text-sub); cursor: pointer; font-family: inherit;
+    transition: all .12s; white-space: nowrap;
+  }
+  .qbtn:hover { border-color: var(--border-hover); color: var(--text); }
+
+  /* Day cards */
+  .day-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 7px; overflow: hidden;
+  }
+  .day-head {
+    padding: 9px 14px; font-size: 13px; font-weight: 700;
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .day-summary { font-size: 11px; font-weight: 400; color: var(--text-hint); }
+  .meal-row { display: flex; align-items: center; padding: 9px 14px; gap: 10px; }
+  .meal-row + .meal-row { border-top: 1px solid var(--border); }
+  .mlbl { font-size: 13px; color: var(--text-sub); width: 38px; flex-shrink: 0; }
+  .tg { display: flex; gap: 5px; }
+  .tb {
+    font-size: 12px; padding: 6px 13px; border-radius: 20px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-sub); cursor: pointer; font-family: inherit; transition: all .12s;
+  }
+  .tb.yes { background: var(--green); border-color: var(--green); color: #fff; font-weight: 500; }
+  .tb.no  { background: var(--surface2); color: var(--text-hint); }
+
+  /* Chef screen */
+  .stat-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 1.25rem; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 14px;
+  }
+  .stat-n { font-size: 26px; font-weight: 700; color: var(--text); }
+  .stat-n span { font-size: 14px; font-weight: 400; color: var(--text-hint); }
+  .stat-l { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+
+  .tab-row { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+  .tab {
+    font-size: 13px; padding: 8px 16px; background: none; border: none;
+    color: var(--text-sub); cursor: pointer; font-family: inherit;
+    border-bottom: 2px solid transparent; transition: all .12s;
+  }
+  .tab.on { color: var(--text); border-bottom-color: var(--green); font-weight: 700; }
+
+  /* Summary table */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .tbl th {
+    font-size: 11px; font-weight: 700; color: var(--text-hint);
+    padding: 6px 8px; text-align: center;
+    border-bottom: 1px solid var(--border); letter-spacing: .05em;
+  }
+  .tbl th:first-child { text-align: left; }
+  .tbl td { padding: 9px 8px; text-align: center; border-bottom: 1px solid var(--border); }
+  .tbl td:first-child { text-align: left; font-weight: 500; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .hi { color: var(--green-dark); font-weight: 700; }
+  .mid { color: #185FA5; }
+  .lo { color: var(--text-hint); }
+
+  /* Person cards */
+  .pcard {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 11px 13px; margin-bottom: 7px;
+  }
+  .phead { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .phead .av { width: 30px; height: 30px; font-size: 12px; }
+  .pname { font-size: 14px; font-weight: 700; }
+  .cnt-badge {
+    margin-left: auto; font-size: 11px; background: var(--green-light);
+    color: var(--green-dark); padding: 2px 8px; border-radius: 20px; font-weight: 700;
+  }
+  .dots-wrap { display: flex; gap: 4px; }
+  .daycol { text-align: center; flex: 1; }
+  .dot {
+    width: 100%; padding: 3px 0; border-radius: 4px; font-size: 10px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 3px;
+    font-weight: 500;
+  }
+  .dy { background: var(--green-light); color: var(--green-dark); }
+  .dn { background: var(--surface2); color: var(--text-hint); }
+  .dlbl { font-size: 10px; color: var(--text-hint); }
+  .not-yet { font-size: 13px; color: var(--text-hint); font-style: italic; }
+
+  /* Week selector */
+  .week-sel-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+  .week-sel-row select {
+    font-size: 13px; padding: 6px 10px; border-radius: var(--radius);
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); cursor: pointer; font-family: inherit; flex: 1;
+  }
+  .reset-btn {
+    font-size: 12px; color: var(--text-hint); background: none; border: none;
+    cursor: pointer; font-family: inherit; padding: 6px 10px;
+    border-radius: var(--radius); border: 1px solid var(--border);
+  }
+  .reset-btn:hover { color: #c0392b; border-color: #c0392b; }
+
+  /* Loading */
+  .loading {
+    text-align: center; color: var(--text-hint); font-size: 13px;
+    padding: 2rem 0;
+  }
+  .spinner {
+    width: 20px; height: 20px; border: 2px solid var(--border);
+    border-top-color: var(--green); border-radius: 50%;
+    animation: spin .7s linear infinite; margin: 0 auto 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: #1a1a1a; color: #fff; font-size: 13px; padding: 10px 20px;
+    border-radius: 20px; transition: transform .3s; z-index: 999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Firebase config prompt */
+  .config-box {
+    background: #fffbeb; border: 1px solid #f59e0b;
+    border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem;
+    font-size: 13px; line-height: 1.7;
+  }
+  .config-box strong { display: block; margin-bottom: 4px; color: #92400e; }
+  .config-box code {
+    background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px;
+    font-family: monospace; font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="app">
+
+  <!-- Home screen -->
+  <div class="screen active" id="s-home">
+    <div class="header">
+      <div class="logo"><div class="logo-dot"></div>寮ごはん</div>
+      <div class="week-chip" id="week-disp"></div>
+    </div>
+    <h2>来週のご飯</h2>
+    <p class="sub">名前を選んで食べる日を入力してください</p>
+    <div class="user-grid" id="home-grid">
+      <div class="loading" style="grid-column:1/-1;"><div class="spinner"></div>読み込み中...</div>
+    </div>
+    <button class="btn-primary" onclick="go('s-chef')">
+      📊 シェフ集計画面
+    </button>
+  </div>
+
+  <!-- Input screen -->
+  <div class="screen" id="s-input">
+    <button class="back-btn" onclick="go('s-home')">← 戻る</button>
+    <div class="user-header">
+      <div class="av" id="in-av"></div>
+      <div>
+        <div style="font-size:16px;font-weight:700;" id="in-name"></div>
+        <div style="font-size:12px;color:var(--text-sub);">来週の食事を選んでください</div>
+      </div>
+    </div>
+    <div class="quick-wrap">
+      <button class="qbtn" onclick="qset('all',true)">✅ 全部食べる</button>
+      <button class="qbtn" onclick="qset('all',false)">❌ 全部外す</button>
+      <button class="qbtn" onclick="qset('b',true)">🌅 朝食すべて</button>
+      <button class="qbtn" onclick="qset('d',true)">🌙 夕食すべて</button>
+      <button class="qbtn" onclick="qset('b',false)">朝食を外す</button>
+      <button class="qbtn" onclick="qset('d',false)">夕食を外す</button>
+    </div>
+    <div id="day-rows"></div>
+    <button class="btn-primary" style="margin-top:1rem;" onclick="saveUser()">
+      💾 保存して戻る
+    </button>
+  </div>
+
+  <!-- Chef screen -->
+  <div class="screen" id="s-chef">
+    <button class="back-btn" onclick="go('s-home')">← 戻る</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+      <h2>集計ダッシュボード</h2>
+      <button class="reset-btn" onclick="resetWeek()">🗑 リセット</button>
+    </div>
+    <div class="week-sel-row">
+      <select id="week-sel" onchange="onWeekChange()"></select>
+    </div>
+    <div class="stat-grid" id="stat-grid">
+      <div class="loading" style="grid-column:1/-1;"><div class="spinner"></div>読み込み中...</div>
+    </div>
+    <div class="tab-row">
+      <button class="tab on" id="tab-s" onclick="switchTab('s')">曜日別まとめ</button>
+      <button class="tab" id="tab-p" onclick="switchTab('p')">個人別</button>
+    </div>
+    <div id="tab-s-content"></div>
+    <div id="tab-p-content" style="display:none;"></div>
+  </div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getDatabase, ref, set, get, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+// ============================================================
+// 🔧 ここにFirebaseの設定を貼り付けてください
+// Firebaseコンソール → プロジェクト設定 → マイアプリ → firebaseConfig
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyD_fMbNMe2OQtok5Ltl37aryVLBrLRjWEU",
+  authDomain: "ryoushoku-kanri.firebaseapp.com",
+  databaseURL: "https://ryoushoku-kanri-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ryoushoku-kanri",
+  storageBucket: "ryoushoku-kanri.firebasestorage.app",
+  messagingSenderId: "922263738558",
+  appId: "1:922263738558:web:2aebe7054ddaefdcc726ef"
+};
+// ============================================================
+
+const USERS = ['田中','佐藤','鈴木','山田','伊藤','渡辺'];
+const DAYS  = ['月','火','水','木','金','土','日'];
+const MEALS = ['朝','夕'];
+const AV    = ['av0','av1','av2','av3','av4','av5'];
+
+let app, db;
+let curUser = null, curIdx = 0, tmp = {};
+let activeTab = 's';
+let WEEK = getWeekKey(1);
+let allData = {};
+
+// Check if config is filled
+const configOK = firebaseConfig.apiKey !== 'YOUR_API_KEY';
+
+if (configOK) {
+  app = initializeApp(firebaseConfig);
+  db  = getDatabase(app);
+}
+
+// ---- Utilities ----
+
+function getWeekKey(offset = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() - d.getDay() + 1 + offset * 7);
+  return d.toISOString().slice(0, 10);
+}
+
+function weekLabel(key) {
+  const d = new Date(key + 'T00:00:00');
+  const e = new Date(d); e.setDate(d.getDate() + 6);
+  return `${d.getMonth()+1}/${d.getDate()}（月）〜${e.getMonth()+1}/${e.getDate()}（日）`;
+}
+
+function defSel() {
+  const s = {};
+  DAYS.forEach(d => { s[d] = { 朝: true, 夕: true }; });
+  return s;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 's-home') renderHome();
+  if (id === 's-chef') renderChef();
+}
+
+window.go = go;
+
+// ---- Firebase helpers ----
+
+async function fbLoad(week) {
+  if (!configOK) return {};
+  try {
+    const snap = await get(ref(db, `meals/${week}`));
+    return snap.exists() ? snap.val() : {};
+  } catch(e) { return {}; }
+}
+
+async function fbSave(week, user, data) {
+  if (!configOK) return;
+  await set(ref(db, `meals/${week}/${user}`), data);
+}
+
+async function fbDelete(week) {
+  if (!configOK) return;
+  await remove(ref(db, `meals/${week}`));
+}
+
+// ---- Home ----
+
+async function renderHome() {
+  document.getElementById('week-disp').textContent = weekLabel(WEEK);
+
+  if (!configOK) {
+    document.getElementById('home-grid').innerHTML = `
+      <div class="config-box" style="grid-column:1/-1;">
+        <strong>⚠️ Firebase設定が必要です</strong>
+        このファイルを開いてください。<code>firebaseConfig</code> の部分に
+        Firebase コンソールのAPIキーを貼り付けると動き始めます。<br>
+        下のセットアップ手順を参考にしてください。
+      </div>`;
+    return;
+  }
+
+  const grid = document.getElementById('home-grid');
+  grid.innerHTML = '<div class="loading" style="grid-column:1/-1;"><div class="spinner"></div>読み込み中...</div>';
+  allData = await fbLoad(WEEK);
+  grid.innerHTML = '';
+
+  USERS.forEach((u, i) => {
+    const done = !!allData[u];
+    const btn = document.createElement('button');
+    btn.className = 'ucard' + (done ? ' done' : '');
+    btn.innerHTML = `<div class="av ${AV[i]}">${u[0]}</div>
+      <span class="uname">${u}</span>
+      ${done ? '<span class="done-chip">✓ 入力済</span>' : ''}`;
+    btn.onclick = () => openInput(u, i);
+    grid.appendChild(btn);
+  });
+}
+
+// ---- Input ----
+
+function openInput(user, idx) {
+  curUser = user; curIdx = idx;
+  tmp = allData[user] ? JSON.parse(JSON.stringify(allData[user])) : defSel();
+  document.getElementById('in-name').textContent = user + 'さん';
+  const av = document.getElementById('in-av');
+  av.className = 'av ' + AV[idx]; av.textContent = user[0];
+  renderDayRows();
+  go('s-input');
+}
+
+function renderDayRows() {
+  const wrap = document.getElementById('day-rows');
+  wrap.innerHTML = '';
+  DAYS.forEach(day => {
+    const dc = document.createElement('div');
+    dc.className = 'day-card';
+    const hasB = tmp[day]?.朝, hasD = tmp[day]?.夕;
+    const sumText = [hasB?'朝食':'', hasD?'夕食':''].filter(Boolean).join('・') || 'なし';
+    dc.innerHTML = `<div class="day-head">${day}曜日<span class="day-summary">${sumText}</span></div>` +
+      MEALS.map(m => {
+        const v = tmp[day] ? tmp[day][m] : true;
+        const lbl = m === '朝' ? '朝食' : '夕食';
+        return `<div class="meal-row">
+          <span class="mlbl">${lbl}</span>
+          <div class="tg">
+            <button class="tb ${v ? 'yes' : ''}" id="b-${day}-${m}-y" onclick="setM('${day}','${m}',true)">食べる</button>
+            <button class="tb ${!v ? 'no' : ''}" id="b-${day}-${m}-n" onclick="setM('${day}','${m}',false)">食べない</button>
+          </div>
+        </div>`;
+      }).join('');
+    wrap.appendChild(dc);
+  });
+}
+
+window.setM = function(day, meal, val) {
+  if (!tmp[day]) tmp[day] = { 朝: true, 夕: true };
+  tmp[day][meal] = val;
+  document.getElementById(`b-${day}-${meal}-y`).className = 'tb' + (val ? ' yes' : '');
+  document.getElementById(`b-${day}-${meal}-n`).className = 'tb' + (!val ? ' no' : '');
+  // update day summary
+  const hasB = tmp[day].朝, hasD = tmp[day].夕;
+  const sumText = [hasB?'朝食':'', hasD?'夕食':''].filter(Boolean).join('・') || 'なし';
+  const head = document.querySelector(`#b-${day}-${meal}-y`)?.closest('.day-card')?.querySelector('.day-summary');
+  if (head) head.textContent = sumText;
+};
+
+window.qset = function(type, val) {
+  const meals = type === 'all' ? MEALS : type === 'b' ? ['朝'] : ['夕'];
+  DAYS.forEach(d => meals.forEach(m => setM(d, m, val)));
+};
+
+window.saveUser = async function() {
+  await fbSave(WEEK, curUser, tmp);
+  allData[curUser] = tmp;
+  toast('保存しました ✓');
+  go('s-home');
+};
+
+// ---- Chef ----
+
+async function renderChef() {
+  buildWeekSel();
+  const sg = document.getElementById('stat-grid');
+  sg.innerHTML = '<div class="loading" style="grid-column:1/-1;"><div class="spinner"></div>読み込み中...</div>';
+
+  allData = await fbLoad(WEEK);
+
+  const responded = USERS.filter(u => allData[u]).length;
+  let total = 0;
+  const dc = {};
+  DAYS.forEach(d => { dc[d] = { 朝: 0, 夕: 0 }; });
+
+  USERS.forEach(u => {
+    const sel = allData[u];
+    if (!sel) return;
+    DAYS.forEach(d => {
+      MEALS.forEach(m => {
+        if (sel[d]?.[m]) { dc[d][m]++; total++; }
+      });
+    });
+  });
+
+  let maxD = { day: '-', cnt: 0 };
+  DAYS.forEach(d => {
+    const c = dc[d]['朝'] + dc[d]['夕'];
+    if (c > maxD.cnt) maxD = { day: d, cnt: c };
+  });
+  const pct = responded > 0 ? Math.round(total / (14 * responded) * 100) : 0;
+
+  sg.innerHTML = `
+    <div class="stat"><div class="stat-n">${responded}<span>/${USERS.length}</span></div><div class="stat-l">入力済み</div></div>
+    <div class="stat"><div class="stat-n">${total}</div><div class="stat-l">総食数</div></div>
+    <div class="stat"><div class="stat-n">${pct}%</div><div class="stat-l">参加率</div></div>
+    <div class="stat"><div class="stat-n">${maxD.day !== '-' ? maxD.day + '曜' : '-'}</div><div class="stat-l">最多曜日</div></div>`;
+
+  const max = USERS.length;
+  const cls = n => n >= max ? 'hi' : n > 0 ? 'mid' : 'lo';
+
+  document.getElementById('tab-s-content').innerHTML = `
+    <table class="tbl">
+      <thead><tr><th style="width:80px;">曜日</th><th>朝食</th><th>夕食</th><th>合計</th></tr></thead>
+      <tbody>${DAYS.map(d => {
+        const b = dc[d]['朝'], di = dc[d]['夕'], tot = b + di;
+        return `<tr><td>${d}曜日</td>
+          <td class="${cls(b)}">${b}人</td>
+          <td class="${cls(di)}">${di}人</td>
+          <td><strong>${tot}</strong></td></tr>`;
+      }).join('')}</tbody>
+    </table>`;
+
+  document.getElementById('tab-p-content').innerHTML = USERS.map((u, i) => {
+    const sel = allData[u];
+    if (!sel) return `<div class="pcard"><div class="phead">
+      <div class="av ${AV[i]}" style="width:30px;height:30px;font-size:11px;">${u[0]}</div>
+      <span class="not-yet">${u} — 未入力</span></div></div>`;
+    const cnt = DAYS.reduce((a, d) => a + (sel[d]?.['朝'] ? 1 : 0) + (sel[d]?.['夕'] ? 1 : 0), 0);
+    const dots = DAYS.map(d => `
+      <div class="daycol">
+        <div class="dot ${sel[d]?.['朝'] ? 'dy' : 'dn'}">朝</div>
+        <div class="dot ${sel[d]?.['夕'] ? 'dy' : 'dn'}">夕</div>
+        <div class="dlbl">${d}</div>
+      </div>`).join('');
+    return `<div class="pcard">
+      <div class="phead">
+        <div class="av ${AV[i]}" style="width:30px;height:30px;font-size:11px;">${u[0]}</div>
+        <span class="pname">${u}</span>
+        <span class="cnt-badge">${cnt}食</span>
+      </div>
+      <div class="dots-wrap">${dots}</div>
+    </div>`;
+  }).join('');
+
+  switchTab(activeTab, true);
+}
+
+function buildWeekSel() {
+  const sel = document.getElementById('week-sel');
+  const weeks = new Set([getWeekKey(0), getWeekKey(1), getWeekKey(2)]);
+  Object.keys(allData).forEach(k => weeks.add(k));
+  sel.innerHTML = '';
+  Array.from(weeks).sort().reverse().forEach(w => {
+    const o = document.createElement('option');
+    o.value = w; o.textContent = weekLabel(w);
+    if (w === WEEK) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+window.onWeekChange = function() {
+  WEEK = document.getElementById('week-sel').value;
+  renderChef();
+};
+
+window.resetWeek = async function() {
+  if (!confirm(`${weekLabel(WEEK)} のデータを全員分リセットしますか？`)) return;
+  await fbDelete(WEEK);
+  allData = {};
+  toast('リセットしました');
+  renderChef();
+};
+
+window.switchTab = function(t, silent = false) {
+  activeTab = t;
+  document.getElementById('tab-s').className = 'tab' + (t === 's' ? ' on' : '');
+  document.getElementById('tab-p').className = 'tab' + (t === 'p' ? ' on' : '');
+  document.getElementById('tab-s-content').style.display = t === 's' ? '' : 'none';
+  document.getElementById('tab-p-content').style.display = t === 'p' ? '' : 'none';
+};
+
+// Start
+renderHome();
+</script>
+</body>
+</html>

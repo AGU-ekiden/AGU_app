@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>ストップウォッチ</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#322f2b" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <button type="button" id="lockToggleBtn" class="lock-toggle" title="ONの間は画面のあらゆる操作をロックし、誤タップを防ぎます">固定</button>
+  <div id="lockOverlay" class="lock-overlay" hidden></div>
+
+  <div id="tabDrawerOverlay" class="tab-drawer-overlay"></div>
+  <nav id="tabDrawer" class="tab-drawer" aria-label="タブメニュー">
+    <div class="tab-drawer-header">
+      <span class="tab-drawer-heading">メニュー</span>
+      <button type="button" id="tabDrawerCloseBtn" class="tab-drawer-close" aria-label="メニューを閉じる">✕</button>
+    </div>
+    <div class="tab-bar">
+      <button type="button" class="tab-btn is-active" data-tab="timer">計測</button>
+      <button type="button" class="tab-btn" data-tab="pace">距離</button>
+      <button type="button" class="tab-btn" data-tab="crossing">山試走</button>
+      <button type="button" class="tab-btn" data-tab="stretch">ストレッチ</button>
+      <button type="button" class="tab-btn" data-tab="reinforceFull">補強フル</button>
+      <button type="button" class="tab-btn" data-tab="reinforceCoreA">補強コアA</button>
+      <button type="button" class="tab-btn" data-tab="reinforceCoreB">補強コアB</button>
+      <button type="button" class="tab-btn" data-tab="reinforceLoop">補強ループ</button>
+      <button type="button" class="tab-btn" data-tab="reinforceLower">補強下肢</button>
+      <button type="button" class="tab-btn" data-tab="tabata">TABATA</button>
+      <button type="button" class="tab-btn" data-tab="rollcall">点呼</button>
+    </div>
+  </nav>
+
+  <div class="app">
+    <div class="app-topbar">
+      <button type="button" id="tabMenuToggle" class="tab-menu-toggle" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="app-topbar-title" id="appTopbarTitle">計測</div>
+    </div>
+
+    <div id="timerTab" class="tab-panel is-active">
+      <button type="button" id="exportAllBtn" class="btn btn-ghost btn-sm">全てExcel保存</button>
+      <div id="stopwatchList" class="stopwatch-list"></div>
+    </div>
+
+    <div id="paceTab" class="tab-panel" hidden>
+      <div class="pace-app">
+        <h2 class="pace-title">ペース計算</h2>
+        <p class="pace-desc">距離(m)とタイムを入力すると、1kmあたりのペースと時速を自動で計算します。タイムは秒(例: 270)でも分:秒(例: 4:30)でも入力できます。</p>
+        <div id="paceRows" class="pace-rows"></div>
+        <button type="button" id="paceAddRowBtn" class="btn btn-ghost btn-sm">+ 行を追加</button>
+      </div>
+
+      <div class="pace-app">
+        <h2 class="pace-title">距離からの所要タイム早見表</h2>
+        <p class="pace-desc">距離(m)を入力すると、決まったペースごとにその距離を走るのにかかる時間が自動で計算されます。</p>
+        <label class="pace-field">
+          <span>距離(m)</span>
+          <input type="number" inputmode="decimal" id="presetDistanceInput" placeholder="1000" min="0" step="any" />
+        </label>
+        <div id="presetPaceTable" class="preset-pace-table">
+          <div class="preset-pace-row" data-pace-sec="180"><span class="preset-pace-label">3:00/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="190"><span class="preset-pace-label">3:10/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="200"><span class="preset-pace-label">3:20/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="204"><span class="preset-pace-label">3:24/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="210"><span class="preset-pace-label">3:30/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="216"><span class="preset-pace-label">3:36/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="220"><span class="preset-pace-label">3:40/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="222"><span class="preset-pace-label">3:42/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="228"><span class="preset-pace-label">3:48/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="230"><span class="preset-pace-label">3:50/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="240"><span class="preset-pace-label">4:00/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="250"><span class="preset-pace-label">4:10/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="260"><span class="preset-pace-label">4:20/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="270"><span class="preset-pace-label">4:30/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="280"><span class="preset-pace-label">4:40/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="290"><span class="preset-pace-label">4:50/km</span><span class="preset-pace-time">--:--</span></div>
+          <div class="preset-pace-row" data-pace-sec="300"><span class="preset-pace-label">5:00/km</span><span class="preset-pace-time">--:--</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="crossingTab" class="tab-panel" hidden>
+      <div class="pace-app crossing-card" id="crossingUpCard" data-direction="up">
+        <h2 class="pace-title">上り(宮ノ下→小涌谷方向、標高差による登り)</h2>
+        <p class="pace-desc">スタートから踏切までのタイムと、区間を走る電車の発着時刻から、踏切に引っかかる可能性のあるスタート時刻を計算します。小涌谷→宮ノ下方向の電車は「発-2分〜着-2分」、宮ノ下→小涌谷方向の電車は「発+1分〜着」が閉鎖時間になります。</p>
+        <div class="crossing-time-fields">
+          <label class="pace-field"><span>踏切まで 最速</span><input type="text" class="crossing-fastest" value="36:00" /></label>
+          <label class="pace-field"><span>踏切まで 最遅</span><input type="text" class="crossing-slowest" value="42:00" /></label>
+        </div>
+        <div class="train-rows"></div>
+        <button type="button" class="btn btn-ghost btn-sm add-train-btn">+ 電車を追加</button>
+        <div class="crossing-time-fields">
+          <label class="pace-field"><span>検索範囲 開始</span><input type="text" class="search-start" value="6:00" /></label>
+          <label class="pace-field"><span>検索範囲 終了</span><input type="text" class="search-end" value="9:00" /></label>
+        </div>
+        <div class="crossing-result"></div>
+      </div>
+
+      <div class="pace-app crossing-card" id="crossingDownCard" data-direction="down">
+        <h2 class="pace-title">下り(小涌谷→宮ノ下方向の下山)</h2>
+        <p class="pace-desc">下山のスタートから踏切までのタイムで、同様に踏切に引っかかる可能性のあるスタート時刻を計算します。</p>
+        <div class="crossing-time-fields">
+          <label class="pace-field"><span>踏切まで 最速</span><input type="text" class="crossing-fastest" value="29:00" /></label>
+          <label class="pace-field"><span>踏切まで 最遅</span><input type="text" class="crossing-slowest" value="32:00" /></label>
+        </div>
+        <div class="train-rows"></div>
+        <button type="button" class="btn btn-ghost btn-sm add-train-btn">+ 電車を追加</button>
+        <div class="crossing-time-fields">
+          <label class="pace-field"><span>検索範囲 開始</span><input type="text" class="search-start" value="6:00" /></label>
+          <label class="pace-field"><span>検索範囲 終了</span><input type="text" class="search-end" value="9:00" /></label>
+        </div>
+        <div class="crossing-result"></div>
+      </div>
+    </div>
+
+    <div id="stretchTab" class="tab-panel" hidden>
+      <div class="stretch-app">
+        <div class="stretch-header-row">
+          <button type="button" class="btn btn-ghost btn-sm" id="stretchVoiceToggle">🔊 音声</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="stretchRecordingsToggle">🎙 録音する</button>
+          <div class="stretch-progress" id="stretchProgress">0 / 0</div>
+        </div>
+
+        <label class="stretch-voice-picker">
+          <span>声を選ぶ(選ぶと試し読みします)</span>
+          <select id="stretchVoiceSelect"></select>
+        </label>
+
+        <div class="stretch-display-panel">
+          <div class="stretch-timer" id="stretchTimer">0:00</div>
+          <div class="stretch-current-group" id="stretchCurrentGroup">準備中</div>
+        </div>
+
+        <div class="stretch-next">
+          <div class="stretch-next-label">次は</div>
+          <div class="stretch-next-group" id="stretchNextGroup"></div>
+          <div class="stretch-next-speech" id="stretchNextSpeech"></div>
+        </div>
+
+        <div class="stretch-buttons">
+          <button type="button" class="btn btn-primary stretch-start-btn" id="stretchStartBtn">スタート</button>
+          <button type="button" class="btn btn-ghost btn-sm stretch-auto-btn" id="stretchAutoBtn">▶️ 全種目を連続再生</button>
+          <div class="stretch-buttons-row">
+            <button type="button" class="btn btn-ghost btn-sm" id="stretchPrevBtn">◀ 前に戻る</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="stretchNextBtn">次に進む ▶</button>
+          </div>
+          <div class="stretch-buttons-row">
+            <button type="button" class="btn btn-ghost btn-sm" id="stretchPauseBtn" disabled>一時停止</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="stretchResetBtn">最初に戻す</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 補強フル・コアA・コアB・ループ・下肢: それぞれ独立したタブ。
+         中身は app.js の createReinforceTab() が下の
+         reinforceMenuTabTemplate を複製して差し込む。 -->
+    <div id="reinforceFullTab" class="tab-panel" hidden></div>
+    <div id="reinforceCoreATab" class="tab-panel" hidden></div>
+    <div id="reinforceCoreBTab" class="tab-panel" hidden></div>
+    <div id="reinforceLoopTab" class="tab-panel" hidden></div>
+    <div id="reinforceLowerTab" class="tab-panel" hidden></div>
+
+    <div id="tabataTab" class="tab-panel" hidden>
+      <div class="tabata-app">
+        <div class="tabata-progress" id="tabataProgress">セット 0 / 8</div>
+
+        <div class="tabata-display-panel" id="tabataDisplayPanel">
+          <div class="tabata-phase" id="tabataPhase">スタート待ち</div>
+          <div class="tabata-timer" id="tabataTimer">20</div>
+        </div>
+
+        <div class="tabata-buttons">
+          <button type="button" class="btn btn-primary tabata-start-btn" id="tabataStartBtn">スタート</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="tabataResetBtn">リセット</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="rollcallTab" class="tab-panel" hidden>
+      <div class="rollcall-app">
+        <div class="rollcall-header-row">
+          <div class="rollcall-progress" id="rollcallProgress">点呼 0 / 0</div>
+          <button type="button" class="btn btn-ghost btn-sm" id="rollcallRegisterToggle">📋 名簿を編集</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="rollcallResetBtn">リセット</button>
+        </div>
+        <label class="rollcall-filter">
+          <span>タグで絞り込み</span>
+          <select id="rollcallMainTagFilter"><option value="">すべて表示</option></select>
+        </label>
+        <div class="rollcall-list" id="rollcallList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="stretchRecordingsModal" class="stretch-recordings-modal" hidden>
+    <div class="stretch-recordings-modal-panel">
+      <div class="stretch-recordings-modal-header">
+        <span id="stretchRecordingsModalTitle">セリフを自分の声で録音する</span>
+        <button type="button" class="stretch-recordings-close-btn" id="stretchRecordingsCloseBtn" title="閉じる">×</button>
+      </div>
+      <p class="pace-desc">録音は「セット」ごとに保存されます(「個人利用音声①〜③」は削除不可、「+ 新しいセット」で自由に追加可)。同じ文言(「反対」「終わり」等)は1件にまとめられ、全種目に反映されます(ストレッチと補強は別一覧)。端末保存のみで自動アップロードなし。「☁️ チームに共有」で録音分をまとめて共有できます(未完成でもOK。初回のみ合言葉が必要)。</p>
+
+      <div class="recording-set-picker">
+        <label class="recording-set-picker-select">
+          <span>セット</span>
+          <select id="recordingSetSelect"></select>
+        </label>
+        <button type="button" class="btn btn-ghost btn-sm" id="recordingSetNewBtn">+ 新しいセット</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="recordingSetRenameBtn">✎ 名前を変更</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="recordingSetDeleteBtn">🗑 セットを削除</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="recordingSetShareBtn">☁️ チームに共有</button>
+      </div>
+
+      <div id="stretchRecordingsList" class="stretch-recordings-list"></div>
+    </div>
+  </div>
+
+  <div id="rollcallRegisterModal" class="stretch-recordings-modal" hidden>
+    <div class="stretch-recordings-modal-panel">
+      <div class="stretch-recordings-modal-header">
+        <span>名簿の登録・編集</span>
+        <button type="button" class="stretch-recordings-close-btn" id="rollcallRegisterCloseBtn" title="閉じる">×</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" id="rollcallShareBtn">☁️ この端末の名簿をチームに共有</button>
+      <div class="rollcall-tag-manage">
+        <div class="rollcall-tag-manage-heading">タグを管理</div>
+        <div class="rollcall-tag-chip-list" id="rollcallTagManageList"></div>
+        <div class="rollcall-add-form-row">
+          <input type="text" id="rollcallNewTagName" placeholder="新しいタグ名(例: 故障者)" />
+          <button type="button" class="btn btn-ghost btn-sm" id="rollcallNewTagBtn">+ タグを追加</button>
+        </div>
+      </div>
+
+      <div class="rollcall-add-form">
+        <div class="rollcall-add-form-row">
+          <input type="text" id="rollcallAddName" placeholder="氏名" />
+          <select id="rollcallAddGrade">
+            <option value="4">4年</option>
+            <option value="3">3年</option>
+            <option value="2">2年</option>
+            <option value="1">1年</option>
+          </select>
+        </div>
+        <div class="rollcall-tag-checkboxes" id="rollcallAddTagCheckboxes"></div>
+        <div class="rollcall-add-form-row">
+          <button type="button" class="btn btn-primary btn-sm" id="rollcallAddBtn">+ 追加</button>
+        </div>
+      </div>
+
+      <label class="rollcall-filter">
+        <span>タグで絞り込み</span>
+        <select id="rollcallTagFilter"><option value="">すべて表示</option></select>
+      </label>
+
+      <div id="rollcallRegisterList" class="stretch-recordings-list"></div>
+    </div>
+  </div>
+
+  <template id="rollcallMemberTemplate">
+    <button type="button" class="rollcall-member">
+      <span class="rollcall-member-name"></span>
+      <span class="rollcall-member-tags">
+        <span class="rollcall-member-tag-line"></span>
+        <span class="rollcall-member-tag-line"></span>
+      </span>
+    </button>
+  </template>
+
+  <template id="rollcallRegisterRowTemplate">
+    <div class="rollcall-register-row">
+      <div class="rollcall-register-row-view">
+        <div class="rollcall-register-row-info">
+          <span class="rollcall-register-row-name"></span>
+          <span class="rollcall-register-row-grade"></span>
+          <span class="rollcall-register-row-tags"></span>
+        </div>
+        <div class="rollcall-register-row-buttons">
+          <button type="button" class="btn btn-ghost btn-sm rollcall-edit-btn">✎ 編集</button>
+          <button type="button" class="btn btn-ghost btn-sm rollcall-delete-btn">🗑 削除</button>
+        </div>
+      </div>
+      <div class="rollcall-register-row-edit" hidden>
+        <div class="rollcall-add-form-row">
+          <input type="text" class="rollcall-edit-name" />
+          <select class="rollcall-edit-grade">
+            <option value="4">4年</option>
+            <option value="3">3年</option>
+            <option value="2">2年</option>
+            <option value="1">1年</option>
+          </select>
+        </div>
+        <div class="rollcall-tag-checkboxes rollcall-edit-tag-checkboxes"></div>
+        <div class="rollcall-register-row-buttons">
+          <button type="button" class="btn btn-primary btn-sm rollcall-save-btn">保存</button>
+          <button type="button" class="btn btn-ghost btn-sm rollcall-cancel-btn">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="paceRowTemplate">
+    <div class="pace-row">
+      <div class="pace-row-top">
+        <label class="pace-field">
+          <span>距離(m)</span>
+          <input type="number" inputmode="decimal" class="pace-distance" placeholder="1000" min="0" step="any" />
+        </label>
+        <label class="pace-field">
+          <span>タイム</span>
+          <input type="text" class="pace-time" placeholder="4:30 か 270" />
+        </label>
+        <button type="button" class="pace-remove" title="この行を削除">×</button>
+      </div>
+      <div class="pace-row-result">
+        <div class="pace-metric">
+          <span class="pace-metric-label">ペース</span>
+          <span class="pace-pace-value">--:--/km</span>
+        </div>
+        <div class="pace-metric">
+          <span class="pace-metric-label">速度</span>
+          <span class="pace-speed-value">-- km/h</span>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="trainRowTemplate">
+    <div class="pace-row train-row">
+      <div class="pace-row-top">
+        <select class="train-direction">
+          <option value="AtoB">小涌谷→宮ノ下</option>
+          <option value="BtoA">宮ノ下→小涌谷</option>
+        </select>
+        <label class="pace-field">
+          <span>発</span>
+          <input type="text" class="train-dep" placeholder="7:21" />
+        </label>
+        <label class="pace-field">
+          <span>着</span>
+          <input type="text" class="train-arr" placeholder="7:26" />
+        </label>
+        <button type="button" class="pace-remove train-remove" title="この電車を削除">×</button>
+      </div>
+      <div class="pace-row-result">
+        <div class="pace-metric">
+          <span class="pace-metric-label">閉鎖</span>
+          <span class="train-closure">--</span>
+        </div>
+        <div class="pace-metric">
+          <span class="pace-metric-label">スタート回避</span>
+          <span class="train-avoid">--</span>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="recordingRowTemplate">
+    <div class="recording-row">
+      <div class="recording-row-top">
+        <span class="recording-row-group"></span>
+        <span class="recording-row-status">未録音</span>
+      </div>
+      <div class="recording-row-text"></div>
+      <div class="recording-row-buttons">
+        <button type="button" class="btn btn-ghost btn-sm recording-record-btn">🔴 録音</button>
+        <button type="button" class="btn btn-ghost btn-sm recording-play-btn" disabled>▶️ 再生</button>
+        <button type="button" class="btn btn-ghost btn-sm recording-delete-btn" disabled>🗑 削除</button>
+      </div>
+    </div>
+  </template>
+
+  <!-- 補強フル・コアA・コアB・ループ・下肢の各タブ共通の中身。
+       app.js の createReinforceTab() がタブごとに複製して差し込む
+       (要素はすべて class で参照するので id は付けない)。 -->
+  <template id="reinforceMenuTabTemplate">
+    <div class="stretch-app">
+      <div class="stretch-header-row">
+        <button type="button" class="btn btn-ghost btn-sm reinforce-voice-toggle">🔊 音声</button>
+        <button type="button" class="btn btn-ghost btn-sm reinforce-recordings-toggle">🎙 録音する</button>
+        <div class="stretch-progress reinforce-progress">0 / 0</div>
+      </div>
+
+      <label class="stretch-voice-picker">
+        <span>声を選ぶ(選ぶと試し読みします)</span>
+        <select class="reinforce-voice-select"></select>
+      </label>
+
+      <div class="stretch-display-panel">
+        <div class="stretch-timer reinforce-timer">0:00</div>
+        <div class="stretch-current-group reinforce-current-group">準備中</div>
+        <div class="reinforce-current-spec"></div>
+      </div>
+
+      <div class="stretch-next">
+        <div class="stretch-next-label">次は</div>
+        <div class="stretch-next-group reinforce-next-group"></div>
+        <div class="stretch-next-speech reinforce-next-speech"></div>
+      </div>
+
+      <div class="stretch-buttons">
+        <button type="button" class="btn btn-primary stretch-start-btn reinforce-start-btn">スタート</button>
+        <div class="stretch-buttons-row">
+          <button type="button" class="btn btn-ghost btn-sm reinforce-prev-btn">◀ 前に戻る</button>
+          <button type="button" class="btn btn-ghost btn-sm reinforce-next-btn">次に進む ▶</button>
+        </div>
+        <div class="stretch-buttons-row">
+          <button type="button" class="btn btn-ghost btn-sm reinforce-pause-btn" disabled>一時停止</button>
+          <button type="button" class="btn btn-ghost btn-sm reinforce-reset-btn">最初に戻す</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="stopwatchTemplate">
+    <section class="stopwatch-card">
+      <div class="sw-header">
+        <span class="sw-label" contenteditable="true" spellcheck="false" title="タップして名前を編集"></span>
+        <div class="sw-actions">
+          <button type="button" class="btn btn-ghost btn-sm sw-duplicate" title="このストップウォッチの子として複製します(記録・経過時間を引き継ぎます)">子複製</button>
+          <button type="button" class="btn btn-ghost btn-sm sw-duplicate-parent" title="記録を引き継がない完全に新しいストップウォッチを追加します">親複製</button>
+          <button type="button" class="btn btn-ghost btn-sm sw-remove">削除</button>
+        </div>
+      </div>
+
+      <div class="watch-body">
+        <div class="timer-panel">
+          <div class="display-panel">
+            <div class="display">00:00.00</div>
+            <div class="split-columns">
+              <div class="split-col">
+                <div class="split-item split-item-a">
+                  <span class="split-tag">A</span>
+                  <span class="split-time sw-live-a">00:00.00</span>
+                </div>
+                <div class="latest-lane-list sw-latest-a"></div>
+              </div>
+              <div class="split-col">
+                <div class="split-item split-item-b">
+                  <span class="split-tag">B</span>
+                  <span class="split-time sw-live-b">00:00.00</span>
+                </div>
+                <div class="latest-lane-list sw-latest-b"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button type="button" class="btn btn-primary sw-toggle">スタート</button>
+            <div class="lap-group">
+              <button type="button" class="btn btn-lap sw-lap-a" disabled>Aラップ</button>
+              <button type="button" class="btn btn-lap sw-lap-b" disabled>Bラップ</button>
+              <button type="button" class="btn btn-lap sw-lap-both" disabled>両方</button>
+            </div>
+          </div>
+          <div class="secondary-actions">
+            <button type="button" class="btn btn-ghost sw-reset">リセット</button>
+            <button type="button" class="btn btn-ghost sw-export-csv">Excel保存</button>
+          </div>
+          <p class="status sw-status" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="records-panel">
+          <div class="records-header">
+            <h2>記録</h2>
+            <div class="legend">区間タイム / 累計タイム</div>
+          </div>
+          <div class="records-columns">
+            <div class="records-col">
+              <div class="records-col-head">
+                <span class="col-tag col-tag-a">A</span>
+                <span class="count-badge sw-count-a">0</span>
+              </div>
+              <div class="records-grid sw-records-a" aria-label="Aラップ記録"></div>
+            </div>
+            <div class="records-col">
+              <div class="records-col-head">
+                <span class="col-tag col-tag-b">B</span>
+                <span class="count-badge sw-count-b">0</span>
+              </div>
+              <div class="records-grid sw-records-b" aria-label="Bラップ記録"></div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm records-more sw-more" hidden></button>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

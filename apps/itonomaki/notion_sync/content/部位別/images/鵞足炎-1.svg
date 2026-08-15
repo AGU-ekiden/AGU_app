@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 560" font-family="'Hiragino Sans','Yu Gothic',sans-serif">
+  <defs>
+    <radialGradient id="skin3" cx="42%" cy="25%" r="80%">
+      <stop offset="0%" stop-color="#fbead9"/>
+      <stop offset="100%" stop-color="#eccbac"/>
+    </radialGradient>
+  </defs>
+  <rect width="480" height="560" fill="#ffffff"/>
+  <text x="240" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#2b2a27">鵞足(膝を内側から見た模式図)</text>
+  <text x="240" y="66" text-anchor="middle" font-size="13" fill="#8a8578">股関節側</text>
+
+  <!-- leg silhouette: thigh narrowing to knee, then tibia -->
+  <path d="M155,80 C122,135 116,210 138,265
+           C118,300 104,360 110,420
+           C114,458 132,488 162,503
+           L278,503
+           C300,483 310,452 306,418
+           C300,368 284,308 258,268
+           C284,215 278,140 250,82
+           C210,66 188,66 155,80 Z"
+        fill="url(#skin3)" stroke="#d8c3a5" stroke-width="3"/>
+  <line x1="108" y1="278" x2="308" y2="278" stroke="#c9c4b4" stroke-width="2" stroke-dasharray="4 4"/>
+  <text x="365" y="283" font-size="13" fill="#8a8578">膝関節</text>
+
+  <!-- pes anserinus bursa -->
+  <circle cx="230" cy="342" r="15" fill="#f3c3bf" stroke="#b3413e" stroke-width="2"/>
+  <text x="230" y="347" text-anchor="middle" font-size="11" fill="#7a2c29">鵞足包</text>
+
+  <!-- three tendons, ribbon-like with soft width -->
+  <path d="M168,98 C152,160 146,222 165,266 C188,292 213,317 227,334"
+        fill="none" stroke="#4a9c89" stroke-width="9" stroke-linecap="round"/>
+  <path d="M218,92 C207,155 202,215 211,260 C217,290 224,315 231,336"
+        fill="none" stroke="#d99c2e" stroke-width="9" stroke-linecap="round"/>
+  <path d="M258,150 C252,200 246,240 236,270 C233,295 232,315 232,333"
+        fill="none" stroke="#8a68b8" stroke-width="9" stroke-linecap="round"/>
+
+  <text x="88" y="100" font-size="14" fill="#2f7f6f" font-weight="600">縫工筋</text>
+  <text x="188" y="80" font-size="14" fill="#b8860b" font-weight="600">薄筋</text>
+  <text x="332" y="150" font-size="14" fill="#7a5ca8" font-weight="600">半腱様筋</text>
+
+  <text x="240" y="525" text-anchor="middle" font-size="13" fill="#8a8578">脛骨内側(3本の腱がここに集まって付着)</text>
+</svg>

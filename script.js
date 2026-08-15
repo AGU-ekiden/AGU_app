@@ -22,7 +22,7 @@
     if (app.liveUrl) {
       return { url: app.liveUrl, label: app.urlConfidence === 'guess' ? '開く(推定)' : '開く', kind: app.urlConfidence === 'guess' ? 'guess' : 'live' };
     }
-    return { url: app.repoUrl, label: 'GitHub', kind: 'repo' };
+    return { url: app.repoUrl, label: app.external ? 'GitHub(別リポジトリ)' : 'コード', kind: 'repo' };
   }
 
   function setRole(roleId) {

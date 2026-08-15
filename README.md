@@ -1,36 +1,80 @@
-# AGU_app — チームアプリ ポータル
+# AGU_app — チームアプリ モノレポ + ポータル
 
-AGU駅伝部でこれまで作ってきた各種アプリ(タスク管理・寮費清算・メディカルカルテなど)への入り口をひとつにまとめたポータルサイトです。ビルド不要の静的サイトで、Vercel にそのままデプロイできます。
+AGU駅伝部でこれまで作ってきた各種アプリ(タスク管理・寮費清算・メディカルカルテなど)をまとめたモノレポです。各アプリのコードは `apps/<アプリID>/` 以下にあり、それぞれ元のリポジトリから**切り離して**このリポジトリ内で開発を続けます(元のリポジトリとの同期は行いません)。ルート直下は、各アプリへの入り口となるポータルサイトです。
 
 初回アクセス時に「選手 / マネージャー / スタッフ / メディカルトレーナー / フィジカルトレーナー」から役割を選ぶと、その役割用のメニュー(よく使う機能への直リンク)が表示されます。選択はブラウザに保存され、次回からは自動でそのメニューが開きます。「すべてのアプリ」からはアプリ単位の一覧(カテゴリ別)も見られます。
 
-## 構成
+## リポジトリ構成
 
-- `index.html` / `style.css` / `script.js` — ポータル本体
-- `apps-data.js` — 掲載するアプリの一覧データ
-- `roles-data.js` — 役割ごとのメニュー(機能一覧)データ
+```
+AGU_app/
+├── index.html / style.css / script.js   ← ポータル本体
+├── apps-data.js                          ← 掲載アプリの一覧データ
+├── roles-data.js                         ← 役割ごとのメニューデータ
+└── apps/
+    ├── tokei/            静的HTML(単一ファイル)
+    ├── stopwatch/         Vanilla JS / PWA
+    ├── taskkyoyu/         Vanilla JS + GAS
+    ├── task/              Vanilla JS + GAS
+    ├── ryouhi/            React (Vite) + Tailwind + GAS
+    ├── meal_traker/       静的HTML(単一ファイル)
+    ├── label_create/      React (Vite) + TypeScript
+    ├── tiryou-karte/      Next.js + Notion API
+    └── itonomaki/
+        ├── web/           ← デプロイ対象はこちら(Next.js)
+        └── notion_sync/   Notion同期用スクリプト(Python、非デプロイ)
+```
 
-各アプリの実体(コード)はこのリポジトリには含まれていません。それぞれ別リポジトリで管理されているアプリへ、カード/メニュー項目からリンクする形の「ハブ」です。
+`spm-medical-record`(フィジカルカルテ)のみ、まだこのモノレポに取り込んでおらず別リポジトリ(`ekidenagustaff-debug/SPM-medical-record`)のままです。取り込む場合は同様に `apps/spm-medical-record/` を作成してください。
 
-## アプリを追加・編集する
+## Vercelへのデプロイ(アプリごとに別プロジェクト)
 
-`apps-data.js` の `window.APPS` 配列にオブジェクトを1つ追加(または編集)するだけです。
+各アプリは**別々のVercelプロジェクト**として、このリポジトリを共通のソースにしつつ `Root Directory` だけを変えてデプロイします。
+
+1. Vercelで「Add New Project」→ このリポジトリ(`AGU-ekiden/AGU_app`)を選択
+2. `Root Directory` に対象アプリのパスを指定(下表)
+3. `Framework Preset` は基本 `Other`(Vite/Next.jsのアプリは自動検出されるのでそのままでOK)
+4. アプリごとに必要な環境変数(GASのURL、Notionトークンなど)を設定
+5. プロジェクト名はアプリ名にしておくと分かりやすい(例: `agu-stopwatch`)
+
+| アプリ | Root Directory | Framework Preset |
+| --- | --- | --- |
+| tokei | `apps/tokei` | Other |
+| stopwatch | `apps/stopwatch` | Other |
+| taskkyoyu | `apps/taskkyoyu` | Other |
+| task | `apps/task` | Other |
+| ryouhi | `apps/ryouhi` | Vite(自動検出) |
+| meal_traker | `apps/meal_traker` | Other |
+| label_create | `apps/label_create` | Vite(自動検出) |
+| tiryou-karte | `apps/tiryou-karte` | Next.js(自動検出) |
+| itonomaki | `apps/itonomaki/web` | Next.js(自動検出) |
+
+ポータル自体(ルート直下)は `Root Directory` を空(リポジトリルート)にして、`Other` プリセットでデプロイします。
+
+## アプリを改良する
+
+各アプリのコードは `apps/<アプリID>/` の下にあります。中の `README.md` に元々のセットアップ手順が書かれているので参考にしつつ、通常のコード変更と同じように編集してください。変更後、対応するVercelプロジェクトが自動で再デプロイされます。
+
+## ポータルにアプリを追加・編集する
+
+`apps-data.js` の `window.APPS` 配列にオブジェクトを1つ追加(または編集)します。
 
 ```js
 {
-  id: 'example',
+  id: 'example',           // apps/example/ ディレクトリ名と一致させる
   name: '表示名',
   description: '1〜2行の説明',
   category: 'ops', // 'measure' | 'ops' | 'medical'
   icon: '📦',
-  repoUrl: 'https://github.com/AGU-ekiden/example',
+  repoUrl: `${REPO_TREE}/apps/example`,
+  rootDir: 'apps/example',  // Vercelの Root Directory と異なる場合のみ指定(itonomakiなど)
   liveUrl: 'https://example.vercel.app', // 未デプロイ/未確認なら null
-  urlConfidence: 'guess', // URLが未検証の推測の場合のみ付ける。確認済みなら省略
+  urlConfidence: 'guess',  // URLが未検証の推測の場合のみ付ける。確認済みなら省略
   stack: '技術スタックの短い説明',
 }
 ```
 
-`liveUrl` が設定されていればカード/メニューはそのURLを開き、未設定(`null`)の場合は GitHub リポジトリを開きます。
+`liveUrl` が設定されていればカード/メニューはそのURLを開き、未設定(`null`)の場合はこのリポジトリの `apps/<id>` フォルダを開きます。
 
 ## 役割ごとのメニューを追加・編集する
 
@@ -47,24 +91,24 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 
 ## 現在掲載しているアプリ
 
-| アプリ | カテゴリ | デプロイURL |
-| --- | --- | --- |
-| Joy-Con ストップウォッチ / レーシングウォッチ (tokei) | 計測・トレーニング | https://joycontimer.vercel.app (推定・要確認) |
-| ストップウォッチ(タバタ/補強/ストレッチ/山試走/ペース計算/点呼を含む) | 計測・トレーニング | 未確認 |
-| タスク共有 (taskkyoyu) | チーム運営・事務 | 未確認 |
-| タスク管理 (task) | チーム運営・事務 | https://task-ochre-one-88.vercel.app |
-| 寮費・食費清算 (ryouhi) | チーム運営・事務 | 未確認 |
-| 食数管理 (meal_traker) | チーム運営・事務 | 未確認 |
-| 会員ラベル作成 (label_create) | チーム運営・事務 | https://label-create-alpha.vercel.app |
-| メディカルカルテ (tiryou-karte) | メディカル | https://tiryou-karte.vercel.app |
-| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | 未確認 |
-| フィジカルカルテ(SPM) (spm-medical-record) | メディカル | https://spm-medical-record.vercel.app |
+| アプリ | カテゴリ | 状態 | デプロイURL |
+| --- | --- | --- | --- |
+| Joy-Con ストップウォッチ / レーシングウォッチ (tokei) | 計測・トレーニング | モノレポ内 | https://joycontimer.vercel.app (推定・要確認) |
+| ストップウォッチ(タバタ/補強/ストレッチ/山試走/ペース計算/点呼を含む) | 計測・トレーニング | モノレポ内 | 未確認 |
+| タスク共有 (taskkyoyu) | チーム運営・事務 | モノレポ内 | 未確認 |
+| タスク管理 (task) | チーム運営・事務 | モノレポ内 | https://task-ochre-one-88.vercel.app |
+| 寮費・食費清算 (ryouhi) | チーム運営・事務 | モノレポ内 | 未確認 |
+| 食数管理 (meal_traker) | チーム運営・事務 | モノレポ内 | 未確認 |
+| 会員ラベル作成 (label_create) | チーム運営・事務 | モノレポ内 | https://label-create-alpha.vercel.app |
+| メディカルカルテ (tiryou-karte) | メディカル | モノレポ内 | https://tiryou-karte.vercel.app |
+| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | モノレポ内 | 未確認 |
+| フィジカルカルテ(SPM) (spm-medical-record) | メディカル | **別リポジトリのまま** | https://spm-medical-record.vercel.app |
 
 「未確認」のアプリは実際のデプロイURLが分かり次第 `apps-data.js` の `liveUrl` を埋めてください。`tokei` の URL は同名アプリ("Joy-Con Stopwatch")のものと推測していますが未検証のため、確認後は `urlConfidence: 'guess'` の行を削除してください。
 
 「故障者報告確認」はまだどのアプリにも実装されていない機能のため、メニュー上は「準備中」と表示されます。実装後に `roles-data.js` の `injury_report.target` を設定してください。
 
-## ローカルで確認する
+## ローカルで確認する(ポータル)
 
 ビルド不要です。`index.html` を直接ブラウザで開くか、簡易サーバーを立てて確認できます。
 
@@ -74,6 +118,4 @@ npx serve .
 python3 -m http.server 8080
 ```
 
-## デプロイ
-
-Vercel に接続すれば `vercel.json` の設定でそのまま静的サイトとして配信されます。
+各アプリを個別に確認する場合は、`apps/<アプリID>/` に移動してそれぞれの `README.md` の手順に従ってください(Vite/Next.js系は `npm install && npm run dev`、静的HTML系はブラウザで直接開くか簡易サーバーでOK)。

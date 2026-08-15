@@ -1,0 +1,1612 @@
+/*
+ * Palette based on a well-worn SEIKO professional stopwatch: gunmetal-grey
+ * resin case, a sage-grey LCD panel with dark ink segments, and a single
+ * MODE-button accent color (currently teal-green, per request).
+ */
+:root {
+  --bg: #ffffff;
+  --panel: #322f2b;
+  --panel-2: #3e3a35;
+  --border: #56514a;
+  --text: #f1ede4;
+  --text-dim: #a89f92;
+  --ink-dim: #8a8072;
+  --accent: #3d8b85;
+  --accent-dim: #1b3f3c;
+  --danger: #3d8b85;
+  --danger-dim: #16332f;
+  --lcd-bg: #c7cfbd;
+  --lcd-ink: #383f31;
+  --lcd-ink-dim: #6b7263;
+  --mono: "SF Mono", "Menlo", "Consolas", "Roboto Mono", monospace;
+
+  /* A stopwatch duplicated while running becomes a navy "child" case,
+     grouped under its parent, so it reads as clearly related but distinct. */
+  --child-accent: #3a5aa8;
+  --child-accent-dim: #16213f;
+  --child-panel: #1b2440;
+  --child-panel-2: #242f52;
+  --child-border: #3a4570;
+
+  /* TABATA: accent = go hard, teal = recover — glanceable from a distance
+     without reading the phase label. */
+  --tabata-rest: #2f7d8f;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink-dim);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+}
+
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+  /* Clears the fixed lock toggle pinned at top-right, so it never overlaps
+     the first stopwatch's action buttons (both are right-aligned). */
+  padding-top: 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100vh;
+}
+
+.stopwatch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* One parent stopwatch plus any children duplicated from it while running —
+   siblings sit next to the parent as swipeable pages, not stacked below it. */
+.family-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.family-group + .family-group {
+  margin-top: 12px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+.family-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.family-track::-webkit-scrollbar {
+  display: none;
+}
+.family-track > .stopwatch-card {
+  flex: 0 0 100%;
+  min-width: 100%;
+  scroll-snap-align: start;
+}
+
+/* Page dots — one per card in the family, shown only when there's more
+   than a lone parent to swipe between. */
+.family-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.family-dots:empty {
+  display: none;
+}
+.family-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--border);
+  cursor: pointer;
+}
+.family-dot.is-active {
+  background: var(--accent);
+}
+
+.stopwatch-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* Track children scroll horizontally in whole-card steps; a hairline of
+     breathing room between adjacent cards keeps the swipe edge legible. */
+  padding: 0 2px;
+  box-sizing: border-box;
+}
+
+/* Children get their own navy palette (scoped via custom property
+   overrides, so every descendant that reads var(--accent)/var(--panel)/etc.
+   picks it up automatically), reading as distinct from their parent's page. */
+.stopwatch-card.is-child {
+  --accent: var(--child-accent);
+  --accent-dim: var(--child-accent-dim);
+  --danger: var(--child-accent);
+  --panel: var(--child-panel);
+  --panel-2: var(--child-panel-2);
+  --border: var(--child-border);
+}
+
+.sw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sw-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: text;
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border-bottom: 1px dashed transparent;
+}
+.sw-label:hover {
+  border-bottom-color: var(--accent);
+}
+.sw-label:focus {
+  border-bottom-color: var(--accent);
+  background: var(--panel-2);
+}
+
+.sw-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* sw-actions buttons sit directly on the white page, not inside the dark
+   watch-body panel, so they need their own self-contained contrast. */
+.sw-actions .btn {
+  background: var(--panel-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+/* The first stopwatch's row also carries the "全てExcel保存" button
+   (4 buttons total instead of 3), so it needs tighter sizing to stay on
+   one line even on narrow phones. */
+.sw-actions:has(#exportAllBtn) {
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+.sw-actions:has(#exportAllBtn) .btn {
+  padding: 6px 8px;
+  font-size: 11.5px;
+}
+
+/* Compound selector (not just .btn-sm) so this reliably beats the later,
+   equal-specificity .btn rule's padding/font-size — same fix as .btn.btn-lap
+   below. Previously .btn-sm's sizing was silently overridden and every
+   btn-sm button rendered at the full base .btn size. */
+.btn.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+/* Watch face and lap memory fused into a single case, like the device itself. */
+.watch-body {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  overflow: hidden;
+}
+
+.timer-panel {
+  padding: 24px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* The whole LCD screen — main time plus the A/B live splits inside
+   the same glass, like the multi-row display on the real device. */
+.display-panel {
+  width: 100%;
+  background: var(--lcd-bg);
+  color: var(--lcd-ink);
+  border-radius: 10px;
+  padding: 10px 12px 8px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.display {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(44px, 11vw, 78px);
+  font-weight: 700;
+  letter-spacing: 1px;
+  width: 100%;
+  text-align: center;
+  text-shadow: 0 0 1px rgba(56, 63, 49, 0.35);
+}
+
+/* Past 1 hour an "H:" (or "HH:") prefix is added, which would otherwise
+   overflow the case on narrow phones at the base font size. */
+.display.is-hours {
+  font-size: clamp(34px, 9vw, 66px);
+}
+.display.is-long-hours {
+  font-size: clamp(28px, 7.5vw, 56px);
+}
+
+/* A and B live splits side by side, each with that lane's latest
+   completed record (across every stopwatch) stacked directly beneath
+   it — all inside the same LCD glass as the main clock. */
+.split-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  padding-top: 6px;
+  border-top: 1px solid rgba(56, 63, 49, 0.25);
+}
+
+.split-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.split-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.split-tag {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+.split-time {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+/* This lane's own latest completed lap. Stays visible (frozen) after
+   Stop; only clears when Reset wipes the records. */
+.latest-lane-list {
+  width: 100%;
+}
+
+.latest-lane-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.latest-lane-row.is-placeholder {
+  opacity: 0.4;
+}
+
+.latest-lane-lap {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--lcd-ink);
+}
+
+.latest-lane-total {
+  font-size: 19px;
+  color: var(--lcd-ink-dim);
+}
+
+.split-item-a,
+.split-item-b {
+  color: var(--lcd-ink);
+}
+
+/* Slim full-width toggle on top, tall lap buttons below — keeps the
+   accent-colored Start/Stop bar as thin as possible so the lap results below
+   have as much room as possible. */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.controls .sw-toggle {
+  width: 100%;
+  min-height: 64px;
+  font-size: 16px;
+}
+
+.lap-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.btn.btn-lap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 104px;
+  padding: 12px 6px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: var(--lcd-bg);
+  border-color: var(--lcd-bg);
+  color: var(--lcd-ink);
+}
+
+/* Reset / CSV / spreadsheet always share a single row. */
+.secondary-actions {
+  display: flex;
+  width: 100%;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+.secondary-actions .btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px 4px;
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.btn {
+  flex: 1 1 auto;
+  min-width: 90px;
+  padding: 14px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.05s ease, background 0.15s ease, opacity 0.15s ease, filter 0.05s ease;
+}
+/* .is-pressed is set on pointerdown (see app.js) rather than relying only on
+   :active, since iOS Safari is unreliable about applying :active on a quick
+   tap. A stronger scale/darken than a plain :active gives a clearer "pressed"
+   feel to stand in for the haptic buzz iOS can't provide. */
+.btn:active,
+.btn.is-pressed {
+  transform: scale(0.93);
+  filter: brightness(0.85);
+}
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fdf3ee;
+}
+.btn-danger {
+  background: var(--panel-2);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.btn-ghost {
+  background: transparent;
+  font-weight: 500;
+  font-size: 13px;
+  min-width: 0;
+}
+
+/* Fixed one-line height. Font shrunk so the longest message ("停止しま
+   した。スタートで再開、リセットでクリアできます。") still fits on a
+   single line instead of wrapping and growing the card. */
+.status {
+  font-size: 10px;
+  line-height: 1.4;
+  min-height: 1.4em;
+  color: var(--text-dim);
+  margin: 0;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.records-panel {
+  border-top: 1px solid var(--border);
+  padding: 10px 12px 12px;
+}
+
+.records-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.records-header h2 {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.count-badge {
+  background: var(--panel-2);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.legend {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* A and B laps side by side, each its own dense column. */
+.records-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.records-col {
+  min-width: 0;
+}
+.records-col + .records-col {
+  border-left: 1px solid var(--border);
+  padding-left: 10px;
+}
+
+/* Reveals laps older than the latest 5 shown by default. */
+.records-more {
+  width: 100%;
+  margin-top: 6px;
+  padding: 5px 6px;
+  font-size: 11px;
+}
+
+.records-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.col-tag {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 2px 9px;
+  border-radius: 5px;
+}
+.col-tag-a {
+  background: var(--lcd-bg);
+  color: var(--lcd-ink);
+}
+.col-tag-b {
+  background: var(--accent-dim);
+  color: var(--text);
+}
+
+/* Dense multi-column grid so many laps are visible at a glance */
+.records-grid {
+  column-width: 130px;
+  column-gap: 8px;
+}
+
+/* Two lines per record (idx+lap time, then total time) instead of three
+   side-by-side columns — a single-line layout squeezed the digits down to
+   illegible/ellipsized widths once the A/B split halved the column width. */
+.record-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  break-inside: avoid;
+  margin-bottom: 3px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.record-row:nth-child(odd) { background: var(--panel-2); }
+
+.record-row-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.record-row .idx {
+  color: var(--text-dim);
+  font-size: 10px;
+  flex: 0 0 auto;
+}
+
+.record-row .time-lap {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.record-row .time-total {
+  color: var(--text-dim);
+  font-size: 11px;
+  text-align: right;
+}
+
+.record-row.latest {
+  outline: 1px solid var(--accent);
+}
+
+/* Screen lock: while running outdoors, a stray tap shouldn't be able to hit
+   reset/delete/etc. The toggle sits above the overlay (higher z-index) so
+   it's always reachable to unlock; the overlay itself blocks every other
+   tap on the page underneath it. */
+.lock-toggle {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.lock-toggle.is-locked {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fdf3ee;
+}
+
+.lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  box-sizing: border-box;
+  border: 4px solid var(--accent);
+  background: rgba(61, 139, 133, 0.05);
+  cursor: not-allowed;
+}
+
+/* ---------- Tabs ---------- */
+/* 増えたタブを普段は隠し、ハンバーガーボタンから開くドロワーにまとめる
+   (計測・距離・山試走・ストレッチ・補強・TABATAの6つでは常時表示だと
+   窮屈になったため)。現在のタブ名は上部バーに常時表示して迷子を防ぐ。 */
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tab-menu-toggle {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.tab-menu-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--text);
+}
+.app-topbar-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.tab-drawer-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tab-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1200;
+  width: min(78vw, 300px);
+  box-sizing: border-box;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.35);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+}
+.tab-drawer.is-open {
+  transform: translateX(0);
+}
+.tab-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tab-drawer-heading {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tab-drawer-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tab-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tab-btn {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text-dim);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.tab-btn.is-active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+/* ---------- Pace calculator ---------- */
+.pace-app {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pace-title {
+  font-size: 16px;
+  margin: 0;
+  color: var(--text);
+}
+.pace-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.pace-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Stacked layout (fields on top, results below) rather than a single-line
+   grid — a one-line row with distance/time/pace/speed/remove doesn't fit
+   narrow phones without squeezing digits illegible. */
+.pace-row {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pace-row-top {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.pace-field {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pace-field span {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+.pace-field input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  padding: 8px;
+}
+.pace-field input:focus {
+  outline: 1px solid var(--accent);
+}
+
+.pace-remove {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  line-height: 1;
+  padding: 6px 6px;
+  cursor: pointer;
+}
+
+.pace-row-result {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+.pace-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.pace-metric-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.pace-pace-value,
+.pace-speed-value {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.preset-pace-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.preset-pace-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: var(--panel-2);
+}
+.preset-pace-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.preset-pace-time {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ---------- Level-crossing safety calculator ---------- */
+.crossing-time-fields {
+  display: flex;
+  gap: 8px;
+}
+
+.train-row .pace-row-top {
+  flex-wrap: wrap;
+}
+
+.train-direction {
+  flex: 1 1 100%;
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px;
+}
+
+.crossing-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.crossing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.crossing-list li {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 10px;
+  border-radius: 8px;
+}
+.crossing-danger {
+  background: var(--accent-dim);
+  color: var(--text);
+}
+.crossing-safe {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--accent);
+}
+
+/* ---------- Stretch-count timer ---------- */
+.stretch-app {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.stretch-header-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stretch-progress {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+  margin-left: auto; /* 🔊音声・🎙録音するボタンは左詰めでまとめ、進捗表示だけ右端に寄せる */
+}
+
+#stretchVoiceToggle.is-muted {
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.stretch-voice-picker {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stretch-voice-picker span {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+.stretch-voice-picker select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px;
+}
+.stretch-voice-picker select:disabled {
+  opacity: 0.5;
+}
+
+.stretch-recordings-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.stretch-recordings-modal[hidden] {
+  display: none;
+}
+.stretch-recordings-modal-panel {
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  box-sizing: border-box;
+  padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.stretch-recordings-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 0 0 auto;
+}
+.stretch-recordings-close-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.stretch-recordings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.recording-set-picker {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.recording-set-picker-select {
+  flex: 1 1 160px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.recording-set-picker-select span {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+.recording-set-picker-select select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px;
+}
+#recordingSetNewBtn,
+#recordingSetRenameBtn,
+#recordingSetDeleteBtn,
+#recordingSetShareBtn {
+  flex: 0 0 auto;
+}
+
+.recording-row {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.recording-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.recording-row-group {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.recording-row-status {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.recording-row.is-recorded .recording-row-status {
+  color: var(--accent);
+}
+.recording-row-text {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+.recording-row-buttons {
+  display: flex;
+  gap: 6px;
+}
+.recording-row-buttons .btn {
+  flex: 1 1 0;
+  padding: 6px 4px;
+  font-size: 11px;
+  min-width: 0;
+}
+.recording-record-btn.is-recording {
+  background: var(--accent);
+  color: #fdf3ee;
+  border-color: var(--accent);
+}
+
+.stretch-display-panel {
+  width: 100%;
+  background: var(--lcd-bg);
+  color: var(--lcd-ink);
+  border-radius: 10px;
+  padding: 18px 16px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.stretch-timer {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(40px, 14vw, 64px);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 1px rgba(56, 63, 49, 0.35);
+}
+/* Past 30 seconds — the cue to press スタート for the next stretch. */
+.stretch-timer.is-overtime {
+  color: var(--accent);
+}
+
+.stretch-current-group {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.reinforce-current-spec {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lcd-ink-dim);
+}
+
+.stretch-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.stretch-buttons-row {
+  display: flex;
+  gap: 8px;
+}
+.stretch-buttons-row .btn {
+  flex: 1 1 0;
+}
+.stretch-start-btn {
+  width: 100%;
+  min-height: 192px;
+  font-size: 28px;
+}
+
+.stretch-auto-btn {
+  width: 100%;
+}
+.stretch-auto-btn.is-active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.stretch-next {
+  width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stretch-next-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.stretch-next-group {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.stretch-next-speech {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+/* ---------- TABATA timer ---------- */
+.tabata-app {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.tabata-progress {
+  align-self: flex-end;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.tabata-display-panel {
+  width: 100%;
+  background: var(--lcd-bg);
+  color: var(--lcd-ink);
+  border-radius: 10px;
+  padding: 24px 16px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+/* Bold, saturated color per phase so it reads at a glance mid-workout,
+   without needing to focus on the text label. */
+.tabata-display-panel.is-train {
+  background: var(--accent);
+  color: #fdf3ee;
+}
+.tabata-display-panel.is-rest {
+  background: var(--tabata-rest);
+  color: #f0fbfa;
+}
+
+.tabata-phase {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.tabata-timer {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(64px, 22vw, 110px);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.tabata-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tabata-start-btn {
+  width: 100%;
+  min-height: 128px;
+  font-size: 40px;
+}
+
+/* ---------- 点呼(ロールコール) ---------- */
+.rollcall-app {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.rollcall-header-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.rollcall-progress {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+  margin-right: auto;
+}
+
+/* 4年・3年・2年・1年を横に4列並べたグリッド(ROLLCALL_GRADES =
+   [4, 3, 2, 1] の順そのまま、左から右に並ぶ)。 */
+.rollcall-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px 8px;
+  align-items: start;
+}
+.rollcall-grade-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rollcall-grade-heading {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+  padding: 2px 2px;
+}
+.rollcall-grade-members {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* タグの有無でボタンの高さが変わらないよう、バッジ欄は常に2段ぶんの
+   高さを確保しておく(中身が0〜1個の時は空の段をnbspで埋める)。これで
+   バッジが0個・1個・2個のどのボタンも高さが揃う。 */
+.rollcall-member {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.05s ease, background 0.15s ease, opacity 0.2s ease, filter 0.05s ease;
+}
+.rollcall-member-name {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.rollcall-member:active,
+.rollcall-member.is-pressed {
+  transform: scale(0.97);
+  filter: brightness(0.85);
+}
+.rollcall-member.is-checked {
+  background: transparent;
+  border-style: dashed;
+  color: var(--text-dim);
+  font-weight: 500;
+  opacity: 0.6;
+}
+.rollcall-member-tags {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1px;
+}
+.rollcall-member-tag-line {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.rollcall-member.is-checked .rollcall-member-tag-line {
+  color: var(--text-dim);
+}
+
+.rollcall-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rollcall-add-form-row {
+  display: flex;
+  gap: 6px;
+}
+.rollcall-add-form-row input[type='text'] {
+  flex: 1 1 0;
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  padding: 8px;
+}
+.rollcall-add-form-row input[type='text']:focus {
+  outline: 1px solid var(--accent);
+}
+.rollcall-add-form-row select {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  padding: 8px;
+}
+#rollcallAddBtn {
+  flex: 0 0 auto;
+}
+
+.rollcall-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rollcall-filter span {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+.rollcall-filter select {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px;
+}
+
+#rollcallShareBtn {
+  width: 100%;
+}
+
+.rollcall-tag-manage {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rollcall-tag-manage-heading {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.rollcall-tag-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.rollcall-tag-chip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 4px 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+}
+.rollcall-tag-chip-delete {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px 4px;
+}
+/* この登録モーダルは項目数が多く縦に詰まりやすいので、共通モーダルの
+   ブロック間の余白(gap: 10px)より少し詰めて、下の一覧のスクロール領域を
+   広く取れるようにする。 */
+#rollcallRegisterModal.stretch-recordings-modal .stretch-recordings-modal-panel {
+  gap: 6px;
+}
+.rollcall-tag-badge-toggle {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  white-space: nowrap;
+  padding-left: 4px;
+  border-left: 1px solid var(--border);
+}
+.rollcall-tag-badge-toggle input {
+  accent-color: var(--accent);
+}
+.rollcall-tag-empty-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.rollcall-tag-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.rollcall-tag-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+.rollcall-tag-checkbox input {
+  accent-color: var(--accent);
+}
+
+.rollcall-register-row {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rollcall-register-row-view {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.rollcall-register-row-view[hidden] {
+  display: none;
+}
+.rollcall-register-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rollcall-register-row-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.rollcall-register-row-grade {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.rollcall-register-row-tags {
+  font-size: 11px;
+  color: var(--accent);
+}
+.rollcall-register-row-buttons {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.rollcall-register-row-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rollcall-register-row-edit[hidden] {
+  display: none;
+}
+

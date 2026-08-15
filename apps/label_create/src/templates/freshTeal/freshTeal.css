@@ -1,0 +1,147 @@
+.ft-label {
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
+  color: #1c2b29;
+  background: #ffffff;
+}
+
+.ft-watermark {
+  position: absolute;
+  right: -8%;
+  bottom: -14%;
+  height: 130%;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.1;
+  filter: saturate(1.4);
+  pointer-events: none;
+}
+
+.ft-accent-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1.4mm;
+  height: 100%;
+}
+
+.ft-content {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 1.8mm 2.4mm 1.8mm 3.4mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ft-header {
+  display: flex;
+  align-items: center;
+  gap: 1.2mm;
+  min-height: 0;
+}
+
+.ft-logo {
+  height: 4.6mm;
+  max-width: 14mm;
+  object-fit: contain;
+}
+
+.ft-brand-name {
+  font-size: 2.6mm;
+  font-weight: 700;
+  letter-spacing: 0.1mm;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ft-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8mm;
+  min-height: 0;
+}
+
+.ft-name {
+  font-size: 8mm;
+  font-weight: 300;
+  line-height: 1.15;
+  color: #0f2624;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.ft-name-suffix {
+  font-size: 0.5em;
+  font-weight: 500;
+  margin-left: 0.3em;
+  color: #5c7d78;
+}
+
+.ft-tag {
+  flex: none;
+  font-size: 2.5mm;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.6mm 1.6mm;
+  border: 0.2mm solid;
+  border-radius: 1.2mm;
+  white-space: nowrap;
+}
+
+.ft-kana {
+  font-size: 2.6mm;
+  color: #5c7d78;
+  letter-spacing: 0.15mm;
+}
+
+.ft-address {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.2mm;
+  font-size: 2.8mm;
+  color: #34504c;
+  line-height: 1.3;
+}
+
+.ft-postal {
+  white-space: nowrap;
+}
+
+.ft-phone {
+  font-size: 2.6mm;
+  color: #5c7d78;
+  letter-spacing: 0.1mm;
+}
+
+.ft-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5mm;
+}
+
+.ft-badge {
+  font-size: 2.5mm;
+  font-weight: 700;
+  letter-spacing: 0.2mm;
+  color: #ffffff;
+  padding: 0.6mm 1.8mm;
+  border-radius: 3mm;
+  white-space: nowrap;
+}
+
+.ft-member-id {
+  font-size: 2.5mm;
+  color: #6b8783;
+  letter-spacing: 0.1mm;
+  white-space: nowrap;
+  margin-left: auto;
+}

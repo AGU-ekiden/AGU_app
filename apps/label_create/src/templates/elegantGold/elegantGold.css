@@ -1,0 +1,164 @@
+.eg-label {
+  box-sizing: border-box;
+  overflow: hidden;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  color: #f4ead0;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(201, 162, 75, 0.16), transparent 45%),
+    linear-gradient(155deg, #14161c 0%, #1d1f28 55%, #101116 100%);
+}
+
+.eg-frame {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 1.6mm 2.2mm;
+  border: 0.25mm solid rgba(201, 162, 75, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.eg-header {
+  display: flex;
+  align-items: center;
+  gap: 1mm;
+  min-height: 0;
+}
+
+.eg-logo {
+  height: 4mm;
+  max-width: 12mm;
+  object-fit: contain;
+}
+
+.eg-brand-mark {
+  font-size: 3.1mm;
+  line-height: 1;
+}
+
+.eg-brand-name {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 2.6mm;
+  letter-spacing: 0.15mm;
+  text-transform: uppercase;
+  color: rgba(244, 234, 208, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eg-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8mm;
+  min-height: 0;
+}
+
+.eg-name {
+  font-size: 8mm;
+  font-weight: 300;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.eg-name-suffix {
+  font-size: 0.5em;
+  font-weight: 400;
+  margin-left: 0.3em;
+  color: rgba(244, 234, 208, 0.8);
+}
+
+.eg-tag {
+  flex: none;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 2.5mm;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.6mm 1.6mm;
+  border: 0.2mm solid;
+  border-radius: 1.2mm;
+  white-space: nowrap;
+}
+
+.eg-kana {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 2.6mm;
+  color: rgba(244, 234, 208, 0.6);
+  letter-spacing: 0.2mm;
+}
+
+.eg-address {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.2mm;
+  font-size: 2.8mm;
+  color: rgba(244, 234, 208, 0.88);
+  line-height: 1.3;
+}
+
+.eg-postal {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.eg-phone {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 2.6mm;
+  color: rgba(244, 234, 208, 0.8);
+  letter-spacing: 0.1mm;
+}
+
+.eg-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5mm;
+}
+
+.eg-badge {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 2.5mm;
+  letter-spacing: 0.3mm;
+  text-transform: uppercase;
+  padding: 0.6mm 1.8mm;
+  border: 0.2mm solid;
+  border-radius: 3mm;
+  white-space: nowrap;
+}
+
+.eg-member-id {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 2.5mm;
+  color: rgba(244, 234, 208, 0.65);
+  letter-spacing: 0.15mm;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.eg-corner {
+  position: absolute;
+  width: 3mm;
+  height: 3mm;
+  border-style: solid;
+  border-width: 0;
+  opacity: 0.9;
+}
+
+.eg-corner-tl {
+  top: 0.6mm;
+  left: 0.6mm;
+  border-top-width: 0.25mm;
+  border-left-width: 0.25mm;
+}
+
+.eg-corner-br {
+  bottom: 0.6mm;
+  right: 0.6mm;
+  border-bottom-width: 0.25mm;
+  border-right-width: 0.25mm;
+}

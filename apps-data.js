@@ -1,15 +1,30 @@
 // AGU_app ポータルに掲載するアプリの一覧。
-// 新しいアプリを追加するときは、この配列にオブジェクトを1つ足すだけでOKです。
 //
-// id:          一意なID(英数字)。roles-data.js の feature からこのIDで参照される
+// このリポジトリはモノレポ構成で、各アプリの実体は apps/<id>/ 以下に
+// コピーされている(元のリポジトリとは切り離し済み。以後の改良はこの
+// リポジトリの apps/<id>/ で行う)。Vercel には apps/<id>/ (rootDir が
+// 指定されている場合はそちら)を Root Directory にしたプロジェクトを
+// アプリごとに1つずつ作成してデプロイする。
+//
+// 新しいアプリを追加するときは、apps/<id>/ にコードを置いた上で、この
+// 配列にオブジェクトを1つ足してください。
+//
+// id:          一意なID(英数字)。apps/<id>/ ディレクトリ名と一致させる。
+//               roles-data.js の feature からもこのIDで参照される
 // name:        表示名
 // description: 1〜2行の説明
 // category:    "measure" | "ops" | "medical" のいずれか(下の CATEGORIES に対応)
 // icon:        絵文字アイコン
-// repoUrl:     GitHubリポジトリのURL(必須)
+// repoUrl:     コード参照先URL(通常はこのリポジトリの apps/<id> フォルダ)
+// rootDir:     Vercelプロジェクト作成時に Root Directory に指定するパス。
+//               省略時は `apps/<id>` と同じ
 // liveUrl:     デプロイ済みアプリのURL。未確認/未デプロイの場合は null にしておく
-// urlConfidence: "confirmed"(GitHubのhomepage設定等で確認済み) | "guess"(推定、要確認) | undefined(confirmedとして扱う)
+// urlConfidence: "guess"(推定、要確認) | undefined(確認済みとして扱う)
 // stack:       技術スタックの短い説明
+// external:    true の場合、このモノレポには取り込まれておらず、別リポジトリの
+//               ままであることを示す(現状 spm-medical-record のみ)
+const REPO_TREE = 'https://github.com/AGU-ekiden/AGU_app/tree/main';
+
 window.CATEGORIES = [
   { id: 'measure', name: '⏱️ 計測・トレーニング' },
   { id: 'ops', name: '📋 チーム運営・事務' },
@@ -23,7 +38,7 @@ window.APPS = [
     description: 'シンプルな計測ダッシュボード。練習タイムの計測に使う時計アプリ。',
     category: 'measure',
     icon: '⏱️',
-    repoUrl: 'https://github.com/AGU-ekiden/tokei',
+    repoUrl: `${REPO_TREE}/apps/tokei`,
     liveUrl: 'https://joycontimer.vercel.app',
     urlConfidence: 'guess',
     stack: '静的HTML(単一ファイル)',
@@ -34,7 +49,7 @@ window.APPS = [
     description: 'A/B 2系列のラップ計測、距離・ペース計算、山試走の踏切安全チェック、ストレッチ/補強タイマー、TABATA、点呼機能まで備えた多機能計測アプリ。',
     category: 'measure',
     icon: '⏲️',
-    repoUrl: 'https://github.com/AGU-ekiden/stopwatch',
+    repoUrl: `${REPO_TREE}/apps/stopwatch`,
     liveUrl: null,
     stack: 'Vanilla JS / PWA',
   },
@@ -44,7 +59,7 @@ window.APPS = [
     description: 'スマホ最適化のタスク管理アプリ。優先度バッジ・@タグでの確認先指定・LINE確認メモに対応。',
     category: 'ops',
     icon: '✅',
-    repoUrl: 'https://github.com/AGU-ekiden/taskkyoyu',
+    repoUrl: `${REPO_TREE}/apps/taskkyoyu`,
     liveUrl: null,
     stack: 'Vanilla JS + GAS(スプレッドシートDB)',
   },
@@ -54,7 +69,7 @@ window.APPS = [
     description: 'taskkyoyu と同系統のタスク管理アプリ(優先度ラベルの構成が異なる別デプロイ)。',
     category: 'ops',
     icon: '📝',
-    repoUrl: 'https://github.com/AGU-ekiden/task',
+    repoUrl: `${REPO_TREE}/apps/task`,
     liveUrl: 'https://task-ochre-one-88.vercel.app',
     stack: 'Vanilla JS + GAS(スプレッドシートDB)',
   },
@@ -64,7 +79,7 @@ window.APPS = [
     description: '寮生の会費・食費の月次清算管理システム。集金用PDFの一括出力に対応。',
     category: 'ops',
     icon: '🧾',
-    repoUrl: 'https://github.com/AGU-ekiden/ryouhi',
+    repoUrl: `${REPO_TREE}/apps/ryouhi`,
     liveUrl: null,
     stack: 'React (Vite) + Tailwind + GAS',
   },
@@ -74,7 +89,7 @@ window.APPS = [
     description: '寮の朝食・夕食の喫食数を記録するアプリ。',
     category: 'ops',
     icon: '🍚',
-    repoUrl: 'https://github.com/AGU-ekiden/meal_traker',
+    repoUrl: `${REPO_TREE}/apps/meal_traker`,
     liveUrl: null,
     stack: '静的HTML(単一ファイル)',
   },
@@ -84,7 +99,7 @@ window.APPS = [
     description: '会員データから印刷用の宛名ラベルシートを作成するアプリ。データはサーバーに送信せずブラウザ内で処理。',
     category: 'ops',
     icon: '🏷️',
-    repoUrl: 'https://github.com/AGU-ekiden/label_create',
+    repoUrl: `${REPO_TREE}/apps/label_create`,
     liveUrl: 'https://label-create-alpha.vercel.app',
     stack: 'React (Vite) + TypeScript',
   },
@@ -94,7 +109,7 @@ window.APPS = [
     description: '陸上部向けメディカルトレーナーカルテシステム。血液検査・InBody・大会結果などを選手ごとに横断表示。',
     category: 'medical',
     icon: '🩺',
-    repoUrl: 'https://github.com/AGU-ekiden/tiryou-karte',
+    repoUrl: `${REPO_TREE}/apps/tiryou-karte`,
     liveUrl: 'https://tiryou-karte.vercel.app',
     stack: 'Next.js + Notion API',
   },
@@ -104,18 +119,20 @@ window.APPS = [
     description: 'フィジカル・メンタル・部位別・種目別・トレーナーの知見をまとめた閲覧用サイト。Notionと同期。',
     category: 'medical',
     icon: '📚',
-    repoUrl: 'https://github.com/AGU-ekiden/itonomaki',
+    repoUrl: `${REPO_TREE}/apps/itonomaki`,
+    rootDir: 'apps/itonomaki/web',
     liveUrl: null,
     stack: 'Next.js + Notion同期(Python)',
   },
   {
     id: 'spm-medical-record',
     name: 'フィジカルカルテ(SPM)',
-    description: 'フィジカルトレーナーがフィジカルカルテを記録するアプリ。記録内容は tiryou-karte の選手ページにも統合表示される。',
+    description: 'フィジカルトレーナーがフィジカルカルテを記録するアプリ。記録内容は tiryou-karte の選手ページにも統合表示される。このモノレポにはまだ取り込まれておらず、別リポジトリ(ekidenagustaff-debug/SPM-medical-record)のまま。',
     category: 'medical',
     icon: '💊',
     repoUrl: 'https://github.com/ekidenagustaff-debug/SPM-medical-record',
     liveUrl: 'https://spm-medical-record.vercel.app',
     stack: 'React + TypeScript',
+    external: true,
   },
 ];
