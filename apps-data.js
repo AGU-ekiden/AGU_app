@@ -1,13 +1,14 @@
 // AGU_app ポータルに掲載するアプリの一覧。
 // 新しいアプリを追加するときは、この配列にオブジェクトを1つ足すだけでOKです。
 //
-// id:          一意なID(英数字)
+// id:          一意なID(英数字)。roles-data.js の feature からこのIDで参照される
 // name:        表示名
 // description: 1〜2行の説明
 // category:    "measure" | "ops" | "medical" のいずれか(下の CATEGORIES に対応)
 // icon:        絵文字アイコン
 // repoUrl:     GitHubリポジトリのURL(必須)
 // liveUrl:     デプロイ済みアプリのURL。未確認/未デプロイの場合は null にしておく
+// urlConfidence: "confirmed"(GitHubのhomepage設定等で確認済み) | "guess"(推定、要確認) | undefined(confirmedとして扱う)
 // stack:       技術スタックの短い説明
 window.CATEGORIES = [
   { id: 'measure', name: '⏱️ 計測・トレーニング' },
@@ -23,7 +24,8 @@ window.APPS = [
     category: 'measure',
     icon: '⏱️',
     repoUrl: 'https://github.com/AGU-ekiden/tokei',
-    liveUrl: null,
+    liveUrl: 'https://joycontimer.vercel.app',
+    urlConfidence: 'guess',
     stack: '静的HTML(単一ファイル)',
   },
   {
@@ -98,12 +100,22 @@ window.APPS = [
   },
   {
     id: 'itonomaki',
-    name: 'トレーナー知見ライブラリ',
+    name: 'トレーナー知見ライブラリ(青トレデータ)',
     description: 'フィジカル・メンタル・部位別・種目別・トレーナーの知見をまとめた閲覧用サイト。Notionと同期。',
     category: 'medical',
     icon: '📚',
     repoUrl: 'https://github.com/AGU-ekiden/itonomaki',
     liveUrl: null,
     stack: 'Next.js + Notion同期(Python)',
+  },
+  {
+    id: 'spm-medical-record',
+    name: 'フィジカルカルテ(SPM)',
+    description: 'フィジカルトレーナーがフィジカルカルテを記録するアプリ。記録内容は tiryou-karte の選手ページにも統合表示される。',
+    category: 'medical',
+    icon: '💊',
+    repoUrl: 'https://github.com/ekidenagustaff-debug/SPM-medical-record',
+    liveUrl: 'https://spm-medical-record.vercel.app',
+    stack: 'React + TypeScript',
   },
 ];
