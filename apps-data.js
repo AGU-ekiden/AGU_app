@@ -118,7 +118,7 @@ window.APPS = [
     category: 'medical',
     icon: '💊',
     repoUrl: `${REPO_TREE}/apps/spm-medical-record`,
-    liveUrl: 'https://spm-medical-record.vercel.app',
+    liveUrl: 'https://agu-spm-medical-record.aoyamagakuin-shimoda.workers.dev',
     stack: 'Next.js + Notion API',
   },
 ];
