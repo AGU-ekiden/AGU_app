@@ -1,0 +1,20 @@
+# 秘密情報を含むローカル専用ファイル(絶対にコミットしない)
+.env
+.env.local
+.env.*.local
+.env.vercel.local
+
+# Vercel CLI のローカル状態
+.vercel
+
+# 依存関係・ビルド成果物
+node_modules/
+dist/
+.next/
+build/
+
+# OS/エディタ
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc

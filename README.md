@@ -103,12 +103,29 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 | 食数管理 (meal_traker) | チーム運営・事務 | 未確認 |
 | 会員ラベル作成 (label_create) | チーム運営・事務 | https://label-create-alpha.vercel.app |
 | メディカルカルテ (tiryou-karte) | メディカル | https://tiryou-karte.vercel.app |
-| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | 未確認 |
+| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | https://itonomaki-55ve.vercel.app (旧リポジトリのデプロイ。stopwatchのコード内に直書きされていたURL) |
 | フィジカルカルテ(SPM) (spm-medical-record) | メディカル | https://spm-medical-record.vercel.app |
 
 「未確認」のアプリは実際のデプロイURLが分かり次第 `apps-data.js` の `liveUrl` を埋めてください。`tokei` の URL は同名アプリ("Joy-Con Stopwatch")のものと推測していますが未検証のため、確認後は `urlConfidence: 'guess'` の行を削除してください。
 
 「故障者報告確認」はまだどのアプリにも実装されていない機能のため、メニュー上は「準備中」と表示されます。実装後に `roles-data.js` の `injury_report.target` を設定してください。
+
+## Vercelプロジェクトの一括作成
+
+`scripts/setup_vercel.py` でアプリごとのVercelプロジェクト作成・Root Directory
+設定・環境変数投入を自動化できます。手順は `scripts/README.md` を参照してくだ
+さい。
+
+### 移行に伴う既知の未修正点
+
+- **itonomaki**: `src/lib/github.ts` が Web編集機能(`/edit`)の保存先として旧リ
+  ポジトリ `itoaogaku/itonomaki` を直書きしたままです。このモノレポ
+  (`AGU-ekiden/AGU_app`、パス `apps/itonomaki/notion_sync/content`)向けに直
+  すまで、編集内容の保存は動きません(閲覧は問題なし)。
+- **stopwatch**: `app.js` が itonomakiの音声共有・点呼名簿共有APIのURLとして
+  旧デプロイ `https://itonomaki-55ve.vercel.app/...` を直書きしています。
+  itonomakiを新しいVercelプロジェクトとして再デプロイしたら、このURLも新しい
+  ものに更新する必要があります。
 
 ## ローカルで確認する(ポータル)
 

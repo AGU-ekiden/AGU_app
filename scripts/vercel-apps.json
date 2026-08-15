@@ -1,0 +1,112 @@
+{
+  "repo": "AGU-ekiden/AGU_app",
+  "apps": [
+    {
+      "id": "portal",
+      "projectName": "agu-portal",
+      "rootDirectory": null,
+      "framework": null,
+      "envVars": []
+    },
+    {
+      "id": "tokei",
+      "projectName": "agu-tokei",
+      "rootDirectory": "apps/tokei",
+      "framework": null,
+      "envVars": []
+    },
+    {
+      "id": "stopwatch",
+      "projectName": "agu-stopwatch",
+      "rootDirectory": "apps/stopwatch",
+      "framework": null,
+      "envVars": []
+    },
+    {
+      "id": "taskkyoyu",
+      "projectName": "agu-taskkyoyu",
+      "rootDirectory": "apps/taskkyoyu",
+      "framework": null,
+      "envVars": []
+    },
+    {
+      "id": "task",
+      "projectName": "agu-task",
+      "rootDirectory": "apps/task",
+      "framework": null,
+      "envVars": []
+    },
+    {
+      "id": "ryouhi",
+      "projectName": "agu-ryouhi",
+      "rootDirectory": "apps/ryouhi",
+      "framework": "vite",
+      "envVars": [
+        { "key": "VITE_GAS_API_URL", "required": false, "note": "未設定でもダミーデータで動作" },
+        { "key": "VITE_USE_DUMMY_DATA", "required": false, "note": "true/false" }
+      ]
+    },
+    {
+      "id": "meal_traker",
+      "projectName": "agu-meal-traker",
+      "rootDirectory": "apps/meal_traker",
+      "framework": null,
+      "envVars": []
+    },
+    {
+      "id": "label_create",
+      "projectName": "agu-label-create",
+      "rootDirectory": "apps/label_create",
+      "framework": "vite",
+      "envVars": []
+    },
+    {
+      "id": "tiryou-karte",
+      "projectName": "agu-tiryou-karte",
+      "rootDirectory": "apps/tiryou-karte",
+      "framework": "nextjs",
+      "envVars": [
+        { "key": "NOTION_TOKEN", "required": true, "note": "Notionインテグレーションのシークレットトークン" },
+        { "key": "NOTION_MEMBERS_DATABASE_ID", "required": true, "note": "" },
+        { "key": "NOTION_MEDICAL_KARTE_DATABASE_ID", "required": true, "note": "" },
+        { "key": "NOTION_RACE_RESULTS_DATABASE_ID", "required": true, "note": "" },
+        { "key": "NOTION_PERSONAL_KARTE_DATABASE_ID", "required": true, "note": "spm-medical-recordのDBと同じ値" },
+        { "key": "NOTION_BLOOD_TEST_DATABASE_ID", "required": true, "note": "" },
+        { "key": "NOTION_PLAYER_PROFILE_DATABASE_ID", "required": true, "note": "" },
+        { "key": "NOTION_INBODY_DATABASE_ID", "required": true, "note": "" }
+      ]
+    },
+    {
+      "id": "itonomaki",
+      "projectName": "agu-itonomaki",
+      "rootDirectory": "apps/itonomaki/web",
+      "framework": "nextjs",
+      "envVars": [
+        { "key": "SITE_USER", "required": false, "note": "閲覧用Basic認証。未設定なら誰でも閲覧可" },
+        { "key": "SITE_PASSWORD", "required": false, "note": "" },
+        { "key": "EDIT_PASSWORD", "required": false, "note": "Web編集機能(/edit)用。未設定なら編集不可" },
+        { "key": "GITHUB_TOKEN", "required": false, "note": "contents:write on AGU-ekiden/AGU_app が必要(要コード修正、下記メモ参照)" },
+        { "key": "FTP_HOST", "required": false, "note": "写真アップロード用" },
+        { "key": "FTP_USER", "required": false, "note": "" },
+        { "key": "FTP_PASSWORD", "required": false, "note": "" },
+        { "key": "STRETCH_AUDIO_TOKEN", "required": false, "note": "stopwatchアプリの音声共有機能から呼ばれるAPIの認証トークン" }
+      ],
+      "note": "src/lib/github.ts が OWNER/REPO/CONTENT_PREFIX を 'itoaogaku/itonomaki' 用にハードコードしたまま(要修正)。修正するまで /edit の保存機能は動かない。"
+    },
+    {
+      "id": "spm-medical-record",
+      "projectName": "agu-spm-medical-record",
+      "rootDirectory": "apps/spm-medical-record",
+      "framework": "nextjs",
+      "envVars": [
+        { "key": "NOTION_TOKEN", "required": true, "note": "" },
+        { "key": "NOTION_DATABASE_ID", "required": false, "note": "" },
+        { "key": "NOTION_MEMBERS_DATABASE_ID", "required": false, "note": "" },
+        { "key": "NOTION_RACE_RESULTS_DATABASE_ID", "required": false, "note": "" },
+        { "key": "NOTION_MEDICAL_KARTE_DATABASE_ID", "required": true, "note": "" },
+        { "key": "NOTION_BLOOD_TEST_DATABASE_ID", "required": true, "note": "tiryou-karteと同じ値" },
+        { "key": "NOTION_PLAYER_PROFILE_DATABASE_ID", "required": false, "note": "" }
+      ]
+    }
+  ]
+}
