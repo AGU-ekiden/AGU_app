@@ -42,16 +42,20 @@ python3 scripts/setup_vercel.py --only ryouhi,tiryou-karte
 
 ## スクリプトがやること
 
-各アプリについて:
+`itonomaki` を除く各アプリについて:
 
 1. 同名のVercelプロジェクトが無ければ、このリポジトリと連携した状態で新規作成
-2. `Root Directory` を `apps/<アプリID>`(itonomakiのみ `apps/itonomaki/web`)に設定
+2. `Root Directory` を `apps/<アプリID>` に設定
 3. `.env.vercel.local` に値があるキーだけ、Production/Preview/Development 全環境に環境変数として登録
 4. 値が無かったキー・既に登録済みのキーはスキップし、最後に一覧表示
 
 **上書きはしません**。既にVercel側に同名の環境変数がある場合はスキップされる
 ので、誤って既存の値を消すことはありません。値を更新したい場合はVercelダッシュ
 ボードから直接編集してください。
+
+`itonomaki` は既に本番稼働中の既存プロジェクト(`itonomaki-55ve`)があるため、
+このスクリプトは自動でスキップします(`vercel-apps.json` の `skipAutoCreate`)。
+新しいプロジェクトを作らず、既存プロジェクトを繋ぎ直す方法は下記参照。
 
 ## 実行後にやること
 
@@ -60,11 +64,22 @@ python3 scripts/setup_vercel.py --only ryouhi,tiryou-karte
   ボードから追加する
 - 各プロジェクトのデプロイが成功したら、`apps-data.js` の該当アプリの `liveUrl`
   を実際のURLに更新する
-- `itonomaki` は `src/lib/github.ts` の `OWNER`/`REPO`/`CONTENT_PREFIX` が旧リポ
-  ジトリ(`itoaogaku/itonomaki`)を指したままなので、Web編集機能(`/edit`)を使う
-  前にこのリポジトリ向け(`AGU-ekiden/AGU_app`、パス `apps/itonomaki/notion_sync/content`)
-  に修正が必要
-- `stopwatch` は `app.js` 内で itonomaki の共有API URL
-  (`https://itonomaki-55ve.vercel.app/...`)を直接ハードコードしているので、
-  itonomakiを新しいプロジェクトとして再デプロイする場合はそのURLも合わせて
-  更新する
+
+## itonomaki: 既存プロジェクトの繋ぎ直し(このスクリプトでは行いません)
+
+`itonomaki-55ve` は既に本番で使われており、URLが `stopwatch` のコードにも
+直書きされているため、新規プロジェクトを作るのではなく**既存プロジェクトの
+Git連携を張り替える**方法を取ります。これならURLは変わらず、既存の環境変数
+(`GITHUB_TOKEN`・`FTP_*` 等)もそのまま使えます。
+
+1. Vercelダッシュボードで `itonomaki-55ve` プロジェクトを開く
+2. **Settings → Git** → 現在連携しているリポジトリの連携を解除し、
+   `AGU-ekiden/AGU_app` を新たに連携する
+3. **Settings → General → Root Directory** を `apps/itonomaki/web` に変更
+4. **Settings → Environment Variables** で既存の値がそのまま残っていることを確認
+   (消えていた場合のみ `scripts/vercel-apps.json` の `itonomaki` の項目を参照して再設定)
+5. Deploy し、`/edit` を含めて動作確認する
+
+上記の作業を行う前提で、`apps/itonomaki/web/src/lib/github.ts` は既に
+`AGU-ekiden/AGU_app` (`apps/itonomaki/notion_sync/content`) 向けに修正済みです
+(以前のコミットで対応済み)。`stopwatch` 側のURLもこの方法なら変更不要です。

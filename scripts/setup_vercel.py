@@ -182,6 +182,10 @@ def main():
         name = app["projectName"]
         print(f"\n=== {app_id} ({name}) ===")
 
+        if app.get("skipAutoCreate"):
+            print(f"  スキップ: {app.get('note', '手動での対応が必要です')}")
+            continue
+
         project = client.get_project(name)
         if project is None:
             print(f"  プロジェクトが無いので作成します (framework={app['framework']})")

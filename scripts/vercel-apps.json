@@ -78,20 +78,21 @@
     },
     {
       "id": "itonomaki",
-      "projectName": "agu-itonomaki",
+      "projectName": "itonomaki-55ve",
       "rootDirectory": "apps/itonomaki/web",
       "framework": "nextjs",
+      "skipAutoCreate": true,
       "envVars": [
         { "key": "SITE_USER", "required": false, "note": "閲覧用Basic認証。未設定なら誰でも閲覧可" },
         { "key": "SITE_PASSWORD", "required": false, "note": "" },
         { "key": "EDIT_PASSWORD", "required": false, "note": "Web編集機能(/edit)用。未設定なら編集不可" },
-        { "key": "GITHUB_TOKEN", "required": false, "note": "contents:write on AGU-ekiden/AGU_app が必要(要コード修正、下記メモ参照)" },
+        { "key": "GITHUB_TOKEN", "required": false, "note": "contents:write on AGU-ekiden/AGU_app が必要" },
         { "key": "FTP_HOST", "required": false, "note": "写真アップロード用" },
         { "key": "FTP_USER", "required": false, "note": "" },
         { "key": "FTP_PASSWORD", "required": false, "note": "" },
         { "key": "STRETCH_AUDIO_TOKEN", "required": false, "note": "stopwatchアプリの音声共有機能から呼ばれるAPIの認証トークン" }
       ],
-      "note": "src/lib/github.ts が OWNER/REPO/CONTENT_PREFIX を 'itoaogaku/itonomaki' 用にハードコードしたまま(要修正)。修正するまで /edit の保存機能は動かない。"
+      "note": "新規プロジェクトを作らず、既存の 'itonomaki-55ve' プロジェクトのGit連携をこのリポジトリに繋ぎ直して使う(URL・既存の環境変数を維持するため)。このスクリプトでは自動作成しない(skipAutoCreate)。手順はscripts/README.md参照。"
     },
     {
       "id": "spm-medical-record",

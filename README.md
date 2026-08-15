@@ -116,16 +116,19 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 設定・環境変数投入を自動化できます。手順は `scripts/README.md` を参照してくだ
 さい。
 
-### 移行に伴う既知の未修正点
+### itonomakiは既存プロジェクトを繋ぎ直す
 
-- **itonomaki**: `src/lib/github.ts` が Web編集機能(`/edit`)の保存先として旧リ
-  ポジトリ `itoaogaku/itonomaki` を直書きしたままです。このモノレポ
-  (`AGU-ekiden/AGU_app`、パス `apps/itonomaki/notion_sync/content`)向けに直
-  すまで、編集内容の保存は動きません(閲覧は問題なし)。
-- **stopwatch**: `app.js` が itonomakiの音声共有・点呼名簿共有APIのURLとして
-  旧デプロイ `https://itonomaki-55ve.vercel.app/...` を直書きしています。
-  itonomakiを新しいVercelプロジェクトとして再デプロイしたら、このURLも新しい
-  ものに更新する必要があります。
+`itonomaki-55ve` が本番で稼働中の実体で、`stopwatch` のコードにもこのURLが
+直書きされています。そのため `itonomaki` だけは新規Vercelプロジェクトを
+作らず、既存の `itonomaki-55ve` プロジェクトのGit連携をこのリポジトリに
+張り替える方式にしています(URL・既存の環境変数を維持するため)。手順は
+`scripts/README.md` の「itonomaki: 既存プロジェクトの繋ぎ直し」を参照して
+ください。この方式なら `stopwatch` 側の修正は不要です。
+
+`src/lib/github.ts` はWeb編集機能(`/edit`)の保存先として旧リポジトリ
+`itoaogaku/itonomaki` を直書きしていましたが、このモノレポ
+(`AGU-ekiden/AGU_app`、パス `apps/itonomaki/notion_sync/content`)向けに
+修正済みです。
 
 ## ローカルで確認する(ポータル)
 
