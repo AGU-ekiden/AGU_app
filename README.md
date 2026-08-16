@@ -26,34 +26,21 @@ AGU_app/
     └── spm-medical-record/ Next.js + Notion API
 ```
 
-## デプロイ先: Cloudflare
+## デプロイ先: Vercel
 
-このリポジトリは **Cloudflare** に統一してデプロイします。アプリの種類で2つの経路に分かれます。
+このリポジトリは **Vercel** に統一してデプロイします。静的サイトもViteアプリもNext.jsアプリも、同じ仕組み(Vercelのgit連携による自動ビルド)でデプロイされます。アプリごとにVercelプロジェクトを1つ作成し、Root Directory・Framework Presetをそのアプリに合わせて設定します(詳細は `scripts/README.md` を参照)。`main` ブランチへのpushで自動的に再デプロイされます。
 
-| 種類 | 対象アプリ | デプロイ先 |
-| --- | --- | --- |
-| 静的サイト・Viteアプリ | tokei, stopwatch, taskkyoyu, task, meal_traker, ryouhi, label_create, ポータル本体 | **Cloudflare Pages** |
-| Next.js(SSR/API Routes) | tiryou-karte, spm-medical-record, itonomaki | **Cloudflare Workers**(`@opennextjs/cloudflare`) |
-
-各アプリはこれまで別々のオリジン(`*.pages.dev` / `*.workers.dev`)で
-公開されていましたが、`gateway/` にあるリバースプロキシWorkerが
-`/stopwatch/` のようなパスプレフィックスで全部を1つのオリジンに束ねます
-(iPhoneの「ホーム画面に追加」でアプリ間を移動してもSafariのヘッダーが
-再表示されないようにするため)。実際にユーザーがブックマークするのは
-このゲートウェイのURLです。詳細は `scripts/README.md` の
-「C. ゲートウェイ」を参照してください。
+各アプリはそれぞれ別々のVercelドメイン(`*.vercel.app`)にデプロイされますが、リポジトリルートの **`vercel.json`** の `rewrites` が `/stopwatch/` のようなパスプレフィックスで全部を1つのオリジン(ポータルのドメイン)に束ねます(iPhoneの「ホーム画面に追加」でアプリ間を移動してもSafariのヘッダーが再表示されないようにするため)。実際にユーザーがブックマークするのはポータルのURLです。詳細は `scripts/README.md` の「B. vercel.json による1オリジン化」を参照してください。
 
 セットアップ手順・スクリプトは `scripts/README.md` にまとめています。要点:
 
-- 静的/Viteアプリは `scripts/setup_cloudflare.py` でPagesプロジェクトを一括作成
-- Next.jsアプリは各ディレクトリで `npm run cf:deploy`(= `opennextjs-cloudflare build && wrangler deploy`)を実行してWorkerとしてデプロイ
-- Next.jsアプリのうち、Cloudflareでは動かない機能(FTP経由の写真/音声アップロード、`@vercel/blob`)については `scripts/README.md` の「既知の制限」を参照
-
-(以前はVercelでの運用を試していた名残として `scripts/setup_vercel.py` / `vercel-apps.json` も残っていますが、現在はCloudflareが正の方針です)
+- `scripts/setup_vercel.py` / `scripts/vercel-apps.json` でVercelプロジェクトを一括作成
+- 各アプリのデプロイURLが確定したら、リポジトリルートの `vercel.json` の `rewrites` / `redirects` にそのURLを反映
+- Next.jsアプリ(tiryou-karte・spm-medical-record・itonomaki)固有の環境変数、Vercelで復活する機能(FTP経由のアップロード、`@vercel/blob`、Basic認証)については `scripts/README.md` の「C. Next.jsアプリ固有の設定」を参照
 
 ## アプリを改良する
 
-各アプリのコードは `apps/<アプリID>/` の下にあります。中の `README.md` に元々のセットアップ手順が書かれているので参考にしつつ、通常のコード変更と同じように編集してください。Next.jsアプリはCloudflare向けに `next` を `16.3.1` 以上に、`@opennextjs/cloudflare` と `wrangler` を追加済みです。
+各アプリのコードは `apps/<アプリID>/` の下にあります。中の `README.md` に元々のセットアップ手順が書かれているので参考にしつつ、通常のコード変更と同じように編集してください。
 
 ## ポータルにアプリを追加・編集する
 
@@ -68,13 +55,13 @@ AGU_app/
   icon: '📦',
   repoUrl: `${REPO_TREE}/apps/example`,
   rootDir: 'apps/example',  // デプロイ設定のRoot Directoryが apps/<id> と異なる場合のみ指定(itonomakiなど)
-  liveUrl: '/example/', // gateway配下のパス(相対パス)。未デプロイ/未確認なら null
+  liveUrl: '/example/', // 1オリジン化後のパス(相対パス)。未デプロイ/未確認なら null
   urlConfidence: 'guess',  // URLが未検証の推測の場合のみ付ける。確認済みなら省略
   stack: '技術スタックの短い説明',
 }
 ```
 
-`liveUrl` が設定されていればカード/メニューはそのURLを開き、未設定(`null`)の場合はこのリポジトリの `apps/<id>` フォルダを開きます。`liveUrl` は絶対URLではなく `gateway/` 配下のパス(`/example/` のような相対パス)にしてください。新しいアプリを追加した場合は `gateway/src/index.ts` の `STATIC_ROUTES`(静的/Viteアプリ)または `PREFIXED_ROUTES`(Next.jsアプリ)にもプレフィックスとデプロイ先ホスト名を追加する必要があります。詳細は `scripts/README.md` の「C. ゲートウェイ」を参照してください。
+`liveUrl` が設定されていればカード/メニューはそのURLを開き、未設定(`null`)の場合はこのリポジトリの `apps/<id>` フォルダを開きます。`liveUrl` は絶対URLではなく、1オリジン化後の相対パス(`/example/` のような)にしてください。新しいアプリを追加した場合は、リポジトリルートの `vercel.json` の `rewrites`(必要に応じて `redirects` も)にそのアプリのプレフィックスとデプロイ先URLを追加する必要があります。詳細は `scripts/README.md` の「B. vercel.json による1オリジン化」を参照してください。
 
 ## 役割ごとのメニューを追加・編集する
 
@@ -91,13 +78,12 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 
 ## 現在掲載しているアプリ
 
-すべて `apps/` 以下にモノレポとして取り込み済みで、Cloudflareへのデプロイも
-完了しています。`apps-data.js` の `liveUrl` は `gateway/` (リバースプロキシ
-Worker)配下のパス(例: `/stopwatch/`)で管理しており、実際にどのアプリが
-どのCloudflareプロジェクトに対応するかは `gateway/src/index.ts` の
-`STATIC_ROUTES` / `PREFIXED_ROUTES` を参照してください。
+すべて `apps/` 以下にモノレポとして取り込み済みで、Vercelへのデプロイも
+完了しています。`apps-data.js` の `liveUrl` は1オリジン化後のパス
+(例: `/stopwatch/`)で管理しており、実際にどのアプリがどのVercelプロジェクト
+に対応するかはリポジトリルートの `vercel.json` の `rewrites` を参照してください。
 
-| アプリ | カテゴリ | ゲートウェイ配下のパス |
+| アプリ | カテゴリ | 公開パス |
 | --- | --- | --- |
 | Joy-Con ストップウォッチ / レーシングウォッチ (tokei) | 計測・トレーニング | `/tokei/` |
 | ストップウォッチ(タバタ/補強/ストレッチ/山試走/ペース計算/点呼を含む) | 計測・トレーニング | `/stopwatch/` |
@@ -113,16 +99,9 @@ Worker)配下のパス(例: `/stopwatch/`)で管理しており、実際にど�
 
 ## itonomakiについて
 
-旧本番環境 `itonomaki-55ve`(Vercel)から Cloudflare Workers
-(`agu-itonomaki.aoyamagakuin-shimoda.workers.dev`)への移行が完了しました。
-`src/lib/github.ts` はWeb編集機能(`/edit`)の保存先として旧リポジトリ
-`itoaogaku/itonomaki` を直書きしていましたが、このモノレポ
-(`AGU-ekiden/AGU_app`、パス `apps/itonomaki/notion_sync/content`)向けに
-修正済みです。`stopwatch` のコード内には旧デプロイ(`itonomaki-55ve`)への
-URL参照がまだ残っています。写真/音声アップロード・点呼名簿はFTP依存で
-現状Cloudflareでは動作しないため実害はありませんが、これらの機能を
-復活させる際は新URLへの向き先変更も合わせて必要です。詳細は
-`scripts/README.md` の「既知の制限」を参照してください。
+itonomakiは元々 `itonomaki-55ve` というVercelプロジェクトで本番運用されており、その後Cloudflare Workersに移行していました。今回のVercel移行では別アカウントに移るため旧プロジェクトは引き継がず、新規に **`agu-itonomaki`** というVercelプロジェクトを作成しています。`src/lib/github.ts` はWeb編集機能(`/edit`)の保存先として旧リポジトリ `itoaogaku/itonomaki` を直書きしていましたが、このモノレポ(`AGU-ekiden/AGU_app`、パス `apps/itonomaki/notion_sync/content`)向けに修正済みです。
+
+`stopwatch` のコード内には、まだ旧デプロイ(`itonomaki-55ve`)への絶対URL参照(`SHARED_AUDIO_API_URL` / `ROLLCALL_ROSTER_API_URL`)が残っています。1オリジン化後は同一オリジンになるため、これらは相対パス(`/itonomaki/api/...`)に書き換えて問題ありません。写真/PDFアップロード・ストレッチ音声共有・点呼名簿はCloudflareでは `basic-ftp` が動かず無効化されていましたが、VercelのNode.jsランタイムでは動作する見込みで、移行完了後の動作確認をもって復活予定です。詳細は `scripts/README.md` を参照してください。
 
 ## ローカルで確認する(ポータル)
 
