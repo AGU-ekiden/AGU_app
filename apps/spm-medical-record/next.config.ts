@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-// ゲートウェイWorker経由で /spm-medical-record プレフィックス配下に配信するため、
+// vercel.jsonのrewrites経由で /spm-medical-record プレフィックス配下に配信するため、
 // Next.js自身にプレフィックスを教える(アセット・next/link・useRouterは
 // これで自動的にプレフィックス付きになる。fetch("/api/...")などの
 // 手書きの絶対パスは lib/api-path.ts の apiPath() で個別に付与している)
@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_BASE_PATH: BASE_PATH,
   },
+  // ポータル側(vercel.json)はtrailingSlash:trueで末尾スラッシュを付与する方向、
+  // Next.jsのデフォルトはその逆(削除する方向)のため、何もしないと両者が
+  // リダイレクトし合って無限ループになる。Next.js側の自動リダイレクトを止める。
+  skipTrailingSlashRedirect: true,
 };
 
 export default nextConfig;
