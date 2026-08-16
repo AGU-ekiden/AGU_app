@@ -2,8 +2,8 @@
 //
 // このリポジトリはモノレポ構成で、各アプリの実体は apps/<id>/ 以下に
 // コピーされている(元のリポジトリとは切り離し済み。以後の改良はこの
-// リポジトリの apps/<id>/ で行う)。デプロイ先はCloudflare
-// (静的/Viteアプリ→Cloudflare Pages、Next.jsアプリ→Cloudflare Workers)。
+// リポジトリの apps/<id>/ で行う)。デプロイ先はVercel(全アプリ共通)。
+// ルートの vercel.json の rewrites で各アプリを1オリジンに束ねている。
 // 詳細は scripts/README.md 参照。
 //
 // 新しいアプリを追加するときは、apps/<id>/ にコードを置いた上で、この

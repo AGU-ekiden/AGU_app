@@ -55,32 +55,10 @@ http://localhost:3000 を開きます。
 
 必要な環境変数(`.env.example` 参照): `STRETCH_AUDIO_TOKEN`(書き込み保護用の合言葉。未設定の場合、一覧取得はできますがアップロード・削除は失敗します)、`FTP_HOST` / `FTP_USER` / `FTP_PASSWORD`(上記の写真アップロードと共通)。
 
-## Cloudflareへのデプロイ
+## デプロイ
 
-`@opennextjs/cloudflare` でCloudflare Workers上に配信する構成にしている。
-詳細な手順は `scripts/README.md`(リポジトリルート)を参照。
+Vercel上に配信する構成にしている(基盤の `next.config.ts` には `basePath: "/itonomaki"` を設定しており、リポジトリルートの `vercel.json` の rewrites 経由でポータルと同一オリジンの `/itonomaki/` 配下に配信される)。詳細な手順は `scripts/README.md`(リポジトリルート)を参照。
 
-### 既知の制限(移行に伴い一時的に無効化した機能)
+一時的にCloudflare Workers(`@opennextjs/cloudflare`)へ移行していた時期があり、そのランタイム制約でサイト全体のBasic認証(`src/proxy.ts`)とFTP経由の機能(写真/PDFアップロード・ストップウォッチ音声共有・点呼名簿)を無効化していたが、Vercelへの移行に伴いどちらも復元済み。`SITE_USER`/`SITE_PASSWORD`・`FTP_HOST`/`FTP_USER`/`FTP_PASSWORD` を設定して動作を確認すること。
 
-- **サイト全体のBasic認証(`SITE_USER`/`SITE_PASSWORD`)は現在無効**。Next.js 16
-  では認証を行う `proxy.ts`(旧middleware)が常にNode.jsランタイムでのみ動作し、
-  CloudflareのOpenNextアダプタが現時点でNode.jsランタイムのProxy/Middlewareを
-  サポートしていないため、`src/proxy.ts` を `src/proxy.ts.vercel-only` に退避し
-  てビルドから除外している。限定公開にしたい場合は、代わりに
-  [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
-  をこのWorkerの前段に設定するのがCloudflare的には正攻法(コード変更不要、
-  ダッシュボードで設定)。OpenNext側が対応した場合は `proxy.ts.vercel-only` を
-  `proxy.ts` に戻せば元の挙動に戻せる。
-- **FTP経由の機能(写真アップロード・PDFアップロード・ストップウォッチ音声共有
-  ・点呼名簿)はビルドは通るが実行時に失敗する**。CloudflareのWorkers環境は
-  Node.js標準のFTP通信に対応していないため。Cloudflare R2への置き換えが必要
-  (別タスクで対応予定)。閲覧・Notion同期・Web編集(画像/PDF以外)は問題なく動作
-  する。
-
-### 旧Vercel環境について
-
-以前は `itonomaki-55ve` としてVercelにデプロイされていたが、Cloudflareへ移行
-した。Vercel向けにNext.jsのMiddleware/Proxyを使う場合は `proxy.ts.vercel-only`
-を参考にすること。
-
-以降は `claude/trainer-knowledge-notion-xg5660` ブランチ(または本番運用するブランチ)に push するたびに自動で再デプロイされます。
+以前は `itonomaki-55ve` というVercelプロジェクトで運用されていたが、現在は新しいVercelプロジェクト(`agu-itonomaki`)に移行している。`main` ブランチに push するたびに自動で再デプロイされる。

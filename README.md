@@ -101,7 +101,7 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 
 itonomakiは元々 `itonomaki-55ve` というVercelプロジェクトで本番運用されており、その後Cloudflare Workersに移行していました。今回のVercel移行では別アカウントに移るため旧プロジェクトは引き継がず、新規に **`agu-itonomaki`** というVercelプロジェクトを作成しています。`src/lib/github.ts` はWeb編集機能(`/edit`)の保存先として旧リポジトリ `itoaogaku/itonomaki` を直書きしていましたが、このモノレポ(`AGU-ekiden/AGU_app`、パス `apps/itonomaki/notion_sync/content`)向けに修正済みです。
 
-`stopwatch` のコード内には、まだ旧デプロイ(`itonomaki-55ve`)への絶対URL参照(`SHARED_AUDIO_API_URL` / `ROLLCALL_ROSTER_API_URL`)が残っています。1オリジン化後は同一オリジンになるため、これらは相対パス(`/itonomaki/api/...`)に書き換えて問題ありません。写真/PDFアップロード・ストレッチ音声共有・点呼名簿はCloudflareでは `basic-ftp` が動かず無効化されていましたが、VercelのNode.jsランタイムでは動作する見込みで、移行完了後の動作確認をもって復活予定です。詳細は `scripts/README.md` を参照してください。
+`stopwatch` のコード内にあった旧デプロイ(`itonomaki-55ve`)への絶対URL参照(`SHARED_AUDIO_API_URL` / `ROLLCALL_ROSTER_API_URL`)は、1オリジン化に合わせて相対パス(`/itonomaki/api/...`)へ書き換え済みです。写真/PDFアップロード・ストレッチ音声共有・点呼名簿はCloudflareでは `basic-ftp` が動かず無効化されていましたが、VercelのNode.jsランタイムでは動作する見込みで、実際のデプロイ後の動作確認をもって復活予定です。詳細は `scripts/README.md` を参照してください。
 
 ## ローカルで確認する(ポータル)
 

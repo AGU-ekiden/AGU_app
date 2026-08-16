@@ -172,12 +172,12 @@ VITE_USE_DUMMY_DATA
 Cloudflare Workers環境では、以下の機能がランタイムの制約で動作しませんでした。VercelはNode.jsランタイムで動作するため、**移行完了後は動作する見込み**です(実際の動作確認が済むまでは「復活予定」の位置づけとして扱ってください)。
 
 - **itonomakiの写真/PDFアップロード・ストレッチ音声共有・点呼名簿**: `basic-ftp` を使っており、Cloudflare Workersのランタイムでは動作しませんでした。`FTP_HOST` / `FTP_USER` / `FTP_PASSWORD` / `STRETCH_AUDIO_TOKEN` を設定すればVercelで動作する見込みです。実際にアップロードを試して確認してください。該当コード: `src/app/api/edit/upload-image/route.ts`、`src/app/api/edit/upload-pdf/route.ts`、`src/app/api/edit/rotate-image/route.ts`、`src/app/api/stretch-audio/route.ts`、`src/app/api/rollcall-roster/route.ts`
-- **itonomakiのサイト全体Basic認証**: Next.js 16の `proxy.ts`(旧middleware)はNode.jsランタイム専用で、Cloudflare/OpenNextが未対応だったため無効化されていました。Vercelでは `SITE_USER` / `SITE_PASSWORD` を設定すれば有効になる見込みです。`/itonomaki/` にアクセスして401が返ること、認証後に静的アセットも含めて正常に表示されることを確認してください。
+- **itonomakiのサイト全体Basic認証**: Next.js 16の `proxy.ts`(旧middleware)はNode.jsランタイム専用で、Cloudflare/OpenNextが未対応だったため `src/proxy.ts.vercel-only` に退避してビルドから除外されていましたが、`src/proxy.ts` に戻し済みです。Vercelでは `SITE_USER` / `SITE_PASSWORD` を設定すれば有効になる見込みです。`/itonomaki/` にアクセスして401が返ること、認証後に静的アセットも含めて正常に表示されることを確認してください。
 - **spm-medical-recordの写真アップロード**: `@vercel/blob` はVercel専用のため、Cloudflareでは動作しませんでした。Vercelダッシュボードで Blob ストアを作成しプロジェクトに接続すれば動作する見込みです。該当コード: `src/app/api/upload/route.ts`、`src/components/KarteForm.tsx`
 
 ### stopwatch: itonomaki APIの参照先
 
-`apps/stopwatch/app.js` に、旧Vercelデプロイ(`itonomaki-55ve`)のハードコードされた絶対URLが2箇所残っています(`SHARED_AUDIO_API_URL` / `ROLLCALL_ROSTER_API_URL`)。1オリジン化後は同一オリジンになるため、相対パス(`/itonomaki/api/stretch-audio`・`/itonomaki/api/rollcall-roster`)に書き換えて動作確認してください。
+`apps/stopwatch/app.js` にあった、旧Vercelデプロイ(`itonomaki-55ve`)への絶対URL2箇所(`SHARED_AUDIO_API_URL` / `ROLLCALL_ROSTER_API_URL`)は、1オリジン化に合わせて相対パス(`/itonomaki/api/stretch-audio`・`/itonomaki/api/rollcall-roster`)へ書き換え済みです。デプロイ後、実際にこれらの機能が動作するか確認してください。
 
 ---
 
