@@ -158,9 +158,10 @@ done
 
 ## itonomakiの旧Vercelプロジェクトについて
 
-これまで本番で使われていた `itonomaki-55ve`(Vercel)は、Cloudflare移行後は
-使わなくなります。`stopwatch` のコード内にこのURLが直書きされている箇所
-(`SHARED_AUDIO_API_URL` / `ROLLCALL_ROSTER_API_URL`)がありますが、該当機能は
-上記の通りいずれもFTP依存で今は動作しないため、Cloudflare移行時点では
-URLを更新しても実害はありません(機能自体が復活した際に、新しいWorkerの
-URLへまとめて更新します)。
+`itonomaki` は `https://agu-itonomaki.aoyamagakuin-shimoda.workers.dev` に
+デプロイ済みです。これまで本番で使われていた `itonomaki-55ve`(Vercel)は
+もう使いません。`stopwatch` のコード内にこの旧URLが直書きされている箇所
+(`SHARED_AUDIO_API_URL` / `ROLLCALL_ROSTER_API_URL`)がまだ残っていますが、
+該当機能はいずれもFTP依存で現状Cloudflareでは動作しないため実害はありません。
+FTP機能をR2などに置き換えて復活させる際に、この2箇所のURLも新しいWorkerの
+URLへまとめて更新してください。

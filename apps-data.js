@@ -108,7 +108,7 @@ window.APPS = [
     icon: '📚',
     repoUrl: `${REPO_TREE}/apps/itonomaki`,
     rootDir: 'apps/itonomaki/web',
-    liveUrl: 'https://itonomaki-55ve.vercel.app',
+    liveUrl: 'https://agu-itonomaki.aoyamagakuin-shimoda.workers.dev',
     stack: 'Next.js + Notion同期(Python)',
   },
   {

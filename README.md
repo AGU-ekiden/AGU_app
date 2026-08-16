@@ -98,7 +98,7 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 | 食数管理 (meal_traker) | チーム運営・事務 | 未確認 |
 | 会員ラベル作成 (label_create) | チーム運営・事務 | https://label-create-alpha.vercel.app |
 | メディカルカルテ (tiryou-karte) | メディカル | https://tiryou-karte.vercel.app |
-| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | https://itonomaki-55ve.vercel.app (旧リポジトリのデプロイ) |
+| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | https://agu-itonomaki.aoyamagakuin-shimoda.workers.dev |
 | フィジカルカルテ(SPM) (spm-medical-record) | メディカル | https://spm-medical-record.vercel.app |
 
 「未確認」のアプリは実際のデプロイURLが分かり次第 `apps-data.js` の `liveUrl` を埋めてください。`tokei` の URL は同名アプリ("Joy-Con Stopwatch")のものと推測していますが未検証のため、確認後は `urlConfidence: 'guess'` の行を削除してください。
@@ -107,12 +107,15 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 
 ## itonomakiについて
 
-旧本番環境 `itonomaki-55ve`(Vercel)からCloudflareへ移行しました。
+旧本番環境 `itonomaki-55ve`(Vercel)から Cloudflare Workers
+(`agu-itonomaki.aoyamagakuin-shimoda.workers.dev`)への移行が完了しました。
 `src/lib/github.ts` はWeb編集機能(`/edit`)の保存先として旧リポジトリ
 `itoaogaku/itonomaki` を直書きしていましたが、このモノレポ
 (`AGU-ekiden/AGU_app`、パス `apps/itonomaki/notion_sync/content`)向けに
-修正済みです。`stopwatch` のコード内に残っている `itonomaki-55ve` のURL
-参照、およびFTP依存機能(写真/音声アップロード・点呼名簿)については
+修正済みです。`stopwatch` のコード内には旧デプロイ(`itonomaki-55ve`)への
+URL参照がまだ残っています。写真/音声アップロード・点呼名簿はFTP依存で
+現状Cloudflareでは動作しないため実害はありませんが、これらの機能を
+復活させる際は新URLへの向き先変更も合わせて必要です。詳細は
 `scripts/README.md` の「既知の制限」を参照してください。
 
 ## ローカルで確認する(ポータル)
