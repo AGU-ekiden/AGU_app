@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { KarteFormData, KarteRecord, PlayerInfo, RaceResult, MedicalKarteRecord, BloodTestRecord } from "@/types/karte";
+import { apiPath } from "@/lib/api-path";
 import KarteForm from "@/components/KarteForm";
 import KarteCard from "@/components/KarteCard";
 import KarteCompareView from "@/components/KarteCompareView";
@@ -142,22 +143,22 @@ export default function KarteRecordPage() {
   );
 
   useEffect(() => {
-    fetch(`/api/players/${playerId}`)
+    fetch(apiPath(`/api/players/${playerId}`))
       .then((r) => r.json())
       .then(setPlayer)
       .finally(() => setLoadingPlayer(false));
 
-    fetch(`/api/race-results?playerId=${encodeURIComponent(playerId)}`)
+    fetch(apiPath(`/api/race-results?playerId=${encodeURIComponent(playerId)}`))
       .then((r) => r.ok ? r.json() : [])
       .then(setRaceResults)
       .catch(() => {});
 
-    fetch(`/api/medical-karte?playerId=${encodeURIComponent(playerId)}`)
+    fetch(apiPath(`/api/medical-karte?playerId=${encodeURIComponent(playerId)}`))
       .then((r) => r.ok ? r.json() : [])
       .then(setMedicalRecords)
       .catch(() => {});
 
-    fetch(`/api/blood-test?playerId=${encodeURIComponent(playerId)}`)
+    fetch(apiPath(`/api/blood-test?playerId=${encodeURIComponent(playerId)}`))
       .then((r) => r.ok ? r.json() : [])
       .then(setBloodTestRecords)
       .catch(() => {});
@@ -167,7 +168,7 @@ export default function KarteRecordPage() {
     setLoadingHistory(true);
     setHistoryError(null);
     try {
-      const res = await fetch(`/api/karte?playerId=${encodeURIComponent(playerId)}`);
+      const res = await fetch(apiPath(`/api/karte?playerId=${encodeURIComponent(playerId)}`));
       if (!res.ok) throw new Error("取得失敗");
       setRecords(await res.json());
     } catch {
@@ -183,7 +184,7 @@ export default function KarteRecordPage() {
   const handleCopyTrainingContent = (content: string) => { setCopiedTrainingContent(content); setActiveTab("form"); setFormTab("karte"); setFormCollapsed(false); };
 
   const handleSubmit = async (data: KarteFormData) => {
-    const res = await fetch("/api/karte", {
+    const res = await fetch(apiPath("/api/karte"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -195,7 +196,7 @@ export default function KarteRecordPage() {
 
   const handleUpdate = async (data: KarteFormData) => {
     if (!editingKarte) return;
-    const res = await fetch(`/api/karte/${editingKarte.id}`, {
+    const res = await fetch(apiPath(`/api/karte/${editingKarte.id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

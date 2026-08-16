@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { upload } from "@vercel/blob/client";
 import { KarteFormData, KarteRecord } from "@/types/karte";
+import { apiPath } from "@/lib/api-path";
 
 interface KarteFormProps {
   playerId: string;
@@ -125,9 +126,9 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch("/api/trainers").then((r) => r.json()).then(setTrainerOptions).catch(() => {});
-    fetch("/api/locations").then((r) => r.json()).then(setLocationOptions).catch(() => {});
-    fetch("/api/tags").then((r) => r.json()).then(setTagOptions).catch(() => {});
+    fetch(apiPath("/api/trainers")).then((r) => r.json()).then(setTrainerOptions).catch(() => {});
+    fetch(apiPath("/api/locations")).then((r) => r.json()).then(setLocationOptions).catch(() => {});
+    fetch(apiPath("/api/tags")).then((r) => r.json()).then(setTagOptions).catch(() => {});
   }, []);
 
   useEffect(() => {

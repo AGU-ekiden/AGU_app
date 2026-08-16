@@ -39,7 +39,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <a
-          href="https://agu-portal.pages.dev/"
+          href="/"
           className="fixed top-2 left-2 z-50 inline-flex items-center rounded-md bg-[#c9a227] px-2 py-1 text-xs font-bold text-[#10254a] shadow-sm hover:bg-[#dbbd57]"
         >
           ← ポータル

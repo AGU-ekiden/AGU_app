@@ -1,0 +1,13 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "agu-gateway",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-08-15",
+	"observability": {
+		"enabled": true
+	}
+	// カスタムドメインを取得したら、Cloudflareダッシュボードの
+	// Workers & Pages → agu-gateway → Settings → Domains & Routes で
+	// そのドメインを追加する(このファイルへの追記は不要)。
+	// 詳細は scripts/README.md 参照。
+}

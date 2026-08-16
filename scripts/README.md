@@ -156,6 +156,94 @@ done
 
 ---
 
+## C. ゲートウェイ(全アプリを1つのオリジンに統合)
+
+### これは何のためのものか
+
+ポータルと各アプリはこれまで `*.pages.dev` / `*.workers.dev` の**別々の
+オリジン**にデプロイされていました。これ自体はブラウザで使う分には
+問題ありませんが、iPhoneで「ホーム画面に追加」(standalone表示)した
+場合、Safariはオリジンが変わるナビゲーションのたびにブラウザのUI
+(アドレスバーなど)を再表示してしまいます。ポータル→アプリ、
+アプリ→ポータルの行き来のたびにこれが起きていました。
+
+`gateway/` は、これを解消するための**リバースプロキシWorker**です。
+1つのURL(Workerの `*.workers.dev` か、任意で設定するカスタムドメイン)
+の配下に、パスのプレフィックスで各アプリを振り分けます。
+
+```
+https://<gateway>/            → ポータル本体(agu-portal.pages.dev)
+https://<gateway>/tokei/      → agu-tokei.pages.dev
+https://<gateway>/stopwatch/  → agu-stopwatch.pages.dev
+https://<gateway>/taskkyoyu/  → agu-taskkyoyu.pages.dev
+https://<gateway>/ryouhi/     → agu-ryouhi.pages.dev
+https://<gateway>/meal_traker/    → agu-meal-traker.pages.dev
+https://<gateway>/label_create/   → agu-label-create.pages.dev
+https://<gateway>/tiryou-karte/        → agu-tiryou-karte(Worker)
+https://<gateway>/spm-medical-record/  → agu-spm-medical-record(Worker)
+https://<gateway>/itonomaki/           → agu-itonomaki(Worker)
+```
+
+これに合わせて以下も変更済みです。
+
+- `apps-data.js` の `liveUrl` を絶対URLから上記の相対パス(`/stopwatch/` 等)に変更
+- 全9アプリの「← ポータル」リンクを `/` (相対パス)に変更
+- `ryouhi` / `label_create` (Vite) は `base: './'` を追加(プレフィックス配下でも
+  アセットパスが壊れないように)
+- `tiryou-karte` / `spm-medical-record` / `itonomaki` (Next.js) は
+  `next.config.ts` に `basePath` を設定し、`fetch("/api/...")` のような
+  手書きの絶対パス呼び出しは `src/lib/api-path.ts` の `apiPath()` で
+  プレフィックスを付与するように変更
+
+### デプロイ手順
+
+**1. ゲートウェイWorkerをデプロイする**
+
+```bash
+cd gateway
+npm install
+npx wrangler login      # 初回のみ(CLOUDFLARE_API_TOKENでも可)
+npx wrangler deploy
+```
+
+成功すると `https://agu-gateway.<あなたのworkers.devサブドメイン>.workers.dev`
+のようなURLが表示されます。**これがそのまま新しい統一URLとして使えます**
+(カスタムドメインが無くても、この1つのURLの下に全アプリが同一オリジンで
+まとまります)。
+
+**2. 変更を取り込んだ各アプリを再デプロイする**
+
+- `ryouhi` / `label_create`: Cloudflare PagesがこのリポジトリのGit連携で
+  自動ビルドされる設定なら、`main` にpushするだけで自動的に再デプロイされます
+  (`base: './'` の変更が反映されます)。
+- `tiryou-karte` / `spm-medical-record` / `itonomaki`: GitHub Actions
+  (`.github/workflows/deploy-*.yml`)が設定済みなら `main` へのpushで自動
+  デプロイされます。手動なら各ディレクトリで `npm run cf:deploy`。
+  (`basePath` の変更が反映されます)
+
+**3. ホーム画面のショートカットを新しいURLに差し替える**
+
+これまで各アプリごとに「ホーム画面に追加」していた場合は、一度削除して
+新しいゲートウェイURL(`https://agu-gateway.../` またはポータルの
+`https://agu-gateway.../`)を改めて追加し直してください。ポータルから
+先の遷移はすべて同一オリジンになるため、ヘッダーの再表示は起きなくなります。
+
+### (任意)独自ドメインに差し替える
+
+`*.workers.dev` のままでも動作しますが、見た目や覚えやすさのために独自
+ドメインを使いたい場合は、コード側の変更は一切不要です(すべて相対パス化
+済みのため)。
+
+1. Cloudflareダッシュボード → 左メニュー「Websites」→「Add a site」で
+   独自ドメインを追加し、表示されるネームサーバーにドメインの登録先で
+   切り替える(未取得の場合は先にどこかのレジストラでドメインを取得)
+2. 反映されたら Workers & Pages → `agu-gateway` → Settings →
+   Domains & Routes → 「Add」→ そのドメイン(例: `agu-ekiden.jp`)を追加
+3. 以降は `https://agu-ekiden.jp/` がポータル、`https://agu-ekiden.jp/stopwatch/`
+   が各アプリ、という形でアクセスできます
+
+---
+
 ## itonomakiの旧Vercelプロジェクトについて
 
 `itonomaki` は `https://agu-itonomaki.aoyamagakuin-shimoda.workers.dev` に

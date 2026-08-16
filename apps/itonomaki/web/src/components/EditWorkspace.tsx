@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { apiPath } from "@/lib/api-path";
 
 type Topic = { slug: string; title: string };
 type Section = { slug: string; title: string; topics: Topic[] };
@@ -32,7 +33,7 @@ export function EditWorkspace({ sections }: { sections: Section[] }) {
   const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/edit/auth")
+    fetch(apiPath("/api/edit/auth"))
       .then((res) => res.json())
       .then((data) => setAuthenticated(Boolean(data.authenticated)))
       .catch(() => setAuthenticated(false))
@@ -44,7 +45,7 @@ export function EditWorkspace({ sections }: { sections: Section[] }) {
     setLoginError(null);
     setLoginLoading(true);
     try {
-      const res = await fetch("/api/edit/auth", {
+      const res = await fetch(apiPath("/api/edit/auth"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
@@ -62,7 +63,7 @@ export function EditWorkspace({ sections }: { sections: Section[] }) {
   }
 
   async function handleLogout() {
-    await fetch("/api/edit/auth", { method: "DELETE" });
+    await fetch(apiPath("/api/edit/auth"), { method: "DELETE" });
     setAuthenticated(false);
   }
 
@@ -183,7 +184,7 @@ function Editor({ sections, onLogout }: { sections: Section[]; onLogout: () => v
     setRotatingIdx(index);
     setMessage(null);
     try {
-      const res = await fetch("/api/edit/rotate-image", {
+      const res = await fetch(apiPath("/api/edit/rotate-image"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: target.url }),
@@ -196,7 +197,7 @@ function Editor({ sections, onLogout }: { sections: Section[]; onLogout: () => v
       setContentText(nextContent);
 
       if (mode === "edit" && topicSlug) {
-        const saveRes = await fetch("/api/edit/save", {
+        const saveRes = await fetch(apiPath("/api/edit/save"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ section: sectionSlug, topic: topicSlug, content: nextContent, isNew: false }),
@@ -253,7 +254,7 @@ function Editor({ sections, onLogout }: { sections: Section[]; onLogout: () => v
         setUploadProgress({ done: uploaded, total: fileArray.length });
         const formData = new FormData();
         formData.append("file", file);
-        const res = await fetch("/api/edit/upload-image", { method: "POST", body: formData });
+        const res = await fetch(apiPath("/api/edit/upload-image"), { method: "POST", body: formData });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(`${file.name}: ${data.error ?? "画像のアップロードに失敗しました"}`);
         insertAtCursor(`![](${data.url})\n`);
@@ -282,7 +283,7 @@ function Editor({ sections, onLogout }: { sections: Section[]; onLogout: () => v
         setPdfUploadProgress({ done: uploaded, total: fileArray.length });
         const formData = new FormData();
         formData.append("file", file);
-        const res = await fetch("/api/edit/upload-pdf", { method: "POST", body: formData });
+        const res = await fetch(apiPath("/api/edit/upload-pdf"), { method: "POST", body: formData });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(`${file.name}: ${data.error ?? "PDFのアップロードに失敗しました"}`);
         insertAtCursor(`[${data.name ?? file.name}](${data.url})\n`);
@@ -355,7 +356,7 @@ function Editor({ sections, onLogout }: { sections: Section[]; onLogout: () => v
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/edit/save", {
+      const res = await fetch(apiPath("/api/edit/save"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ section: sectionSlug, topic, content: contentText, isNew: mode === "create" }),

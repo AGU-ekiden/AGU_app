@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ObogPlayerInfo } from "@/types/karte";
+import { apiPath } from "@/lib/api-path";
 
 function Spinner() {
   return (
@@ -20,7 +21,7 @@ export default function ObogListPage() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/obog")
+    fetch(apiPath("/api/obog"))
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then(setPlayers)
       .catch(() => setError(true))

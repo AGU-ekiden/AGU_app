@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { BloodTestRecord, InBodyRecord, KarteFormData, KarteRecord, PersonalKarteRecord, PlayerInfo, RaceResult } from "@/types/karte";
+import { apiPath } from "@/lib/api-path";
 import KarteForm from "@/components/KarteForm";
 import PlayerProfileForm from "@/components/PlayerProfileForm";
 import BloodTestTrendTable from "@/components/BloodTestTrendTable";
@@ -71,17 +72,17 @@ export default function KarteRecordPage() {
   ].sort((a, b) => b.sortKey.localeCompare(a.sortKey));
 
   useEffect(() => {
-    fetch(`/api/players/${playerId}`)
+    fetch(apiPath(`/api/players/${playerId}`))
       .then((r) => r.json())
       .then(setPlayer)
       .finally(() => setLoadingPlayer(false));
 
-    fetch(`/api/race-results?playerId=${encodeURIComponent(playerId)}`)
+    fetch(apiPath(`/api/race-results?playerId=${encodeURIComponent(playerId)}`))
       .then((r) => (r.ok ? r.json() : []))
       .then(setRaceResults)
       .catch(() => {});
 
-    fetch(`/api/personal-karte?playerId=${encodeURIComponent(playerId)}`)
+    fetch(apiPath(`/api/personal-karte?playerId=${encodeURIComponent(playerId)}`))
       .then((r) => (r.ok ? r.json() : []))
       .then(setPersonalRecords)
       .catch(() => {});
@@ -92,9 +93,9 @@ export default function KarteRecordPage() {
     setHistoryError(null);
     try {
       const [karteRes, bloodRes, inbodyRes] = await Promise.all([
-        fetch(`/api/karte?playerId=${encodeURIComponent(playerId)}`),
-        fetch(`/api/blood-test?playerId=${encodeURIComponent(playerId)}`),
-        fetch(`/api/inbody?playerId=${encodeURIComponent(playerId)}`),
+        fetch(apiPath(`/api/karte?playerId=${encodeURIComponent(playerId)}`)),
+        fetch(apiPath(`/api/blood-test?playerId=${encodeURIComponent(playerId)}`)),
+        fetch(apiPath(`/api/inbody?playerId=${encodeURIComponent(playerId)}`)),
       ]);
       if (!karteRes.ok || !bloodRes.ok || !inbodyRes.ok) throw new Error("取得失敗");
       setRecords(await karteRes.json());
@@ -167,7 +168,7 @@ export default function KarteRecordPage() {
   );
 
   const handleSubmit = async (data: KarteFormData) => {
-    const res = await fetch("/api/karte", {
+    const res = await fetch(apiPath("/api/karte"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -179,7 +180,7 @@ export default function KarteRecordPage() {
 
   const handleUpdate = async (data: KarteFormData) => {
     if (!editingKarte) return;
-    const res = await fetch(`/api/karte/${editingKarte.id}`, {
+    const res = await fetch(apiPath(`/api/karte/${editingKarte.id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

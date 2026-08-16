@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PlayerProfile } from "@/types/karte";
+import { apiPath } from "@/lib/api-path";
 
 interface PlayerProfileFormProps {
   playerId: string;
@@ -30,7 +31,7 @@ export default function PlayerProfileForm({ playerId, playerName }: PlayerProfil
   const loadProfile = () => {
     setLoading(true);
     setLoadError(false);
-    fetch(`/api/profile?playerId=${encodeURIComponent(playerId)}`)
+    fetch(apiPath(`/api/profile?playerId=${encodeURIComponent(playerId)}`))
       .then((r) => {
         if (!r.ok) throw new Error("取得失敗");
         return r.json();
@@ -57,7 +58,7 @@ export default function PlayerProfileForm({ playerId, playerName }: PlayerProfil
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/profile", {
+      const res = await fetch(apiPath("/api/profile"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

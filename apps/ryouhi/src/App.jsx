@@ -87,7 +87,7 @@ function AppShell() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <a
-                href="https://agu-portal.pages.dev/"
+                href="/"
                 className="hidden sm:inline-flex items-center rounded-md bg-[#c9a227] px-2 py-1 text-xs font-bold text-[#10254a] hover:bg-[#dbbd57]"
               >
                 ← ポータル

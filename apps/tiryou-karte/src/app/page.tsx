@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { KarteRecord, PlayerInfo } from "@/types/karte";
+import { apiPath } from "@/lib/api-path";
 
 function Spinner() {
   return (
@@ -40,13 +41,13 @@ export default function PlayerListPage() {
   const [quickViewKarte, setQuickViewKarte] = useState<KarteRecord | null>(null);
 
   useEffect(() => {
-    fetch("/api/players")
+    fetch(apiPath("/api/players"))
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then(setPlayers)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
 
-    fetch("/api/karte/recent")
+    fetch(apiPath("/api/karte/recent"))
       .then((r) => r.ok ? r.json() : [])
       .then(setRecentKartes)
       .catch(() => {})

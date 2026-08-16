@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { apiPath } from "@/lib/api-path";
 
 /**
  * Marks a topic as "done" with a ⭐️. Anyone viewing the site sees the star
@@ -14,7 +15,7 @@ export function StarButton({ section, topic, initialStarred }: { section: string
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/edit/auth")
+    fetch(apiPath("/api/edit/auth"))
       .then((res) => res.json())
       .then((data) => setAuthenticated(Boolean(data.authenticated)))
       .catch(() => setAuthenticated(false));
@@ -26,7 +27,7 @@ export function StarButton({ section, topic, initialStarred }: { section: string
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/edit/star", {
+      const res = await fetch(apiPath("/api/edit/star"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ section, topic, starred: next }),

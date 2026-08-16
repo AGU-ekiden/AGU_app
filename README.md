@@ -35,6 +35,14 @@ AGU_app/
 | 静的サイト・Viteアプリ | tokei, stopwatch, taskkyoyu, task, meal_traker, ryouhi, label_create, ポータル本体 | **Cloudflare Pages** |
 | Next.js(SSR/API Routes) | tiryou-karte, spm-medical-record, itonomaki | **Cloudflare Workers**(`@opennextjs/cloudflare`) |
 
+各アプリはこれまで別々のオリジン(`*.pages.dev` / `*.workers.dev`)で
+公開されていましたが、`gateway/` にあるリバースプロキシWorkerが
+`/stopwatch/` のようなパスプレフィックスで全部を1つのオリジンに束ねます
+(iPhoneの「ホーム画面に追加」でアプリ間を移動してもSafariのヘッダーが
+再表示されないようにするため)。実際にユーザーがブックマークするのは
+このゲートウェイのURLです。詳細は `scripts/README.md` の
+「C. ゲートウェイ」を参照してください。
+
 セットアップ手順・スクリプトは `scripts/README.md` にまとめています。要点:
 
 - 静的/Viteアプリは `scripts/setup_cloudflare.py` でPagesプロジェクトを一括作成
@@ -59,14 +67,14 @@ AGU_app/
   category: 'ops', // 'measure' | 'ops' | 'medical'
   icon: '📦',
   repoUrl: `${REPO_TREE}/apps/example`,
-  rootDir: 'apps/example',  // Vercelの Root Directory と異なる場合のみ指定(itonomakiなど)
-  liveUrl: 'https://example.vercel.app', // 未デプロイ/未確認なら null
+  rootDir: 'apps/example',  // デプロイ設定のRoot Directoryが apps/<id> と異なる場合のみ指定(itonomakiなど)
+  liveUrl: '/example/', // gateway配下のパス(相対パス)。未デプロイ/未確認なら null
   urlConfidence: 'guess',  // URLが未検証の推測の場合のみ付ける。確認済みなら省略
   stack: '技術スタックの短い説明',
 }
 ```
 
-`liveUrl` が設定されていればカード/メニューはそのURLを開き、未設定(`null`)の場合はこのリポジトリの `apps/<id>` フォルダを開きます。
+`liveUrl` が設定されていればカード/メニューはそのURLを開き、未設定(`null`)の場合はこのリポジトリの `apps/<id>` フォルダを開きます。`liveUrl` は絶対URLではなく `gateway/` 配下のパス(`/example/` のような相対パス)にしてください。新しいアプリを追加した場合は `gateway/src/index.ts` の `STATIC_ROUTES`(静的/Viteアプリ)または `PREFIXED_ROUTES`(Next.jsアプリ)にもプレフィックスとデプロイ先ホスト名を追加する必要があります。詳細は `scripts/README.md` の「C. ゲートウェイ」を参照してください。
 
 ## 役割ごとのメニューを追加・編集する
 
@@ -83,25 +91,23 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 
 ## 現在掲載しているアプリ
 
-すべて `apps/` 以下にモノレポとして取り込み済みです。デプロイURL欄は
-**Cloudflareへの移行前の旧URL(主にVercel)** で、まだ生きている可能性は
-ありますが今後の正とはしません。Cloudflareへのデプロイが完了次第、
-`apps-data.js` の `liveUrl` を新しいURL(`*.pages.dev` / `*.workers.dev` など)
-に更新してください。
+すべて `apps/` 以下にモノレポとして取り込み済みで、Cloudflareへのデプロイも
+完了しています。`apps-data.js` の `liveUrl` は `gateway/` (リバースプロキシ
+Worker)配下のパス(例: `/stopwatch/`)で管理しており、実際にどのアプリが
+どのCloudflareプロジェクトに対応するかは `gateway/src/index.ts` の
+`STATIC_ROUTES` / `PREFIXED_ROUTES` を参照してください。
 
-| アプリ | カテゴリ | 旧デプロイURL(参考) |
+| アプリ | カテゴリ | ゲートウェイ配下のパス |
 | --- | --- | --- |
-| Joy-Con ストップウォッチ / レーシングウォッチ (tokei) | 計測・トレーニング | https://joycontimer.vercel.app (推定・要確認) |
-| ストップウォッチ(タバタ/補強/ストレッチ/山試走/ペース計算/点呼を含む) | 計測・トレーニング | 未確認 |
-| タスク共有 (taskkyoyu) | チーム運営・事務 | 未確認 |
-| 寮費・食費清算 (ryouhi) | チーム運営・事務 | 未確認 |
-| 食数管理 (meal_traker) | チーム運営・事務 | 未確認 |
-| 会員ラベル作成 (label_create) | チーム運営・事務 | https://label-create-alpha.vercel.app |
-| メディカルカルテ (tiryou-karte) | メディカル | https://tiryou-karte.vercel.app |
-| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | https://agu-itonomaki.aoyamagakuin-shimoda.workers.dev |
-| フィジカルカルテ(SPM) (spm-medical-record) | メディカル | https://spm-medical-record.vercel.app |
-
-「未確認」のアプリは実際のデプロイURLが分かり次第 `apps-data.js` の `liveUrl` を埋めてください。`tokei` の URL は同名アプリ("Joy-Con Stopwatch")のものと推測していますが未検証のため、確認後は `urlConfidence: 'guess'` の行を削除してください。
+| Joy-Con ストップウォッチ / レーシングウォッチ (tokei) | 計測・トレーニング | `/tokei/` |
+| ストップウォッチ(タバタ/補強/ストレッチ/山試走/ペース計算/点呼を含む) | 計測・トレーニング | `/stopwatch/` |
+| タスク共有 (taskkyoyu) | チーム運営・事務 | `/taskkyoyu/` |
+| 寮費・食費清算 (ryouhi) | チーム運営・事務 | `/ryouhi/` |
+| 食数管理 (meal_traker) | チーム運営・事務 | `/meal_traker/` |
+| 会員ラベル作成 (label_create) | チーム運営・事務 | `/label_create/` |
+| メディカルカルテ (tiryou-karte) | メディカル | `/tiryou-karte/` |
+| トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | `/itonomaki/` |
+| フィジカルカルテ(SPM) (spm-medical-record) | メディカル | `/spm-medical-record/` |
 
 「故障者報告確認」はまだどのアプリにも実装されていない機能のため、メニュー上は「準備中」と表示されます。実装後に `roles-data.js` の `injury_report.target` を設定してください。
 

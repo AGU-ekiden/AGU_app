@@ -37,7 +37,7 @@ window.APPS = [
     category: 'measure',
     icon: '⏱️',
     repoUrl: `${REPO_TREE}/apps/tokei`,
-    liveUrl: 'https://agu-tokei.pages.dev',
+    liveUrl: '/tokei/',
     stack: '静的HTML(単一ファイル)',
   },
   {
@@ -47,7 +47,7 @@ window.APPS = [
     category: 'measure',
     icon: '⏲️',
     repoUrl: `${REPO_TREE}/apps/stopwatch`,
-    liveUrl: 'https://agu-stopwatch.pages.dev',
+    liveUrl: '/stopwatch/',
     stack: 'Vanilla JS / PWA',
   },
   {
@@ -57,7 +57,7 @@ window.APPS = [
     category: 'ops',
     icon: '✅',
     repoUrl: `${REPO_TREE}/apps/taskkyoyu`,
-    liveUrl: 'https://agu-taskkyoyu.pages.dev',
+    liveUrl: '/taskkyoyu/',
     stack: 'Vanilla JS + GAS(スプレッドシートDB)',
   },
   {
@@ -67,7 +67,7 @@ window.APPS = [
     category: 'ops',
     icon: '🧾',
     repoUrl: `${REPO_TREE}/apps/ryouhi`,
-    liveUrl: 'https://agu-ryouhi.pages.dev',
+    liveUrl: '/ryouhi/',
     stack: 'React (Vite) + Tailwind + GAS',
   },
   {
@@ -77,7 +77,7 @@ window.APPS = [
     category: 'ops',
     icon: '🍚',
     repoUrl: `${REPO_TREE}/apps/meal_traker`,
-    liveUrl: 'https://agu-meal-traker.pages.dev',
+    liveUrl: '/meal_traker/',
     stack: '静的HTML(単一ファイル)',
   },
   {
@@ -87,7 +87,7 @@ window.APPS = [
     category: 'ops',
     icon: '🏷️',
     repoUrl: `${REPO_TREE}/apps/label_create`,
-    liveUrl: 'https://agu-label-create.pages.dev',
+    liveUrl: '/label_create/',
     stack: 'React (Vite) + TypeScript',
   },
   {
@@ -97,7 +97,7 @@ window.APPS = [
     category: 'medical',
     icon: '🩺',
     repoUrl: `${REPO_TREE}/apps/tiryou-karte`,
-    liveUrl: 'https://agu-tiryou-karte.aoyamagakuin-shimoda.workers.dev',
+    liveUrl: '/tiryou-karte/',
     stack: 'Next.js + Notion API',
   },
   {
@@ -108,7 +108,7 @@ window.APPS = [
     icon: '📚',
     repoUrl: `${REPO_TREE}/apps/itonomaki`,
     rootDir: 'apps/itonomaki/web',
-    liveUrl: 'https://agu-itonomaki.aoyamagakuin-shimoda.workers.dev',
+    liveUrl: '/itonomaki/',
     stack: 'Next.js + Notion同期(Python)',
   },
   {
@@ -118,7 +118,7 @@ window.APPS = [
     category: 'medical',
     icon: '💊',
     repoUrl: `${REPO_TREE}/apps/spm-medical-record`,
-    liveUrl: 'https://agu-spm-medical-record.aoyamagakuin-shimoda.workers.dev',
+    liveUrl: '/spm-medical-record/',
     stack: 'Next.js + Notion API',
   },
 ];

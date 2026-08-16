@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { KarteRecord, PlayerInfo, MedicalKarteRecord } from "@/types/karte";
+import { apiPath } from "@/lib/api-path";
 
 function Spinner() {
   return (
@@ -44,15 +45,15 @@ export default function PlayerListPage() {
   const [quickViewItem, setQuickViewItem] = useState<RecentItem | null>(null);
 
   useEffect(() => {
-    fetch("/api/players")
+    fetch(apiPath("/api/players"))
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then(setPlayers)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
 
     Promise.all([
-      fetch("/api/karte/recent").then((r) => r.ok ? r.json() : []).catch(() => []),
-      fetch("/api/medical-karte/recent").then((r) => r.ok ? r.json() : []).catch(() => []),
+      fetch(apiPath("/api/karte/recent")).then((r) => r.ok ? r.json() : []).catch(() => []),
+      fetch(apiPath("/api/medical-karte/recent")).then((r) => r.ok ? r.json() : []).catch(() => []),
     ]).then(([physical, medical]) => {
       const merged: RecentItem[] = [
         ...(physical as KarteRecord[]).map((d) => ({ kind: "physical" as const, data: d })),

@@ -40,7 +40,7 @@ export default function App() {
     <div className="app-shell">
       <header className="app-header no-print" style={{ position: 'relative' }}>
         <a
-          href="https://agu-portal.pages.dev/"
+          href="/"
           style={{
             position: 'absolute', top: 16, right: 28,
             display: 'inline-flex', alignItems: 'center',
