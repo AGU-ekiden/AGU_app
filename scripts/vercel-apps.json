@@ -30,13 +30,6 @@
       "envVars": []
     },
     {
-      "id": "task",
-      "projectName": "agu-task",
-      "rootDirectory": "apps/task",
-      "framework": null,
-      "envVars": []
-    },
-    {
       "id": "ryouhi",
       "projectName": "agu-ryouhi",
       "rootDirectory": "apps/ryouhi",
@@ -78,10 +71,9 @@
     },
     {
       "id": "itonomaki",
-      "projectName": "itonomaki-55ve",
+      "projectName": "agu-itonomaki",
       "rootDirectory": "apps/itonomaki/web",
       "framework": "nextjs",
-      "skipAutoCreate": true,
       "envVars": [
         { "key": "SITE_USER", "required": false, "note": "閲覧用Basic認証。未設定なら誰でも閲覧可" },
         { "key": "SITE_PASSWORD", "required": false, "note": "" },
@@ -92,7 +84,7 @@
         { "key": "FTP_PASSWORD", "required": false, "note": "" },
         { "key": "STRETCH_AUDIO_TOKEN", "required": false, "note": "stopwatchアプリの音声共有機能から呼ばれるAPIの認証トークン" }
       ],
-      "note": "新規プロジェクトを作らず、既存の 'itonomaki-55ve' プロジェクトのGit連携をこのリポジトリに繋ぎ直して使う(URL・既存の環境変数を維持するため)。このスクリプトでは自動作成しない(skipAutoCreate)。手順はscripts/README.md参照。"
+      "note": "旧Vercelプロジェクト 'itonomaki-55ve' は使わず、新規に 'agu-itonomaki' として作成する(別アカウント/新体制のため)。"
     },
     {
       "id": "spm-medical-record",
@@ -106,7 +98,8 @@
         { "key": "NOTION_RACE_RESULTS_DATABASE_ID", "required": false, "note": "" },
         { "key": "NOTION_MEDICAL_KARTE_DATABASE_ID", "required": true, "note": "" },
         { "key": "NOTION_BLOOD_TEST_DATABASE_ID", "required": true, "note": "tiryou-karteと同じ値" },
-        { "key": "NOTION_PLAYER_PROFILE_DATABASE_ID", "required": false, "note": "" }
+        { "key": "NOTION_PLAYER_PROFILE_DATABASE_ID", "required": false, "note": "" },
+        { "key": "BLOB_READ_WRITE_TOKEN", "required": false, "note": "写真アップロード(@vercel/blob)用。Vercelダッシュボードで Blob ストアを作成しプロジェクトに接続すると自動で設定されることが多い" }
       ]
     }
   ]

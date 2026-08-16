@@ -1582,7 +1582,7 @@ function nestedDelete(map, outerKey, innerKey) {
 // is public; uploading/deleting needs a shared token (entered once, kept in
 // this browser's localStorage — never committed to source, unlike the
 // server-side FTP credentials it ultimately relies on).
-const SHARED_AUDIO_API_URL = 'https://itonomaki-55ve.vercel.app/api/stretch-audio';
+const SHARED_AUDIO_API_URL = '/itonomaki/api/stretch-audio';
 const SHARED_AUDIO_TOKEN_KEY = 'stretchAudioToken';
 const sharedRecordingsMap = new Map(); // mapKey(category, setName) -> Map<text, url>
 
@@ -3022,7 +3022,7 @@ function saveRollcallTags() {
    checkedSeq)は各端末だけのローカル情報のままにする(この端末で今まさに
    点呼中の状態を他の端末の値で上書きしないよう、共有データを取り込む時は
    チェック状態だけ元のものを残す)。 */
-const ROLLCALL_ROSTER_API_URL = 'https://itonomaki-55ve.vercel.app/api/rollcall-roster';
+const ROLLCALL_ROSTER_API_URL = '/itonomaki/api/rollcall-roster';
 const ROLLCALL_TOKEN_KEY = 'rollcallRosterToken';
 
 function getStoredRollcallToken() {
