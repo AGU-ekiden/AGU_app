@@ -13,15 +13,15 @@
   ],
 
   "rewrites": [
-    { "source": "/tokei/:path*", "destination": "https://agu-tokei.vercel.app/:path*" },
-    { "source": "/stopwatch/:path*", "destination": "https://agu-stopwatch.vercel.app/:path*" },
-    { "source": "/taskkyoyu/:path*", "destination": "https://agu-taskkyoyu.vercel.app/:path*" },
-    { "source": "/meal_traker/:path*", "destination": "https://agu-meal-traker.vercel.app/:path*" },
-    { "source": "/ryouhi/:path*", "destination": "https://agu-ryouhi.vercel.app/:path*" },
-    { "source": "/label_create/:path*", "destination": "https://agu-label-create.vercel.app/:path*" },
+    { "source": "/tokei/:path*", "destination": "https://agu-tokei-murex.vercel.app/:path*" },
+    { "source": "/stopwatch/:path*", "destination": "https://agu-stopwatch-two.vercel.app/:path*" },
+    { "source": "/taskkyoyu/:path*", "destination": "https://agu-taskkyoyu-gamma.vercel.app/:path*" },
+    { "source": "/meal_traker/:path*", "destination": "https://agu-meal-traker-two.vercel.app/:path*" },
+    { "source": "/ryouhi/:path*", "destination": "https://agu-ryouhi-seven.vercel.app/:path*" },
+    { "source": "/label_create/:path*", "destination": "https://agu-label-create-gold.vercel.app/:path*" },
 
-    { "source": "/tiryou-karte/:path*", "destination": "https://agu-tiryou-karte.vercel.app/tiryou-karte/:path*" },
-    { "source": "/spm-medical-record/:path*", "destination": "https://agu-spm-medical-record.vercel.app/spm-medical-record/:path*" },
+    { "source": "/tiryou-karte/:path*", "destination": "https://agu-tiryou-karte-delta.vercel.app/tiryou-karte/:path*" },
+    { "source": "/spm-medical-record/:path*", "destination": "https://agu-spm-medical-record-nine.vercel.app/spm-medical-record/:path*" },
     { "source": "/itonomaki/:path*", "destination": "https://agu-itonomaki.vercel.app/itonomaki/:path*" }
   ],
 
