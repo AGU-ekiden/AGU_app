@@ -15,30 +15,30 @@
 
   "rewrites": [
     { "source": "/tokei/", "destination": "https://agu-tokei-murex.vercel.app/" },
-    { "source": "/tokei/:path+", "destination": "https://agu-tokei-murex.vercel.app/:path+" },
+    { "source": "/tokei/(.*)", "destination": "https://agu-tokei-murex.vercel.app/$1" },
 
     { "source": "/stopwatch/", "destination": "https://agu-stopwatch-two.vercel.app/" },
-    { "source": "/stopwatch/:path+", "destination": "https://agu-stopwatch-two.vercel.app/:path+" },
+    { "source": "/stopwatch/(.*)", "destination": "https://agu-stopwatch-two.vercel.app/$1" },
 
     { "source": "/taskkyoyu/", "destination": "https://agu-taskkyoyu-gamma.vercel.app/" },
-    { "source": "/taskkyoyu/:path+", "destination": "https://agu-taskkyoyu-gamma.vercel.app/:path+" },
+    { "source": "/taskkyoyu/(.*)", "destination": "https://agu-taskkyoyu-gamma.vercel.app/$1" },
 
     { "source": "/meal_traker/", "destination": "https://agu-meal-traker-two.vercel.app/" },
-    { "source": "/meal_traker/:path+", "destination": "https://agu-meal-traker-two.vercel.app/:path+" },
+    { "source": "/meal_traker/(.*)", "destination": "https://agu-meal-traker-two.vercel.app/$1" },
 
     { "source": "/ryouhi/", "destination": "https://agu-ryouhi-seven.vercel.app/" },
-    { "source": "/ryouhi/:path+", "destination": "https://agu-ryouhi-seven.vercel.app/:path+" },
+    { "source": "/ryouhi/(.*)", "destination": "https://agu-ryouhi-seven.vercel.app/$1" },
 
     { "source": "/label_create/", "destination": "https://agu-label-create-gold.vercel.app/" },
-    { "source": "/label_create/:path+", "destination": "https://agu-label-create-gold.vercel.app/:path+" },
+    { "source": "/label_create/(.*)", "destination": "https://agu-label-create-gold.vercel.app/$1" },
 
     { "source": "/tiryou-karte/", "destination": "https://agu-tiryou-karte-delta.vercel.app/tiryou-karte/" },
-    { "source": "/tiryou-karte/:path+", "destination": "https://agu-tiryou-karte-delta.vercel.app/tiryou-karte/:path+" },
+    { "source": "/tiryou-karte/(.*)", "destination": "https://agu-tiryou-karte-delta.vercel.app/tiryou-karte/$1" },
 
     { "source": "/spm-medical-record/", "destination": "https://agu-spm-medical-record-nine.vercel.app/spm-medical-record/" },
-    { "source": "/spm-medical-record/:path+", "destination": "https://agu-spm-medical-record-nine.vercel.app/spm-medical-record/:path+" },
+    { "source": "/spm-medical-record/(.*)", "destination": "https://agu-spm-medical-record-nine.vercel.app/spm-medical-record/$1" },
 
     { "source": "/itonomaki/", "destination": "https://agu-itonomaki.vercel.app/itonomaki/" },
-    { "source": "/itonomaki/:path+", "destination": "https://agu-itonomaki.vercel.app/itonomaki/:path+" }
+    { "source": "/itonomaki/(.*)", "destination": "https://agu-itonomaki.vercel.app/itonomaki/$1" }
   ]
 }
