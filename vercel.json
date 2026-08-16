@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "trailingSlash": true,
 
   "headers": [
     {
@@ -23,14 +24,5 @@
     { "source": "/tiryou-karte/:path*", "destination": "https://agu-tiryou-karte-delta.vercel.app/tiryou-karte/:path*" },
     { "source": "/spm-medical-record/:path*", "destination": "https://agu-spm-medical-record-nine.vercel.app/spm-medical-record/:path*" },
     { "source": "/itonomaki/:path*", "destination": "https://agu-itonomaki.vercel.app/itonomaki/:path*" }
-  ],
-
-  "redirects": [
-    { "source": "/tokei", "destination": "/tokei/", "permanent": false },
-    { "source": "/stopwatch", "destination": "/stopwatch/", "permanent": false },
-    { "source": "/taskkyoyu", "destination": "/taskkyoyu/", "permanent": false },
-    { "source": "/meal_traker", "destination": "/meal_traker/", "permanent": false },
-    { "source": "/ryouhi", "destination": "/ryouhi/", "permanent": false },
-    { "source": "/label_create", "destination": "/label_create/", "permanent": false }
   ]
 }

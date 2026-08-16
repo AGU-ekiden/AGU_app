@@ -104,7 +104,7 @@ https://<ポータルのVercelドメイン>/itonomaki/           → agu-itonoma
 
 1. 章A の手順で各Vercelプロジェクトをデプロイし、実際のProduction URLを確認する
 2. リポジトリルートの `vercel.json` の `rewrites` の各 `destination` を実URLに置き換える
-3. 静的/Viteアプリについては、末尾スラッシュ無しでアクセスされると相対パス解決が壊れるため、`redirects` でスラッシュ付きに寄せる設定も確認する
+3. 末尾スラッシュ無し(例: `/stopwatch`)でアクセスされると`rewrites`のパターン(`/stopwatch/:path*`)にマッチせず404になるため、`vercel.json` に `"trailingSlash": true` を設定している(Vercelのデフォルトは逆にスラッシュを削除する方向なので明示的に反転させる必要がある)。拡張子付きのファイルリクエスト(`app.js`等)はこの設定の対象外なのでアセット読み込みには影響しない
 4. ポータルのVercelプロジェクトに変更をデプロイし、`https://<ポータルのドメイン>/xxx/` で各アプリが正しく表示されることを確認する
 
 `vercel.json` 自体の中身はリポジトリルートのファイルを直接参照してください。
@@ -187,7 +187,7 @@ Cloudflare Workers環境では、以下の機能がランタイムの制約で�
 2. **依頼者の環境がWindows / PowerShellの場合がある** — `npm` / `npx` が実行できないエラーが出たら `npm.cmd` / `npx.cmd`。コマンドはどのディレクトリで実行するか毎回明示する。PowerShellのパイプで値を渡すと末尾1文字が欠ける現象があるため、秘密値は必ず1つずつ手入力・貼り付けで設定し、成功表示を都度確認する。`sharp`(itonomakiの依存)のインストールで `EPERM: symlink` が出たら、Windowsの開発者モードを有効にするか管理者権限で実行する。
 3. **`@notionhq/client` に渡している `fetch` について** — `src/lib/notion.ts`(tiryou-karte・spm-medical-record両方)で `new Client({ auth: ..., fetch: globalThis.fetch })` のように明示的に `fetch` を渡している。これはCloudflare Workers対策で入れたものだが、Vercelでもそのままで問題ないため消さないこと(消す必要が無いうえ、消すと `node-fetch` 経由に戻ってしまう)。
 4. **静的アプリとNext.jsアプリでrewriteの対応を間違えない** — 静的/Viteアプリは「プレフィックスを剥がす」、Next.jsアプリは「プレフィックスを付けたまま」。ここを取り違えると404になる。
-5. **末尾スラッシュ** — `/stopwatch`(スラッシュ無し)でアクセスすると相対パス解決が壊れる。`vercel.json` の `redirects` でスラッシュ付きに寄せる。
+5. **末尾スラッシュ** — Vercelはデフォルトで末尾スラッシュを削除する方向にリダイレクトするため、`rewrites`の`/stopwatch/:path*`のようなパターンにマッチしなくなり404になる(実際に発生した不具合)。`vercel.json` に `"trailingSlash": true` を設定して逆方向(スラッシュを付ける)にする。拡張子付きファイルはこの設定の対象外なので静的アセットの読み込みには影響しない。
 6. **Next.js 16の破壊的変更に注意** — このリポジトリのNext.jsは **16.3.1** で、`middleware.js` は `proxy.ts` に名前が変わっている。学習データの知識と食い違う可能性が高いので、迷ったら `apps/itonomaki/web/node_modules/next/dist/docs/` のドキュメントを読んでから書く(`apps/itonomaki/web/AGENTS.md` にも同じ注意書きがある)。
 7. **ビルド成果物をコミットしない** — `.next/` `node_modules/` `dist/` は `.gitignore` 済みだが、コミット前に `git status` を確認する。
 
