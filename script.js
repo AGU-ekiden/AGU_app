@@ -1,7 +1,6 @@
 (function () {
   const main = document.getElementById('main');
   const headerNav = document.getElementById('headerNav');
-  const searchInput = document.getElementById('search');
   const ROLE_STORAGE_KEY = 'agu_portal_role';
   const AUTH_STORAGE_KEY = 'agu_portal_auth';
 
@@ -59,7 +58,7 @@
     localStorage.setItem(ROLE_STORAGE_KEY, roleId);
     view = 'role';
     renderHeaderNav();
-    renderMain('');
+    renderMain();
   }
 
   // ---------- header nav ----------
@@ -103,7 +102,6 @@
   }
 
   function renderLogin() {
-    searchInput.style.display = 'none';
     main.innerHTML = `
       <section class="auth">
         <div class="auth-card">
@@ -169,7 +167,6 @@
   }
 
   function renderPinChange() {
-    searchInput.style.display = 'none';
     main.innerHTML = `
       <section class="auth">
         <div class="auth-card">
@@ -276,27 +273,13 @@
     `;
   }
 
-  function renderRoleMenu(filterText) {
-    searchInput.style.display = '';
-    searchInput.placeholder = 'メニューを検索…';
+  function renderRoleMenu() {
     const role = window.ROLES.find((r) => r.id === currentRoleId);
     if (!role) { logout(); return; }
 
-    const q = (filterText || '').trim().toLowerCase();
-    const keys = role.features.filter((key) => {
-      if (!q) return true;
-      const f = window.FEATURES[key];
-      return f && f.name.toLowerCase().includes(q);
-    });
-
-    if (keys.length === 0) {
-      main.innerHTML = '<p class="empty">該当するメニューが見つかりませんでした。</p>';
-      return;
-    }
-
     main.innerHTML = `
       <section class="feature-list">
-        ${keys.map(featureItemHtml).join('')}
+        ${role.features.map(featureItemHtml).join('')}
       </section>
     `;
   }
@@ -320,26 +303,9 @@
     `;
   }
 
-  function renderAllApps(filterText) {
-    searchInput.style.display = '';
-    searchInput.placeholder = 'アプリを検索…';
-    const q = (filterText || '').trim().toLowerCase();
-    const apps = window.APPS.filter((app) => {
-      if (!q) return true;
-      return (
-        app.name.toLowerCase().includes(q) ||
-        app.description.toLowerCase().includes(q) ||
-        app.stack.toLowerCase().includes(q)
-      );
-    });
-
-    if (apps.length === 0) {
-      main.innerHTML = '<p class="empty">該当するアプリが見つかりませんでした。</p>';
-      return;
-    }
-
+  function renderAllApps() {
     const html = window.CATEGORIES.map((cat) => {
-      const catApps = apps.filter((a) => a.category === cat.id);
+      const catApps = window.APPS.filter((a) => a.category === cat.id);
       if (catApps.length === 0) return '';
       return `
         <section class="category">
@@ -351,20 +317,18 @@
       `;
     }).join('');
 
-    main.innerHTML = html || '<p class="empty">該当するアプリが見つかりませんでした。</p>';
+    main.innerHTML = html || '<p class="empty">掲載されているアプリがありません。</p>';
   }
 
   // ---------- dispatch ----------
-  function renderMain(filterText) {
+  function renderMain() {
     if (view === 'login') renderLogin();
     else if (view === 'pinchange') renderPinChange();
-    else if (view === 'role') renderRoleMenu(filterText);
-    else renderAllApps(filterText);
+    else if (view === 'role') renderRoleMenu();
+    else renderAllApps();
   }
-
-  searchInput.addEventListener('input', (e) => renderMain(e.target.value));
 
   view = (authedName && currentRoleId) ? 'role' : 'login';
   renderHeaderNav();
-  renderMain('');
+  renderMain();
 })();
