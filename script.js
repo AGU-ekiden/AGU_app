@@ -3,9 +3,13 @@
   const headerNav = document.getElementById('headerNav');
   const searchInput = document.getElementById('search');
   const ROLE_STORAGE_KEY = 'agu_portal_role';
+  const AUTH_STORAGE_KEY = 'agu_portal_auth';
 
-  let view = 'picker'; // 'picker' | 'role' | 'all'
+  let view = 'picker'; // 'login' | 'pinchange' | 'picker' | 'role' | 'all'
   let currentRoleId = localStorage.getItem(ROLE_STORAGE_KEY);
+  let authedName = localStorage.getItem(AUTH_STORAGE_KEY);
+  let pendingName = null;
+  let pendingPin = null;
 
   function escapeHtml(str) {
     return str.replace(/[&<>"']/g, (c) => ({
@@ -54,8 +58,29 @@
     renderMain();
   }
 
+  function logout() {
+    authedName = null;
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    view = 'login';
+    renderHeaderNav();
+    renderMain();
+  }
+
+  function completeLogin(name) {
+    authedName = name;
+    localStorage.setItem(AUTH_STORAGE_KEY, name);
+    view = currentRoleId ? 'role' : 'picker';
+    renderHeaderNav();
+    renderMain('');
+  }
+
   // ---------- header nav ----------
   function renderHeaderNav() {
+    if (view === 'login' || view === 'pinchange') {
+      headerNav.innerHTML = '';
+      return;
+    }
+
     const role = window.ROLES.find((r) => r.id === currentRoleId);
     const parts = [];
     if (view === 'role' && role) {
@@ -71,6 +96,9 @@
     } else {
       parts.push('<button type="button" class="nav-btn" data-action="show-all">役割を選ばずすべてのアプリを見る</button>');
     }
+    if (authedName) {
+      parts.push(`<button type="button" class="nav-btn" data-action="logout">${escapeHtml(authedName)} / ログアウト</button>`);
+    }
     headerNav.innerHTML = parts.join('');
 
     headerNav.querySelectorAll('[data-action]').forEach((btn) => {
@@ -79,7 +107,149 @@
         if (action === 'change-role') clearRole();
         else if (action === 'show-all') showAll();
         else if (action === 'back-to-role') backToRole();
+        else if (action === 'logout') logout();
       });
+    });
+  }
+
+  // ---------- login / pin change views ----------
+  function renderAuthError(message) {
+    const errorEl = document.getElementById('authError');
+    if (!errorEl) return;
+    errorEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  function renderLogin() {
+    searchInput.style.display = 'none';
+    main.innerHTML = `
+      <section class="auth">
+        <div class="auth-card">
+          <h1 class="auth-title">ログイン</h1>
+          <p class="auth-sub">氏名と6桁の暗証番号を入力してください。<br>初めての方は暗証番号に【000000】を入力してください。</p>
+          <form id="loginForm" class="auth-form" autocomplete="off">
+            <label class="field">
+              <span>氏名</span>
+              <input type="text" id="loginName" autocomplete="name" required>
+            </label>
+            <label class="field">
+              <span>暗証番号(6桁)</span>
+              <input type="password" id="loginPin" inputmode="numeric" pattern="\\d{6}" maxlength="6" required>
+            </label>
+            <p class="auth-error" id="authError" hidden></p>
+            <button type="submit" class="auth-btn">ログイン</button>
+          </form>
+        </div>
+      </section>
+    `;
+
+    const form = document.getElementById('loginForm');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      document.getElementById('authError').hidden = true;
+      const name = document.getElementById('loginName').value.trim();
+      const pin = document.getElementById('loginPin').value.trim();
+      if (!name || !/^\d{6}$/.test(pin)) {
+        renderAuthError('氏名と6桁の暗証番号を入力してください');
+        return;
+      }
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, pin }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          renderAuthError(data.error || 'ログインに失敗しました');
+          return;
+        }
+        if (data.needsPinChange) {
+          pendingName = name;
+          pendingPin = pin;
+          view = 'pinchange';
+          renderHeaderNav();
+          renderMain();
+        } else {
+          completeLogin(name);
+        }
+      } catch (err) {
+        renderAuthError('通信エラーが発生しました。しばらくしてから再度お試しください。');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  function renderPinChange() {
+    searchInput.style.display = 'none';
+    main.innerHTML = `
+      <section class="auth">
+        <div class="auth-card">
+          <h1 class="auth-title">暗証番号の変更</h1>
+          <p class="auth-sub">初回ログインのため、6桁の暗証番号を新しく設定してください。</p>
+          <form id="pinForm" class="auth-form" autocomplete="off">
+            <label class="field">
+              <span>新しい暗証番号(6桁)</span>
+              <input type="password" id="newPin1" inputmode="numeric" pattern="\\d{6}" maxlength="6" required>
+            </label>
+            <label class="field">
+              <span>新しい暗証番号(確認)</span>
+              <input type="password" id="newPin2" inputmode="numeric" pattern="\\d{6}" maxlength="6" required>
+            </label>
+            <p class="auth-error" id="authError" hidden></p>
+            <button type="submit" class="auth-btn">変更してログイン</button>
+          </form>
+        </div>
+      </section>
+    `;
+
+    const form = document.getElementById('pinForm');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      document.getElementById('authError').hidden = true;
+      const p1 = document.getElementById('newPin1').value.trim();
+      const p2 = document.getElementById('newPin2').value.trim();
+      if (!/^\d{6}$/.test(p1)) {
+        renderAuthError('6桁の数字で入力してください');
+        return;
+      }
+      if (p1 !== p2) {
+        renderAuthError('確認用の暗証番号が一致しません');
+        return;
+      }
+      if (p1 === '000000') {
+        renderAuthError('初期値以外の暗証番号を設定してください');
+        return;
+      }
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      try {
+        const res = await fetch('/api/change-pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: pendingName, currentPin: pendingPin, newPin: p1 }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          renderAuthError(data.error || '変更に失敗しました');
+          return;
+        }
+        const name = pendingName;
+        pendingName = null;
+        pendingPin = null;
+        completeLogin(name);
+      } catch (err) {
+        renderAuthError('通信エラーが発生しました。しばらくしてから再度お試しください。');
+      } finally {
+        submitBtn.disabled = false;
+      }
     });
   }
 
@@ -224,14 +394,16 @@
 
   // ---------- dispatch ----------
   function renderMain(filterText) {
-    if (view === 'picker') renderPicker();
+    if (view === 'login') renderLogin();
+    else if (view === 'pinchange') renderPinChange();
+    else if (view === 'picker') renderPicker();
     else if (view === 'role') renderRoleMenu(filterText);
     else renderAllApps(filterText);
   }
 
   searchInput.addEventListener('input', (e) => renderMain(e.target.value));
 
-  view = currentRoleId ? 'role' : 'picker';
+  view = authedName ? (currentRoleId ? 'role' : 'picker') : 'login';
   renderHeaderNav();
   renderMain('');
 })();
