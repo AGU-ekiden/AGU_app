@@ -5,11 +5,12 @@
   const ROLE_STORAGE_KEY = 'agu_portal_role';
   const AUTH_STORAGE_KEY = 'agu_portal_auth';
 
-  let view = 'picker'; // 'login' | 'pinchange' | 'picker' | 'role' | 'all'
+  let view = 'login'; // 'login' | 'pinchange' | 'role' | 'all'
   let currentRoleId = localStorage.getItem(ROLE_STORAGE_KEY);
   let authedName = localStorage.getItem(AUTH_STORAGE_KEY);
   let pendingName = null;
   let pendingPin = null;
+  let pendingRole = null;
 
   function escapeHtml(str) {
     return str.replace(/[&<>"']/g, (c) => ({
@@ -29,23 +30,6 @@
     return { url: app.repoUrl, label: app.external ? 'GitHub(別リポジトリ)' : 'コード', kind: 'repo' };
   }
 
-  function setRole(roleId) {
-    currentRoleId = roleId;
-    localStorage.setItem(ROLE_STORAGE_KEY, roleId);
-    view = 'role';
-    searchInput.value = '';
-    renderHeaderNav();
-    renderMain();
-  }
-
-  function clearRole() {
-    currentRoleId = null;
-    localStorage.removeItem(ROLE_STORAGE_KEY);
-    view = 'picker';
-    renderHeaderNav();
-    renderMain();
-  }
-
   function showAll() {
     view = 'all';
     renderHeaderNav();
@@ -53,23 +37,27 @@
   }
 
   function backToRole() {
-    if (!currentRoleId) { view = 'picker'; } else { view = 'role'; }
+    view = 'role';
     renderHeaderNav();
     renderMain();
   }
 
   function logout() {
     authedName = null;
+    currentRoleId = null;
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(ROLE_STORAGE_KEY);
     view = 'login';
     renderHeaderNav();
     renderMain();
   }
 
-  function completeLogin(name) {
+  function completeLogin(name, roleId) {
     authedName = name;
+    currentRoleId = roleId;
     localStorage.setItem(AUTH_STORAGE_KEY, name);
-    view = currentRoleId ? 'role' : 'picker';
+    localStorage.setItem(ROLE_STORAGE_KEY, roleId);
+    view = 'role';
     renderHeaderNav();
     renderMain('');
   }
@@ -85,16 +73,11 @@
     const parts = [];
     if (view === 'role' && role) {
       parts.push(`<span class="nav-current">${role.icon} ${escapeHtml(role.name)} メニュー</span>`);
-      parts.push('<button type="button" class="nav-btn" data-action="change-role">役割を変更</button>');
       parts.push('<button type="button" class="nav-btn" data-action="show-all">すべてのアプリ</button>');
     } else if (view === 'all') {
       if (role) {
         parts.push(`<button type="button" class="nav-btn" data-action="back-to-role">${role.icon} ${escapeHtml(role.name)}メニューに戻る</button>`);
-      } else {
-        parts.push('<button type="button" class="nav-btn" data-action="change-role">役割を選ぶ</button>');
       }
-    } else {
-      parts.push('<button type="button" class="nav-btn" data-action="show-all">役割を選ばずすべてのアプリを見る</button>');
     }
     if (authedName) {
       parts.push(`<button type="button" class="nav-btn" data-action="logout">${escapeHtml(authedName)} / ログアウト</button>`);
@@ -104,8 +87,7 @@
     headerNav.querySelectorAll('[data-action]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const action = btn.getAttribute('data-action');
-        if (action === 'change-role') clearRole();
-        else if (action === 'show-all') showAll();
+        if (action === 'show-all') showAll();
         else if (action === 'back-to-role') backToRole();
         else if (action === 'logout') logout();
       });
@@ -171,11 +153,12 @@
         if (data.needsPinChange) {
           pendingName = name;
           pendingPin = pin;
+          pendingRole = data.role;
           view = 'pinchange';
           renderHeaderNav();
           renderMain();
         } else {
-          completeLogin(name);
+          completeLogin(name, data.role);
         }
       } catch (err) {
         renderAuthError('通信エラーが発生しました。しばらくしてから再度お試しください。');
@@ -242,37 +225,16 @@
           return;
         }
         const name = pendingName;
+        const roleId = pendingRole;
         pendingName = null;
         pendingPin = null;
-        completeLogin(name);
+        pendingRole = null;
+        completeLogin(name, roleId);
       } catch (err) {
         renderAuthError('通信エラーが発生しました。しばらくしてから再度お試しください。');
       } finally {
         submitBtn.disabled = false;
       }
-    });
-  }
-
-  // ---------- picker view ----------
-  function renderPicker() {
-    searchInput.style.display = 'none';
-    const cards = window.ROLES.map((role) => `
-      <button type="button" class="role-card" data-role="${role.id}">
-        <span class="role-icon">${role.icon}</span>
-        <span class="role-name">${escapeHtml(role.name)}</span>
-      </button>
-    `).join('');
-
-    main.innerHTML = `
-      <section class="picker">
-        <h1 class="picker-title">あなたの役割を選んでください</h1>
-        <p class="picker-sub">役割に合わせたメニューを表示します(次回から自動的に表示されます)</p>
-        <div class="role-grid">${cards}</div>
-      </section>
-    `;
-
-    main.querySelectorAll('[data-role]').forEach((btn) => {
-      btn.addEventListener('click', () => setRole(btn.getAttribute('data-role')));
     });
   }
 
@@ -318,7 +280,7 @@
     searchInput.style.display = '';
     searchInput.placeholder = 'メニューを検索…';
     const role = window.ROLES.find((r) => r.id === currentRoleId);
-    if (!role) { view = 'picker'; renderPicker(); return; }
+    if (!role) { logout(); return; }
 
     const q = (filterText || '').trim().toLowerCase();
     const keys = role.features.filter((key) => {
@@ -396,14 +358,13 @@
   function renderMain(filterText) {
     if (view === 'login') renderLogin();
     else if (view === 'pinchange') renderPinChange();
-    else if (view === 'picker') renderPicker();
     else if (view === 'role') renderRoleMenu(filterText);
     else renderAllApps(filterText);
   }
 
   searchInput.addEventListener('input', (e) => renderMain(e.target.value));
 
-  view = authedName ? (currentRoleId ? 'role' : 'picker') : 'login';
+  view = (authedName && currentRoleId) ? 'role' : 'login';
   renderHeaderNav();
   renderMain('');
 })();

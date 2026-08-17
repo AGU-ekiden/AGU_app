@@ -1,5 +1,14 @@
 const { findMemberByName, verifyPin, isPlainPin } = require('./_shared/notion');
 
+const ROLE_MAP = {
+  '選手': 'athlete',
+  'マネージャー': 'manager',
+  'スタッフ': 'staff',
+  'メディカルトレーナー': 'medical_trainer',
+  'フィジカルトレーナー': 'physical_trainer',
+  // OBOGは意図的に含めない(ポータル利用不可)
+};
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
@@ -33,5 +42,14 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  res.status(200).json({ ok: true, needsPinChange: isPlainPin(member.pinValue) });
+  const roleId = ROLE_MAP[member.category];
+  if (!roleId) {
+    const message = member.category === 'OBOG'
+      ? 'OBOG・OGの方はこのポータルをご利用いただけません'
+      : '区分が設定されていないため利用できません。管理者にお問い合わせください。';
+    res.status(403).json({ error: message });
+    return;
+  }
+
+  res.status(200).json({ ok: true, needsPinChange: isPlainPin(member.pinValue), role: roleId });
 };

@@ -312,55 +312,6 @@ body {
 .auth-btn:hover, .auth-btn:focus-visible { opacity: 0.9; }
 .auth-btn:disabled { opacity: 0.6; cursor: default; }
 
-/* Role picker */
-.picker {
-  padding: 1.5rem 0 2.5rem;
-  text-align: center;
-}
-
-.picker-title {
-  font-size: 1.3rem;
-  font-weight: 900;
-  margin-bottom: 0.4rem;
-}
-
-.picker-sub {
-  font-size: 0.85rem;
-  color: var(--text-sub);
-  margin-bottom: 1.75rem;
-}
-
-.role-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.9rem;
-  max-width: 640px;
-  margin: 0 auto;
-}
-
-.role-card {
-  font-family: inherit;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.4rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-}
-
-.role-card:hover, .role-card:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(16, 37, 74, 0.1);
-  border-color: var(--gold);
-}
-
-.role-icon { font-size: 1.9rem; }
-.role-name { font-size: 0.95rem; font-weight: 700; }
-
 /* Feature list (role menu) */
 .feature-list {
   display: flex;
@@ -474,21 +425,6 @@ body {
     font-size: 0.95rem;
     padding: 0.6rem 1.15rem;
   }
-
-  /* 役割ピッカー: 5つの役割を1行に並べて一覧性を上げる */
-  .picker { padding: 3.5rem 0 4rem; }
-  .picker-title { font-size: 2rem; }
-  .picker-sub { font-size: 1rem; margin-bottom: 2.75rem; }
-
-  .role-grid {
-    max-width: 900px;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 1.25rem;
-  }
-
-  .role-card { padding: 2rem 1.1rem; }
-  .role-icon { font-size: 2.5rem; }
-  .role-name { font-size: 1.05rem; }
 
   /* すべてのアプリ: カードをより広く、余白にゆとりを持たせる */
   .category-title { font-size: 1.15rem; margin-bottom: 1.1rem; }
