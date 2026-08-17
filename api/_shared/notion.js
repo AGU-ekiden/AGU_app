@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const NOTION_VERSION = '2022-06-28';
 const NAME_PROPERTY = '氏名';
 const PIN_PROPERTY = '暗証番号';
+const CATEGORY_PROPERTY = '区分';
 
 function notionHeaders() {
   return {
@@ -32,7 +33,13 @@ async function findMemberByName(name) {
   const pinValue = prop && prop.type === 'rich_text'
     ? prop.rich_text.map((t) => t.plain_text).join('')
     : '';
-  return { pageId: page.id, pinValue };
+
+  const categoryProp = page.properties[CATEGORY_PROPERTY];
+  const category = categoryProp && categoryProp.type === 'select' && categoryProp.select
+    ? categoryProp.select.name
+    : '';
+
+  return { pageId: page.id, pinValue, category };
 }
 
 function isPlainPin(value) {
