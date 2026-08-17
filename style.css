@@ -3,6 +3,7 @@
 :root {
   --navy: #10254a;
   --navy-dark: #0a1930;
+  --header-teal: #068c89;
   --gold: #c9a227;
   --gold-light: #f4e6bd;
   --text: #1a1a1a;
@@ -31,7 +32,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+  background: var(--header-teal);
   color: #fff;
   box-shadow: 0 2px 12px rgba(0,0,0,0.15);
 }
@@ -223,6 +224,94 @@ body {
   font-size: 0.9rem;
 }
 
+/* Auth (login / pin change) */
+.auth {
+  padding: 2.5rem 0 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem 1.75rem;
+  text-align: center;
+}
+
+.auth-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  margin-bottom: 0.4rem;
+}
+
+.auth-sub {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+.field input {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  outline: none;
+  letter-spacing: 0.05em;
+}
+
+.field input:focus {
+  border-color: var(--gold);
+  background: var(--surface);
+}
+
+.auth-error {
+  font-size: 0.8rem;
+  color: #b3261e;
+  background: #fdecea;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+}
+
+.auth-btn {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.auth-btn:hover, .auth-btn:focus-visible { opacity: 0.9; }
+.auth-btn:disabled { opacity: 0.6; cursor: default; }
+
 /* Role picker */
 .picker {
   padding: 1.5rem 0 2.5rem;
@@ -345,4 +434,106 @@ body {
   background: var(--surface-2);
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
+}
+
+/* ==========================================================
+   Desktop layout
+   モバイル(縦一列)をそのまま引き伸ばすのではなく、
+   横幅を活かして「アプリ/機能を面で見渡せる」デザインにする。
+   ========================================================== */
+@media (min-width: 900px) {
+  .header-inner,
+  .header-nav,
+  .main,
+  .footer {
+    max-width: 1180px;
+  }
+
+  .header-inner {
+    padding: 1.4rem 2.5rem 1.15rem;
+    flex-wrap: nowrap;
+  }
+
+  .header-nav {
+    padding: 0 2.5rem 1.15rem;
+  }
+
+  .main {
+    padding: 3rem 2.5rem 4.5rem;
+  }
+
+  .footer {
+    padding: 0 2.5rem 3rem;
+  }
+
+  .brand-mark { font-size: 1.7rem; }
+  .brand-sub { font-size: 0.95rem; }
+
+  .search {
+    max-width: 320px;
+    font-size: 0.95rem;
+    padding: 0.6rem 1.15rem;
+  }
+
+  /* 役割ピッカー: 5つの役割を1行に並べて一覧性を上げる */
+  .picker { padding: 3.5rem 0 4rem; }
+  .picker-title { font-size: 2rem; }
+  .picker-sub { font-size: 1rem; margin-bottom: 2.75rem; }
+
+  .role-grid {
+    max-width: 900px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .role-card { padding: 2rem 1.1rem; }
+  .role-icon { font-size: 2.5rem; }
+  .role-name { font-size: 1.05rem; }
+
+  /* すべてのアプリ: カードをより広く、余白にゆとりを持たせる */
+  .category-title { font-size: 1.15rem; margin-bottom: 1.1rem; }
+
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.3rem;
+  }
+
+  .card { padding: 1.4rem 1.5rem; }
+  .card-name { font-size: 1.08rem; }
+  .card-desc { font-size: 0.88rem; }
+
+  /* 役割メニュー: 縦一列のリストではなく、複数列のタイル状に */
+  .feature-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+    align-items: stretch;
+    padding: 0.75rem 0 1.5rem;
+  }
+
+  .feature-item {
+    height: 100%;
+    padding: 1rem 1.2rem;
+  }
+
+  .feature-item:not(.is-disabled):hover,
+  .feature-item:not(.is-disabled):focus-visible {
+    transform: translateY(-3px);
+  }
+
+  .feature-name { font-size: 1rem; }
+
+  .footer p { max-width: 78ch; }
+}
+
+@media (min-width: 1400px) {
+  .header-inner,
+  .header-nav,
+  .main,
+  .footer {
+    max-width: 1320px;
+  }
+
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .feature-list { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
 }
