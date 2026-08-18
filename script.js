@@ -107,14 +107,14 @@
         <div class="auth-card">
           <h1 class="auth-title">ログイン</h1>
           <p class="auth-sub">氏名と6桁の暗証番号を入力してください。<br>初めての方は暗証番号に【000000】を入力してください。</p>
-          <form id="loginForm" class="auth-form" autocomplete="off">
+          <form id="loginForm" class="auth-form">
             <label class="field">
               <span>氏名</span>
-              <input type="text" id="loginName" autocomplete="name" required>
+              <input type="text" id="loginName" name="username" autocomplete="username" required>
             </label>
             <label class="field">
               <span>暗証番号(6桁)</span>
-              <input type="password" id="loginPin" inputmode="numeric" pattern="\\d{6}" maxlength="6" required>
+              <input type="password" id="loginPin" name="password" inputmode="numeric" pattern="\\d{6}" maxlength="6" autocomplete="current-password" required>
             </label>
             <p class="auth-error" id="authError" hidden></p>
             <button type="submit" class="auth-btn">ログイン</button>
@@ -172,14 +172,14 @@
         <div class="auth-card">
           <h1 class="auth-title">暗証番号の変更</h1>
           <p class="auth-sub">初回ログインのため、6桁の暗証番号を新しく設定してください。</p>
-          <form id="pinForm" class="auth-form" autocomplete="off">
+          <form id="pinForm" class="auth-form">
             <label class="field">
               <span>新しい暗証番号(6桁)</span>
-              <input type="password" id="newPin1" inputmode="numeric" pattern="\\d{6}" maxlength="6" required>
+              <input type="password" id="newPin1" name="new-password" inputmode="numeric" pattern="\\d{6}" maxlength="6" autocomplete="new-password" required>
             </label>
             <label class="field">
               <span>新しい暗証番号(確認)</span>
-              <input type="password" id="newPin2" inputmode="numeric" pattern="\\d{6}" maxlength="6" required>
+              <input type="password" id="newPin2" name="new-password-confirm" inputmode="numeric" pattern="\\d{6}" maxlength="6" autocomplete="new-password" required>
             </label>
             <p class="auth-error" id="authError" hidden></p>
             <button type="submit" class="auth-btn">変更してログイン</button>
