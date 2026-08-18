@@ -8,11 +8,11 @@ module.exports = async function handler(req, res) {
 
   const body = req.body || {};
   const name = typeof body.name === 'string' ? body.name.trim() : '';
-  const currentPin = typeof body.currentPin === 'string' ? body.currentPin.trim() : '';
-  const newPin = typeof body.newPin === 'string' ? body.newPin.trim() : '';
+  const currentPin = typeof body.currentPin === 'string' ? body.currentPin : '';
+  const newPin = typeof body.newPin === 'string' ? body.newPin : '';
 
-  if (!name || !/^\d{6}$/.test(currentPin) || !/^\d{6}$/.test(newPin)) {
-    res.status(400).json({ error: '入力内容を確認してください' });
+  if (!name || !currentPin || newPin.length < 4 || newPin.length > 64 || newPin === '000000') {
+    res.status(400).json({ error: '入力内容を確認してください(暗証番号は4文字以上で、初期値のままは設定できません)' });
     return;
   }
 
