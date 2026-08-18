@@ -106,15 +106,15 @@
       <section class="auth">
         <div class="auth-card">
           <h1 class="auth-title">ログイン</h1>
-          <p class="auth-sub">氏名と6桁の暗証番号を入力してください。<br>初めての方は暗証番号に【000000】を入力してください。</p>
+          <p class="auth-sub">氏名と暗証番号を入力してください。<br>初めての方は暗証番号に【000000】を入力してください。</p>
           <form id="loginForm" class="auth-form">
             <label class="field">
               <span>氏名</span>
               <input type="text" id="loginName" name="username" autocomplete="username" required>
             </label>
             <label class="field">
-              <span>暗証番号(6桁)</span>
-              <input type="password" id="loginPin" name="password" inputmode="numeric" pattern="\\d{6}" maxlength="6" autocomplete="current-password" required>
+              <span>暗証番号</span>
+              <input type="password" id="loginPin" name="password" autocomplete="current-password" required>
             </label>
             <p class="auth-error" id="authError" hidden></p>
             <button type="submit" class="auth-btn">ログイン</button>
@@ -130,8 +130,8 @@
       document.getElementById('authError').hidden = true;
       const name = document.getElementById('loginName').value.trim();
       const pin = document.getElementById('loginPin').value.trim();
-      if (!name || !/^\d{6}$/.test(pin)) {
-        renderAuthError('氏名と6桁の暗証番号を入力してください');
+      if (!name || !pin) {
+        renderAuthError('氏名と暗証番号を入力してください');
         return;
       }
 
@@ -171,15 +171,15 @@
       <section class="auth">
         <div class="auth-card">
           <h1 class="auth-title">暗証番号の変更</h1>
-          <p class="auth-sub">初回ログインのため、6桁の暗証番号を新しく設定してください。</p>
+          <p class="auth-sub">初回ログインのため、暗証番号を新しく設定してください。<br>4文字以上であれば数字以外(英字・記号など)も使えます。</p>
           <form id="pinForm" class="auth-form">
             <label class="field">
-              <span>新しい暗証番号(6桁)</span>
-              <input type="password" id="newPin1" name="new-password" inputmode="numeric" pattern="\\d{6}" maxlength="6" autocomplete="new-password" required>
+              <span>新しい暗証番号(4文字以上)</span>
+              <input type="password" id="newPin1" name="new-password" minlength="4" maxlength="64" autocomplete="new-password" required>
             </label>
             <label class="field">
               <span>新しい暗証番号(確認)</span>
-              <input type="password" id="newPin2" name="new-password-confirm" inputmode="numeric" pattern="\\d{6}" maxlength="6" autocomplete="new-password" required>
+              <input type="password" id="newPin2" name="new-password-confirm" minlength="4" maxlength="64" autocomplete="new-password" required>
             </label>
             <p class="auth-error" id="authError" hidden></p>
             <button type="submit" class="auth-btn">変更してログイン</button>
@@ -193,10 +193,10 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       document.getElementById('authError').hidden = true;
-      const p1 = document.getElementById('newPin1').value.trim();
-      const p2 = document.getElementById('newPin2').value.trim();
-      if (!/^\d{6}$/.test(p1)) {
-        renderAuthError('6桁の数字で入力してください');
+      const p1 = document.getElementById('newPin1').value;
+      const p2 = document.getElementById('newPin2').value;
+      if (p1.length < 4) {
+        renderAuthError('4文字以上で入力してください');
         return;
       }
       if (p1 !== p2) {

@@ -17,10 +17,10 @@ module.exports = async function handler(req, res) {
 
   const body = req.body || {};
   const name = typeof body.name === 'string' ? body.name.trim() : '';
-  const pin = typeof body.pin === 'string' ? body.pin.trim() : '';
+  const pin = typeof body.pin === 'string' ? body.pin : '';
 
-  if (!name || !/^\d{6}$/.test(pin)) {
-    res.status(400).json({ error: '氏名と6桁の暗証番号を入力してください' });
+  if (!name || !pin) {
+    res.status(400).json({ error: '氏名と暗証番号を入力してください' });
     return;
   }
 
