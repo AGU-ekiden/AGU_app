@@ -1282,6 +1282,11 @@ html, body {
   color: var(--text-dim);
   padding: 2px 2px;
 }
+.rollcall-grade-heading-sub {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
+}
 .rollcall-grade-members {
   display: flex;
   flex-direction: column;
@@ -1358,6 +1363,9 @@ html, body {
   display: flex;
   gap: 6px;
 }
+.rollcall-add-form-row[hidden] {
+  display: none;
+}
 .rollcall-add-form-row input[type='text'] {
   flex: 1 1 0;
   min-width: 0;
@@ -1371,16 +1379,6 @@ html, body {
 }
 .rollcall-add-form-row input[type='text']:focus {
   outline: 1px solid var(--accent);
-}
-.rollcall-add-form-row select {
-  flex: 0 0 auto;
-  box-sizing: border-box;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 14px;
-  padding: 8px;
 }
 #rollcallAddBtn {
   flex: 0 0 auto;
@@ -1419,6 +1417,15 @@ html, body {
 .rollcall-tag-manage-heading {
   font-size: 11px;
   font-weight: 700;
+  color: var(--text-dim);
+}
+.rollcall-add-form-heading {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.rollcall-register-row-note {
+  font-size: 10px;
   color: var(--text-dim);
 }
 .rollcall-tag-chip-list {

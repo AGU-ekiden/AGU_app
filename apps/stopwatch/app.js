@@ -80,7 +80,6 @@ const el = {
   rollcallNewTagName: document.getElementById('rollcallNewTagName'),
   rollcallNewTagBtn: document.getElementById('rollcallNewTagBtn'),
   rollcallAddName: document.getElementById('rollcallAddName'),
-  rollcallAddGrade: document.getElementById('rollcallAddGrade'),
   rollcallAddTagCheckboxes: document.getElementById('rollcallAddTagCheckboxes'),
   rollcallAddBtn: document.getElementById('rollcallAddBtn'),
   rollcallTagFilter: document.getElementById('rollcallTagFilter'),
@@ -2961,6 +2960,7 @@ function loadRollcallMembers() {
     id: makeRollcallId(),
     name: m.name,
     grade: m.grade,
+    isTemp: false,
     tags: [],
     checked: false,
     checkedSeq: 0,
@@ -3060,13 +3060,23 @@ function promptForRollcallToken() {
 
 function rollcallRosterPayload() {
   return {
-    members: rollcallMembers.map((m) => ({ id: m.id, name: m.name, grade: m.grade, tags: m.tags, sortIndex: m.sortIndex })),
+    members: rollcallMembers.map((m) => ({
+      id: m.id,
+      name: m.name,
+      grade: m.grade,
+      isTemp: !!m.isTemp,
+      tags: m.tags,
+      sortIndex: m.sortIndex,
+    })),
     tags: rollcallTags,
   };
 }
 
 // サーバーから取得した共有名簿を、この端末の点呼チェック状態はそのまま
 // 保ちつつ取り込む(id が一致する選手はchecked/checkedSeqを引き継ぐ)。
+// 氏名・学年(部員DB由来)や一時的な参加者(一時参加者DB由来)自体は、
+// この直後にそれぞれの取得処理で最新の内容に上書きされる — ここでは
+// タグ・並び順の端末間共有のためだけに使う。
 function applySharedRollcallRoster(shared) {
   if (!shared || !Array.isArray(shared.members)) return;
   const localById = new Map(rollcallMembers.map((m) => [m.id, m]));
@@ -3076,6 +3086,7 @@ function applySharedRollcallRoster(shared) {
       id: m.id,
       name: m.name,
       grade: m.grade,
+      isTemp: !!m.isTemp,
       tags: Array.isArray(m.tags) ? m.tags : [],
       sortIndex: typeof m.sortIndex === 'number' ? m.sortIndex : 0,
       checked: local ? local.checked : false,
@@ -3105,32 +3116,44 @@ async function loadSharedRollcallRoster() {
 /* ----- 部員DB(Notion)からの選手名簿の自動反映 -----
    氏名・学年は手入力(写真からの転記)だと部員DBとズレることがあったため、
    部員DBの「区分」が選手になっている人を毎回自動取得して名簿に反映する。
-   名前が一致する既存メンバーからはid・タグ・点呼済み状態・並び順を
-   そのまま引き継ぎ、部員DBに無くなった人(退部・区分変更等)は名簿から
-   外れる。取得に失敗した場合は、この端末に既にある名簿のまま使う。 */
+   氏名・学年はここが唯一の情報源になるため、点呼アプリ内からは編集でき
+   ない(「名簿を編集」タブでは読み取り専用)。部員DBのページIDをそのまま
+   member.id として使うことで、端末をまたいでも同一人物として扱える。
+   id が一致する(または、まだ移行前で id が無い場合は氏名が一致する)
+   既存メンバーからはタグ・点呼済み状態・並び順を引き継ぎ、部員DBに
+   無くなった人(退部・区分変更等)は名簿から外れる。一時的な参加者
+   (isTemp)はこの処理では一切触らない。取得に失敗した場合は、この端末に
+   既にある名簿のまま使う。 */
 const ROLLCALL_ATHLETES_API_URL = '/api/rollcall-roster';
 
 function applyNotionAthleteRoster(athletes) {
   if (!Array.isArray(athletes)) return;
   const valid = athletes.filter(
-    (a) => a && typeof a.name === 'string' && a.name.trim() && ROLLCALL_GRADES.includes(a.grade)
+    (a) => a && typeof a.id === 'string' && typeof a.name === 'string' && a.name.trim() && ROLLCALL_GRADES.includes(a.grade)
   );
   if (valid.length === 0) return;
 
-  const byName = new Map(rollcallMembers.map((m) => [m.name, m]));
-  rollcallMembers = valid.map((a) => {
-    const existing = byName.get(a.name);
-    if (existing) return { ...existing, grade: a.grade };
+  const tempMembers = rollcallMembers.filter((m) => m.isTemp);
+  const existingAthletes = rollcallMembers.filter((m) => !m.isTemp);
+  const byId = new Map(existingAthletes.map((m) => [m.id, m]));
+  const byName = new Map(existingAthletes.map((m) => [m.name, m]));
+
+  const athleteMembers = valid.map((a) => {
+    const existing = byId.get(a.id) || byName.get(a.name);
+    if (existing) return { ...existing, id: a.id, name: a.name, grade: a.grade, isTemp: false };
     return {
-      id: makeRollcallId(),
+      id: a.id,
       name: a.name,
       grade: a.grade,
+      isTemp: false,
       tags: [],
       checked: false,
       checkedSeq: 0,
       sortIndex: rollcallNextSortIndex++,
     };
   });
+
+  rollcallMembers = [...athleteMembers, ...tempMembers];
   rollcallNextCheckedSeq = 1 + rollcallMembers.reduce((max, m) => Math.max(max, m.checkedSeq || 0), 0);
   rollcallNextSortIndex = 1 + rollcallMembers.reduce((max, m) => Math.max(max, m.sortIndex || 0), -1);
   saveRollcallMembers();
@@ -3144,6 +3167,97 @@ async function loadAthleteRosterFromNotion() {
     applyNotionAthleteRoster(body.athletes);
   } catch {
     // オフライン、またはサーバー未応答 — この端末に既にある名簿のまま使う。
+  }
+}
+
+/* ----- 一時的な参加者(その他)DB(Notion)-----
+   単発で来る一時的な参加者は、部員DBとは別の専用Notion DBで管理する。
+   氏名は選手と違って点呼アプリの「名簿を編集」タブから直接、追加・
+   氏名変更・削除ができる(削除はNotion側ではアーカイブ扱いになる)。
+   一覧上は grade を問わず常に「4年」欄の下に「その他」として表示する。 */
+const ROLLCALL_TEMP_PARTICIPANTS_API_URL = '/api/temp-participants';
+
+function applyTempParticipantsRoster(participants) {
+  if (!Array.isArray(participants)) return;
+  const valid = participants.filter((p) => p && typeof p.id === 'string' && typeof p.name === 'string' && p.name.trim());
+
+  const athleteMembers = rollcallMembers.filter((m) => !m.isTemp);
+  const existingTemp = rollcallMembers.filter((m) => m.isTemp);
+  const byId = new Map(existingTemp.map((m) => [m.id, m]));
+
+  const tempMembers = valid.map((p) => {
+    const existing = byId.get(p.id);
+    if (existing) return { ...existing, name: p.name };
+    return {
+      id: p.id,
+      name: p.name,
+      grade: null,
+      isTemp: true,
+      tags: [],
+      checked: false,
+      checkedSeq: 0,
+      sortIndex: rollcallNextSortIndex++,
+    };
+  });
+
+  rollcallMembers = [...athleteMembers, ...tempMembers];
+  rollcallNextCheckedSeq = 1 + rollcallMembers.reduce((max, m) => Math.max(max, m.checkedSeq || 0), 0);
+  rollcallNextSortIndex = 1 + rollcallMembers.reduce((max, m) => Math.max(max, m.sortIndex || 0), -1);
+  saveRollcallMembers();
+}
+
+async function loadTempParticipantsFromNotion() {
+  try {
+    const res = await fetch(ROLLCALL_TEMP_PARTICIPANTS_API_URL, { cache: 'no-store' });
+    if (!res.ok) return;
+    const body = await res.json();
+    applyTempParticipantsRoster(body.participants);
+  } catch {
+    // オフライン、またはサーバー未応答 — この端末に既にある名簿のまま使う。
+  }
+}
+
+// 一時的な参加者の追加・氏名変更・削除は、一時参加者DB専用のAPIを直接
+// 呼び出す(部員DBのようにNotion側で更新してもらう運用ではなく、この
+// アプリから完結させたいため)。合言葉は呼び出し側で取得済みのものを
+// 渡す(名簿共有と同じ合言葉を使い回す)。
+async function createTempParticipantOnServer(token, name) {
+  try {
+    const res = await fetch(ROLLCALL_TEMP_PARTICIPANTS_API_URL, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (!res.ok) return null;
+    const body = await res.json();
+    return body.participant || null;
+  } catch {
+    return null;
+  }
+}
+
+async function renameTempParticipantOnServer(token, id, name) {
+  try {
+    const res = await fetch(`${ROLLCALL_TEMP_PARTICIPANTS_API_URL}/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function deleteTempParticipantOnServer(token, id) {
+  try {
+    const res = await fetch(`${ROLLCALL_TEMP_PARTICIPANTS_API_URL}/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.ok;
+  } catch {
+    return false;
   }
 }
 
@@ -3380,6 +3494,30 @@ function buildRollcallMemberButton(member) {
   return node;
 }
 
+// 学年の欄(見出し+一覧)を1つ作って親要素に追加する。isSub は「その他
+// (一時的な参加者)」のように、同じ列の中で別の学年欄の下に続けて表示する
+// 小見出しかどうか。
+function appendRollcallGroup(container, label, members, isSub) {
+  // 未点呼(checked=false)は元の並び順のまま上に、点呼済みは押した順に
+  // 下に積み上がっていく(直近に押した人ほど一番下)。
+  const unchecked = members
+    .filter((m) => !m.checked)
+    .sort((a, b) => a.sortIndex - b.sortIndex);
+  const checked = members
+    .filter((m) => m.checked)
+    .sort((a, b) => a.checkedSeq - b.checkedSeq);
+
+  const heading = document.createElement('div');
+  heading.className = 'rollcall-grade-heading' + (isSub ? ' rollcall-grade-heading-sub' : '');
+  heading.textContent = `${label}(${members.length - checked.length} / ${members.length})`;
+  container.appendChild(heading);
+
+  const list = document.createElement('div');
+  list.className = 'rollcall-grade-members';
+  [...unchecked, ...checked].forEach((member) => list.appendChild(buildRollcallMemberButton(member)));
+  container.appendChild(list);
+}
+
 // タグで絞り込んでいる間は、その絞り込み内の人数だけを対象に一覧・進捗を
 // 表示する(絞り込みを外せば全員が対象に戻る)。
 function renderRollcallList() {
@@ -3389,30 +3527,15 @@ function renderRollcallList() {
 
   el.rollcallList.innerHTML = '';
   ROLLCALL_GRADES.forEach((grade) => {
-    const members = visibleMembers.filter((m) => m.grade === grade);
-    if (members.length === 0) return;
-
-    // 未点呼(checked=false)は元の並び順のまま上に、点呼済みは押した順に
-    // 下に積み上がっていく(直近に押した人ほど一番下)。
-    const unchecked = members
-      .filter((m) => !m.checked)
-      .sort((a, b) => a.sortIndex - b.sortIndex);
-    const checked = members
-      .filter((m) => m.checked)
-      .sort((a, b) => a.checkedSeq - b.checkedSeq);
+    const members = visibleMembers.filter((m) => !m.isTemp && m.grade === grade);
+    // 一時的な参加者(その他)は4年の欄の下に続けて表示する。
+    const tempMembers = grade === 4 ? visibleMembers.filter((m) => m.isTemp) : [];
+    if (members.length === 0 && tempMembers.length === 0) return;
 
     const section = document.createElement('div');
     section.className = 'rollcall-grade-section';
-    const heading = document.createElement('div');
-    heading.className = 'rollcall-grade-heading';
-    heading.textContent = `${grade}年(${members.length - checked.length} / ${members.length})`;
-    section.appendChild(heading);
-
-    const list = document.createElement('div');
-    list.className = 'rollcall-grade-members';
-    [...unchecked, ...checked].forEach((member) => list.appendChild(buildRollcallMemberButton(member)));
-    section.appendChild(list);
-
+    if (members.length > 0) appendRollcallGroup(section, `${grade}年`, members, false);
+    if (tempMembers.length > 0) appendRollcallGroup(section, 'その他', tempMembers, true);
     el.rollcallList.appendChild(section);
   });
   renderRollcallProgress(visibleMembers);
@@ -3477,10 +3600,11 @@ function setRollcallRegisterModalOpen(open) {
     renderRollcallTagManageList();
     renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
     renderRollcallRegisterView();
-    // 開くたびに最新の共有名簿・部員DBの選手名簿を読み直す
-    // (他の端末での編集や、部員DB側の変更を拾う)。
+    // 開くたびに最新の共有名簿・部員DBの選手名簿・一時参加者名簿を
+    // 読み直す(他の端末での編集や、各DB側の変更を拾う)。
     loadSharedRollcallRoster()
       .then(loadAthleteRosterFromNotion)
+      .then(loadTempParticipantsFromNotion)
       .then(() => {
         renderRollcallTagManageList();
         renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
@@ -3505,17 +3629,34 @@ el.rollcallShareBtn.addEventListener('click', async () => {
   alert(ok ? 'この端末の名簿をチームに共有しました。' : 'チームへの共有に失敗しました。');
 });
 
+// 選手(部員DB由来)は氏名・学年を点呼アプリ側から編集できない
+// (部員DBが唯一の情報源のため)。編集できるのはタグのみで、削除もできない
+// (部員DBの区分が変われば次回取得時に自動で名簿から外れる)。
+// 一時的な参加者(isTemp)だけ、氏名の変更・削除も含めてフル編集できる。
 function buildRollcallRegisterRow(member) {
   const node = el.rollcallRegisterRowTemplate.content.firstElementChild.cloneNode(true);
   const viewEl = node.querySelector('.rollcall-register-row-view');
   const editEl = node.querySelector('.rollcall-register-row-edit');
+  const nameRowEl = node.querySelector('.rollcall-edit-name-row');
+  const deleteBtn = node.querySelector('.rollcall-delete-btn');
+  const editBtn = node.querySelector('.rollcall-edit-btn');
+
   node.querySelector('.rollcall-register-row-name').textContent = member.name;
-  node.querySelector('.rollcall-register-row-grade').textContent = `${member.grade}年`;
+  node.querySelector('.rollcall-register-row-grade').textContent = member.isTemp ? 'その他' : `${member.grade}年`;
   node.querySelector('.rollcall-register-row-tags').textContent = member.tags.join(' / ');
 
-  node.querySelector('.rollcall-edit-btn').addEventListener('click', () => {
-    node.querySelector('.rollcall-edit-name').value = member.name;
-    node.querySelector('.rollcall-edit-grade').value = String(member.grade);
+  if (!member.isTemp) {
+    deleteBtn.hidden = true;
+    editBtn.textContent = '🏷️ タグを編集';
+    const note = document.createElement('div');
+    note.className = 'rollcall-register-row-note';
+    note.textContent = '氏名・学年は部員DB(Notion)で管理されています';
+    node.querySelector('.rollcall-register-row-info').appendChild(note);
+  }
+
+  editBtn.addEventListener('click', () => {
+    nameRowEl.hidden = !member.isTemp;
+    if (member.isTemp) node.querySelector('.rollcall-edit-name').value = member.name;
     renderTagCheckboxes(node.querySelector('.rollcall-edit-tag-checkboxes'), member.tags);
     viewEl.hidden = true;
     editEl.hidden = false;
@@ -3525,19 +3666,35 @@ function buildRollcallRegisterRow(member) {
     editEl.hidden = true;
   });
   node.querySelector('.rollcall-save-btn').addEventListener('click', async () => {
-    const name = node.querySelector('.rollcall-edit-name').value.trim();
-    if (!name) {
-      alert('氏名を入力してください。');
-      return;
+    const saveBtn = node.querySelector('.rollcall-save-btn');
+    let newName = member.name;
+    if (member.isTemp) {
+      newName = node.querySelector('.rollcall-edit-name').value.trim();
+      if (!newName) {
+        alert('氏名を入力してください。');
+        return;
+      }
     }
+    const newTags = readCheckedTags(node.querySelector('.rollcall-edit-tag-checkboxes'));
+
     const token = await requireRollcallEditToken();
     if (!token) {
       alert('名簿の編集には合言葉が必要です。');
       return;
     }
-    member.name = name;
-    member.grade = Number(node.querySelector('.rollcall-edit-grade').value);
-    member.tags = readCheckedTags(node.querySelector('.rollcall-edit-tag-checkboxes'));
+
+    if (member.isTemp && newName !== member.name) {
+      saveBtn.disabled = true;
+      const ok = await renameTempParticipantOnServer(token, member.id, newName);
+      saveBtn.disabled = false;
+      if (!ok) {
+        alert('氏名の更新に失敗しました(合言葉が違うか、通信エラーです)。');
+        return;
+      }
+    }
+
+    member.name = newName;
+    member.tags = newTags;
     saveRollcallMembers();
     renderRollcallRegisterView();
     renderRollcallList();
@@ -3545,11 +3702,17 @@ function buildRollcallRegisterRow(member) {
       alert('チームへの共有に失敗しました(この端末には保存されています)。');
     }
   });
-  node.querySelector('.rollcall-delete-btn').addEventListener('click', async () => {
+  deleteBtn.addEventListener('click', async () => {
+    if (!member.isTemp) return; // 選手は削除ボタン自体を表示していない(念のため)
     if (!confirm(`「${member.name}」を名簿から削除しますか?`)) return;
     const token = await requireRollcallEditToken();
     if (!token) {
       alert('名簿の編集には合言葉が必要です。');
+      return;
+    }
+    const ok = await deleteTempParticipantOnServer(token, member.id);
+    if (!ok) {
+      alert('削除に失敗しました(合言葉が違うか、通信エラーです)。');
       return;
     }
     rollcallMembers = rollcallMembers.filter((m) => m.id !== member.id);
@@ -3564,13 +3727,19 @@ function buildRollcallRegisterRow(member) {
   return node;
 }
 
+// 「その他(一時的な参加者)」が4年のすぐ下に来るよう、実際の学年(4〜1)の
+// 次に位置する仮想の並び順キーを割り当てる。
+function registerSortKey(member) {
+  return member.isTemp ? 3.5 : member.grade;
+}
+
 function renderRollcallRegisterView() {
   renderTagFilterOptions(el.rollcallTagFilter);
   const filterTag = el.rollcallTagFilter.value;
   const members = rollcallMembers
     .filter((m) => !filterTag || m.tags.includes(filterTag))
     .slice()
-    .sort((a, b) => (b.grade - a.grade) || (a.sortIndex - b.sortIndex));
+    .sort((a, b) => (registerSortKey(b) - registerSortKey(a)) || (a.sortIndex - b.sortIndex));
 
   el.rollcallRegisterList.innerHTML = '';
   members.forEach((member) => el.rollcallRegisterList.appendChild(buildRollcallRegisterRow(member)));
@@ -3589,10 +3758,18 @@ el.rollcallAddBtn.addEventListener('click', async () => {
     alert('名簿の編集には合言葉が必要です。');
     return;
   }
+  el.rollcallAddBtn.disabled = true;
+  const participant = await createTempParticipantOnServer(token, name);
+  el.rollcallAddBtn.disabled = false;
+  if (!participant) {
+    alert('追加に失敗しました(合言葉が違うか、通信エラーです)。');
+    return;
+  }
   rollcallMembers.push({
-    id: makeRollcallId(),
-    name,
-    grade: Number(el.rollcallAddGrade.value),
+    id: participant.id,
+    name: participant.name,
+    grade: null,
+    isTemp: true,
     tags: readCheckedTags(el.rollcallAddTagCheckboxes),
     checked: false,
     checkedSeq: 0,
@@ -3611,6 +3788,7 @@ el.rollcallAddBtn.addEventListener('click', async () => {
 renderRollcallList();
 loadSharedRollcallRoster()
   .then(loadAthleteRosterFromNotion)
+  .then(loadTempParticipantsFromNotion)
   .then(() => {
     renderRollcallList();
   });

@@ -79,11 +79,80 @@ async function findAthletes() {
       const nameProp = page.properties[NAME_PROPERTY];
       const name = nameProp && nameProp.type === 'title' ? nameProp.title.map((t) => t.plain_text).join('') : '';
       const grade = parseGradeNumber(extractSelectOrText(page.properties[GRADE_PROPERTY]));
-      if (name && grade) members.push({ name, grade });
+      if (name && grade) members.push({ id: page.id, name, grade });
     });
     cursor = data.has_more ? data.next_cursor : null;
   } while (cursor);
   return members;
+}
+
+/* ----- 一時的な参加者DB(点呼アプリ内から編集する専用のNotion DB) ----- */
+const TEMP_NAME_PROPERTY = '氏名';
+
+async function listTempParticipants() {
+  const members = [];
+  let cursor;
+  do {
+    const res = await fetch(`https://api.notion.com/v1/databases/${process.env.NOTION_TEMP_PARTICIPANTS_DATABASE_ID}/query`, {
+      method: 'POST',
+      headers: notionHeaders(),
+      body: JSON.stringify({
+        page_size: 100,
+        ...(cursor ? { start_cursor: cursor } : {}),
+      }),
+    });
+    if (!res.ok) {
+      throw new Error(`Notion query failed: ${res.status}`);
+    }
+    const data = await res.json();
+    (data.results || []).forEach((page) => {
+      const nameProp = page.properties[TEMP_NAME_PROPERTY];
+      const name = nameProp && nameProp.type === 'title' ? nameProp.title.map((t) => t.plain_text).join('') : '';
+      if (name) members.push({ id: page.id, name });
+    });
+    cursor = data.has_more ? data.next_cursor : null;
+  } while (cursor);
+  return members;
+}
+
+async function createTempParticipant(name) {
+  const res = await fetch('https://api.notion.com/v1/pages', {
+    method: 'POST',
+    headers: notionHeaders(),
+    body: JSON.stringify({
+      parent: { database_id: process.env.NOTION_TEMP_PARTICIPANTS_DATABASE_ID },
+      properties: { [TEMP_NAME_PROPERTY]: { title: [{ text: { content: name } }] } },
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`Notion create failed: ${res.status}`);
+  }
+  const page = await res.json();
+  return { id: page.id, name };
+}
+
+async function renameTempParticipant(pageId, name) {
+  const res = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+    method: 'PATCH',
+    headers: notionHeaders(),
+    body: JSON.stringify({
+      properties: { [TEMP_NAME_PROPERTY]: { title: [{ text: { content: name } }] } },
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`Notion update failed: ${res.status}`);
+  }
+}
+
+async function archiveTempParticipant(pageId) {
+  const res = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+    method: 'PATCH',
+    headers: notionHeaders(),
+    body: JSON.stringify({ archived: true }),
+  });
+  if (!res.ok) {
+    throw new Error(`Notion archive failed: ${res.status}`);
+  }
 }
 
 function isPlainPin(value) {
@@ -116,4 +185,14 @@ async function setPinHash(pageId, newPin) {
   }
 }
 
-module.exports = { findMemberByName, findAthletes, isPlainPin, verifyPin, setPinHash };
+module.exports = {
+  findMemberByName,
+  findAthletes,
+  listTempParticipants,
+  createTempParticipant,
+  renameTempParticipant,
+  archiveTempParticipant,
+  isPlainPin,
+  verifyPin,
+  setPinHash,
+};
