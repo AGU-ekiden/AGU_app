@@ -3090,6 +3090,51 @@ async function loadSharedRollcallRoster() {
   }
 }
 
+/* ----- 部員DB(Notion)からの選手名簿の自動反映 -----
+   氏名・学年は手入力(写真からの転記)だと部員DBとズレることがあったため、
+   部員DBの「区分」が選手になっている人を毎回自動取得して名簿に反映する。
+   名前が一致する既存メンバーからはid・タグ・点呼済み状態・並び順を
+   そのまま引き継ぎ、部員DBに無くなった人(退部・区分変更等)は名簿から
+   外れる。取得に失敗した場合は、この端末に既にある名簿のまま使う。 */
+const ROLLCALL_ATHLETES_API_URL = '/api/rollcall-roster';
+
+function applyNotionAthleteRoster(athletes) {
+  if (!Array.isArray(athletes)) return;
+  const valid = athletes.filter(
+    (a) => a && typeof a.name === 'string' && a.name.trim() && ROLLCALL_GRADES.includes(a.grade)
+  );
+  if (valid.length === 0) return;
+
+  const byName = new Map(rollcallMembers.map((m) => [m.name, m]));
+  rollcallMembers = valid.map((a) => {
+    const existing = byName.get(a.name);
+    if (existing) return { ...existing, grade: a.grade };
+    return {
+      id: makeRollcallId(),
+      name: a.name,
+      grade: a.grade,
+      tags: [],
+      checked: false,
+      checkedSeq: 0,
+      sortIndex: rollcallNextSortIndex++,
+    };
+  });
+  rollcallNextCheckedSeq = 1 + rollcallMembers.reduce((max, m) => Math.max(max, m.checkedSeq || 0), 0);
+  rollcallNextSortIndex = 1 + rollcallMembers.reduce((max, m) => Math.max(max, m.sortIndex || 0), -1);
+  saveRollcallMembers();
+}
+
+async function loadAthleteRosterFromNotion() {
+  try {
+    const res = await fetch(ROLLCALL_ATHLETES_API_URL, { cache: 'no-store' });
+    if (!res.ok) return;
+    const body = await res.json();
+    applyNotionAthleteRoster(body.athletes);
+  } catch {
+    // オフライン、またはサーバー未応答 — この端末に既にある名簿のまま使う。
+  }
+}
+
 // 名簿の追加・編集・削除・タグ管理は全て合言葉が無いとできない(点呼名簿
 // 専用の合言葉。録音のチーム共有とは別物)。合言葉が得られなければ null を
 // 返し、呼び出し側は編集そのものを行わない。
@@ -3420,13 +3465,16 @@ function setRollcallRegisterModalOpen(open) {
     renderRollcallTagManageList();
     renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
     renderRollcallRegisterView();
-    // 開くたびに最新の共有名簿を読み直す(他の端末で編集された分を拾う)。
-    loadSharedRollcallRoster().then(() => {
-      renderRollcallTagManageList();
-      renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
-      renderRollcallRegisterView();
-      renderRollcallList();
-    });
+    // 開くたびに最新の共有名簿・部員DBの選手名簿を読み直す
+    // (他の端末での編集や、部員DB側の変更を拾う)。
+    loadSharedRollcallRoster()
+      .then(loadAthleteRosterFromNotion)
+      .then(() => {
+        renderRollcallTagManageList();
+        renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
+        renderRollcallRegisterView();
+        renderRollcallList();
+      });
   }
 }
 el.rollcallRegisterToggle.addEventListener('click', () => setRollcallRegisterModalOpen(true));
@@ -3549,6 +3597,8 @@ el.rollcallAddBtn.addEventListener('click', async () => {
 });
 
 renderRollcallList();
-loadSharedRollcallRoster().then(() => {
-  renderRollcallList();
-});
+loadSharedRollcallRoster()
+  .then(loadAthleteRosterFromNotion)
+  .then(() => {
+    renderRollcallList();
+  });
