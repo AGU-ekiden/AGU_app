@@ -1,15 +1,5 @@
 const { listTempParticipants, createTempParticipant } = require('../_shared/notion');
 
-function checkEditToken(req, res) {
-  const auth = req.headers.authorization || '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!process.env.ROLLCALL_EDIT_TOKEN || token !== process.env.ROLLCALL_EDIT_TOKEN) {
-    res.status(401).json({ error: '合言葉が正しくありません' });
-    return false;
-  }
-  return true;
-}
-
 module.exports = async function handler(req, res) {
   if (!process.env.NOTION_TOKEN || !process.env.NOTION_TEMP_PARTICIPANTS_DATABASE_ID) {
     res.status(500).json({ error: 'サーバー設定が未完了です。管理者に連絡してください。' });
@@ -27,7 +17,6 @@ module.exports = async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    if (!checkEditToken(req, res)) return;
     const body = req.body || {};
     const name = typeof body.name === 'string' ? body.name.trim() : '';
     if (!name) {

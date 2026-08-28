@@ -3028,35 +3028,12 @@ function saveRollcallTags() {
 /* ----- 名簿(氏名・学年・タグ)のチーム共有 -----
    名簿の登録・編集データ(このタブで管理する氏名・学年・タグ)は、録音の
    チーム共有と同じXserver(itonomakiアプリの /api/rollcall-roster)に
-   アップロードしてチームで共有する。ただし合言葉は録音共有とは別物
-   (ROLLCALL_TOKEN_KEY)にしてあり、それぞれ別のチームに別々の合言葉を
-   配れる。一方、実際に点呼した/していないのチェック状態(checked /
+   アップロードしてチームで共有する。合言葉は不要(誰でも編集・共有できる
+   仕様)。一方、実際に点呼した/していないのチェック状態(checked /
    checkedSeq)は各端末だけのローカル情報のままにする(この端末で今まさに
    点呼中の状態を他の端末の値で上書きしないよう、共有データを取り込む時は
    チェック状態だけ元のものを残す)。 */
 const ROLLCALL_ROSTER_API_URL = '/itonomaki/api/rollcall-roster';
-const ROLLCALL_TOKEN_KEY = 'rollcallRosterToken';
-
-function getStoredRollcallToken() {
-  try {
-    return localStorage.getItem(ROLLCALL_TOKEN_KEY) || '';
-  } catch {
-    return '';
-  }
-}
-
-function promptForRollcallToken() {
-  const input = prompt('点呼名簿の編集用の合言葉を入力してください(この端末に保存され、次回からは聞かれません)');
-  const token = input ? input.trim() : '';
-  if (token) {
-    try {
-      localStorage.setItem(ROLLCALL_TOKEN_KEY, token);
-    } catch {
-      /* localStorage unavailable (private browsing etc.) — just skip this once */
-    }
-  }
-  return token;
-}
 
 function rollcallRosterPayload() {
   return {
@@ -3219,13 +3196,12 @@ async function loadTempParticipantsFromNotion() {
 
 // 一時的な参加者の追加・氏名変更・削除は、一時参加者DB専用のAPIを直接
 // 呼び出す(部員DBのようにNotion側で更新してもらう運用ではなく、この
-// アプリから完結させたいため)。合言葉は呼び出し側で取得済みのものを
-// 渡す(名簿共有と同じ合言葉を使い回す)。
-async function createTempParticipantOnServer(token, name) {
+// アプリから完結させたいため)。合言葉は不要。
+async function createTempParticipantOnServer(name) {
   try {
     const res = await fetch(ROLLCALL_TEMP_PARTICIPANTS_API_URL, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
     if (!res.ok) return null;
@@ -3236,11 +3212,11 @@ async function createTempParticipantOnServer(token, name) {
   }
 }
 
-async function renameTempParticipantOnServer(token, id, name) {
+async function renameTempParticipantOnServer(id, name) {
   try {
     const res = await fetch(`${ROLLCALL_TEMP_PARTICIPANTS_API_URL}/${encodeURIComponent(id)}`, {
       method: 'PATCH',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
     return res.ok;
@@ -3249,11 +3225,10 @@ async function renameTempParticipantOnServer(token, id, name) {
   }
 }
 
-async function deleteTempParticipantOnServer(token, id) {
+async function deleteTempParticipantOnServer(id) {
   try {
     const res = await fetch(`${ROLLCALL_TEMP_PARTICIPANTS_API_URL}/${encodeURIComponent(id)}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
     });
     return res.ok;
   } catch {
@@ -3261,36 +3236,13 @@ async function deleteTempParticipantOnServer(token, id) {
   }
 }
 
-// 名簿の追加・編集・削除・タグ管理は全て合言葉が無いとできない(点呼名簿
-// 専用の合言葉。録音のチーム共有とは別物)。合言葉が得られなければ null を
-// 返し、呼び出し側は編集そのものを行わない。
-async function requireRollcallEditToken() {
-  let token = getStoredRollcallToken();
-  if (!token) token = promptForRollcallToken();
-  return token || null;
-}
-
-async function uploadRollcallRosterToServer(allowRetry = true) {
-  let token = getStoredRollcallToken();
-  if (!token) token = promptForRollcallToken();
-  if (!token) return false;
-
+async function uploadRollcallRosterToServer() {
   try {
     const res = await fetch(ROLLCALL_ROSTER_API_URL, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(rollcallRosterPayload()),
     });
-    if (res.status === 401) {
-      try {
-        localStorage.removeItem(ROLLCALL_TOKEN_KEY);
-      } catch {
-        /* ignore */
-      }
-      if (!allowRetry) return false;
-      alert('合言葉が正しくありませんでした。もう一度入力してください。');
-      return uploadRollcallRosterToServer(false);
-    }
     return res.ok;
   } catch {
     return false; // オフライン等 — この端末には保存済みなのでそのまま続行
@@ -3304,11 +3256,6 @@ async function addRollcallTag(name) {
     alert('そのタグは既に登録されています。');
     return false;
   }
-  const token = await requireRollcallEditToken();
-  if (!token) {
-    alert('名簿の編集には合言葉が必要です。');
-    return false;
-  }
   rollcallTags.push({ name: trimmed, showBadge: false });
   saveRollcallTags();
   return true;
@@ -3316,11 +3263,6 @@ async function addRollcallTag(name) {
 
 async function deleteRollcallTag(name) {
   if (!confirm(`タグ「${name}」を削除しますか?(このタグが付いている全選手からも外れます)`)) return;
-  const token = await requireRollcallEditToken();
-  if (!token) {
-    alert('名簿の編集には合言葉が必要です。');
-    return;
-  }
   rollcallTags = rollcallTags.filter((t) => t.name !== name);
   rollcallMembers.forEach((m) => {
     m.tags = m.tags.filter((t) => t !== name);
@@ -3334,13 +3276,7 @@ async function deleteRollcallTag(name) {
   }
 }
 
-async function setRollcallTagShowBadge(name, showBadge, checkboxEl) {
-  const token = await requireRollcallEditToken();
-  if (!token) {
-    alert('名簿の編集には合言葉が必要です。');
-    if (checkboxEl) checkboxEl.checked = !showBadge; // 変更を取り消して表示を戻す
-    return;
-  }
+async function setRollcallTagShowBadge(name, showBadge) {
   const tag = rollcallTags.find((t) => t.name === name);
   if (!tag) return;
   tag.showBadge = showBadge;
@@ -3372,7 +3308,7 @@ function renderRollcallTagManageList() {
     const badgeCheckbox = document.createElement('input');
     badgeCheckbox.type = 'checkbox';
     badgeCheckbox.checked = tag.showBadge;
-    badgeCheckbox.addEventListener('change', () => setRollcallTagShowBadge(tag.name, badgeCheckbox.checked, badgeCheckbox));
+    badgeCheckbox.addEventListener('change', () => setRollcallTagShowBadge(tag.name, badgeCheckbox.checked));
     badgeToggle.appendChild(badgeCheckbox);
     badgeToggle.appendChild(document.createTextNode('ボタンに表示'));
     chip.appendChild(badgeToggle);
@@ -3620,11 +3556,6 @@ el.rollcallRegisterCloseBtn.addEventListener('click', () => setRollcallRegisterM
 // 端末が今持っている名簿をそのままチームに共有し直したい」場合(他の
 // 端末がまだ古い名簿のままの時など)のための手動ボタン。
 el.rollcallShareBtn.addEventListener('click', async () => {
-  const token = await requireRollcallEditToken();
-  if (!token) {
-    alert('チームへの共有には合言葉が必要です。');
-    return;
-  }
   const ok = await uploadRollcallRosterToServer();
   alert(ok ? 'この端末の名簿をチームに共有しました。' : 'チームへの共有に失敗しました。');
 });
@@ -3677,18 +3608,12 @@ function buildRollcallRegisterRow(member) {
     }
     const newTags = readCheckedTags(node.querySelector('.rollcall-edit-tag-checkboxes'));
 
-    const token = await requireRollcallEditToken();
-    if (!token) {
-      alert('名簿の編集には合言葉が必要です。');
-      return;
-    }
-
     if (member.isTemp && newName !== member.name) {
       saveBtn.disabled = true;
-      const ok = await renameTempParticipantOnServer(token, member.id, newName);
+      const ok = await renameTempParticipantOnServer(member.id, newName);
       saveBtn.disabled = false;
       if (!ok) {
-        alert('氏名の更新に失敗しました(合言葉が違うか、通信エラーです)。');
+        alert('氏名の更新に失敗しました(通信エラーです)。');
         return;
       }
     }
@@ -3705,14 +3630,9 @@ function buildRollcallRegisterRow(member) {
   deleteBtn.addEventListener('click', async () => {
     if (!member.isTemp) return; // 選手は削除ボタン自体を表示していない(念のため)
     if (!confirm(`「${member.name}」を名簿から削除しますか?`)) return;
-    const token = await requireRollcallEditToken();
-    if (!token) {
-      alert('名簿の編集には合言葉が必要です。');
-      return;
-    }
-    const ok = await deleteTempParticipantOnServer(token, member.id);
+    const ok = await deleteTempParticipantOnServer(member.id);
     if (!ok) {
-      alert('削除に失敗しました(合言葉が違うか、通信エラーです)。');
+      alert('削除に失敗しました(通信エラーです)。');
       return;
     }
     rollcallMembers = rollcallMembers.filter((m) => m.id !== member.id);
@@ -3753,16 +3673,11 @@ el.rollcallAddBtn.addEventListener('click', async () => {
     alert('氏名を入力してください。');
     return;
   }
-  const token = await requireRollcallEditToken();
-  if (!token) {
-    alert('名簿の編集には合言葉が必要です。');
-    return;
-  }
   el.rollcallAddBtn.disabled = true;
-  const participant = await createTempParticipantOnServer(token, name);
+  const participant = await createTempParticipantOnServer(name);
   el.rollcallAddBtn.disabled = false;
   if (!participant) {
-    alert('追加に失敗しました(合言葉が違うか、通信エラーです)。');
+    alert('追加に失敗しました(通信エラーです)。');
     return;
   }
   rollcallMembers.push({
