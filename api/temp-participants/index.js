@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
       const participants = await listTempParticipants();
       res.status(200).json({ participants });
     } catch (err) {
-      res.status(500).json({ error: '一時的な参加者の取得に失敗しました' });
+      res.status(500).json({ error: `一時的な参加者の取得に失敗しました: ${err.message}` });
     }
     return;
   }
@@ -27,7 +27,7 @@ module.exports = async function handler(req, res) {
       const participant = await createTempParticipant(name);
       res.status(200).json({ participant });
     } catch (err) {
-      res.status(500).json({ error: '追加に失敗しました' });
+      res.status(500).json({ error: `追加に失敗しました: ${err.message}` });
     }
     return;
   }

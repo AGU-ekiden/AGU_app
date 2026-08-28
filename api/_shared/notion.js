@@ -86,8 +86,20 @@ async function findAthletes() {
   return members;
 }
 
-/* ----- 一時的な参加者DB(点呼アプリ内から編集する専用のNotion DB) ----- */
+/* ----- 一時的な参加者DB(点呼アプリ内から編集する専用のNotion DB) -----
+   設定ミス(DB IDが違う、Integrationが未共有、タイトル列名が氏名でない等)
+   を画面上のエラーメッセージだけで切り分けられるよう、NotionのAPIエラー
+   本文(message)をそのまま呼び出し元に伝える。 */
 const TEMP_NAME_PROPERTY = '氏名';
+
+async function notionErrorMessage(res) {
+  try {
+    const data = await res.json();
+    return data && data.message ? `${data.message} (status ${res.status})` : `Notion API error (status ${res.status})`;
+  } catch {
+    return `Notion API error (status ${res.status})`;
+  }
+}
 
 async function listTempParticipants() {
   const members = [];
@@ -102,7 +114,7 @@ async function listTempParticipants() {
       }),
     });
     if (!res.ok) {
-      throw new Error(`Notion query failed: ${res.status}`);
+      throw new Error(await notionErrorMessage(res));
     }
     const data = await res.json();
     (data.results || []).forEach((page) => {
@@ -125,7 +137,7 @@ async function createTempParticipant(name) {
     }),
   });
   if (!res.ok) {
-    throw new Error(`Notion create failed: ${res.status}`);
+    throw new Error(await notionErrorMessage(res));
   }
   const page = await res.json();
   return { id: page.id, name };
@@ -140,7 +152,7 @@ async function renameTempParticipant(pageId, name) {
     }),
   });
   if (!res.ok) {
-    throw new Error(`Notion update failed: ${res.status}`);
+    throw new Error(await notionErrorMessage(res));
   }
 }
 
@@ -151,7 +163,7 @@ async function archiveTempParticipant(pageId) {
     body: JSON.stringify({ archived: true }),
   });
   if (!res.ok) {
-    throw new Error(`Notion archive failed: ${res.status}`);
+    throw new Error(await notionErrorMessage(res));
   }
 }
 

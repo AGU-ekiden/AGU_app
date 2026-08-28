@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
       await renameTempParticipant(id, name);
       res.status(200).json({ ok: true });
     } catch (err) {
-      res.status(500).json({ error: '更新に失敗しました' });
+      res.status(500).json({ error: `更新に失敗しました: ${err.message}` });
     }
     return;
   }
@@ -33,7 +33,7 @@ module.exports = async function handler(req, res) {
       await archiveTempParticipant(id);
       res.status(200).json({ ok: true });
     } catch (err) {
-      res.status(500).json({ error: '削除に失敗しました' });
+      res.status(500).json({ error: `削除に失敗しました: ${err.message}` });
     }
     return;
   }

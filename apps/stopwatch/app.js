@@ -3197,6 +3197,9 @@ async function loadTempParticipantsFromNotion() {
 // 一時的な参加者の追加・氏名変更・削除は、一時参加者DB専用のAPIを直接
 // 呼び出す(部員DBのようにNotion側で更新してもらう運用ではなく、この
 // アプリから完結させたいため)。合言葉は不要。
+// エラー時、原因の切り分け(サーバー未設定・Notion側の問題・通信断など)
+// ができるよう、サーバーが返したエラーメッセージをそのまま呼び出し側に
+// 返す(「通信エラーです」の一言で握りつぶさない)。
 async function createTempParticipantOnServer(name) {
   try {
     const res = await fetch(ROLLCALL_TEMP_PARTICIPANTS_API_URL, {
@@ -3204,11 +3207,11 @@ async function createTempParticipantOnServer(name) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
-    if (!res.ok) return null;
-    const body = await res.json();
-    return body.participant || null;
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
+    return { ok: true, participant: body.participant };
   } catch {
-    return null;
+    return { ok: false, error: 'サーバーに接続できませんでした(オフライン等)' };
   }
 }
 
@@ -3219,9 +3222,11 @@ async function renameTempParticipantOnServer(id, name) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
-    return res.ok;
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
+    return { ok: true };
   } catch {
-    return false;
+    return { ok: false, error: 'サーバーに接続できませんでした(オフライン等)' };
   }
 }
 
@@ -3230,9 +3235,11 @@ async function deleteTempParticipantOnServer(id) {
     const res = await fetch(`${ROLLCALL_TEMP_PARTICIPANTS_API_URL}/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
-    return res.ok;
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
+    return { ok: true };
   } catch {
-    return false;
+    return { ok: false, error: 'サーバーに接続できませんでした(オフライン等)' };
   }
 }
 
@@ -3610,10 +3617,10 @@ function buildRollcallRegisterRow(member) {
 
     if (member.isTemp && newName !== member.name) {
       saveBtn.disabled = true;
-      const ok = await renameTempParticipantOnServer(member.id, newName);
+      const result = await renameTempParticipantOnServer(member.id, newName);
       saveBtn.disabled = false;
-      if (!ok) {
-        alert('氏名の更新に失敗しました(通信エラーです)。');
+      if (!result.ok) {
+        alert(`氏名の更新に失敗しました: ${result.error}`);
         return;
       }
     }
@@ -3630,9 +3637,9 @@ function buildRollcallRegisterRow(member) {
   deleteBtn.addEventListener('click', async () => {
     if (!member.isTemp) return; // 選手は削除ボタン自体を表示していない(念のため)
     if (!confirm(`「${member.name}」を名簿から削除しますか?`)) return;
-    const ok = await deleteTempParticipantOnServer(member.id);
-    if (!ok) {
-      alert('削除に失敗しました(通信エラーです)。');
+    const result = await deleteTempParticipantOnServer(member.id);
+    if (!result.ok) {
+      alert(`削除に失敗しました: ${result.error}`);
       return;
     }
     rollcallMembers = rollcallMembers.filter((m) => m.id !== member.id);
@@ -3674,12 +3681,13 @@ el.rollcallAddBtn.addEventListener('click', async () => {
     return;
   }
   el.rollcallAddBtn.disabled = true;
-  const participant = await createTempParticipantOnServer(name);
+  const result = await createTempParticipantOnServer(name);
   el.rollcallAddBtn.disabled = false;
-  if (!participant) {
-    alert('追加に失敗しました(通信エラーです)。');
+  if (!result.ok) {
+    alert(`追加に失敗しました: ${result.error}`);
     return;
   }
+  const { participant } = result;
   rollcallMembers.push({
     id: participant.id,
     name: participant.name,
