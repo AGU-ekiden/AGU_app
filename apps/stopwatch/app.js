@@ -113,6 +113,18 @@ function selectTab(tabName) {
   // 複数の機能(タバタ・点呼・補強など)が同じアプリを指しているため、
   // ブラウザのタブ名でも見分けられるようにタブごとに document.title を変える。
   document.title = label ? `${label} | ストップウォッチ` : 'ストップウォッチ';
+
+  // 点呼タブは連続してボタンをタップする操作なので、誤タップ防止の
+  // 「固定」ボタンは不要かつ邪魔になるため非表示にする。ロック中に
+  // このタブへ切り替えた場合は、ボタンごと消えて解除できなくなって
+  // しまわないよう自動でロックを解除しておく。
+  const isRollcallTab = tabName === 'rollcall';
+  el.lockToggleBtn.hidden = isRollcallTab;
+  if (isRollcallTab && !el.lockOverlay.hidden) {
+    el.lockOverlay.hidden = true;
+    el.lockToggleBtn.classList.remove('is-locked');
+    el.lockToggleBtn.textContent = '固定';
+  }
   return true;
 }
 
