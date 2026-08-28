@@ -3302,11 +3302,18 @@ function rollcallBadgeLabelsForMember(member) {
     .slice(0, ROLLCALL_BADGE_LINES);
 }
 
+// 点呼ボタンには「姓 名」のフルネームではなく、スペースより前の苗字だけを表示する
+// (ボタンを詰めて並べるため)。名簿編集画面ではフルネームのまま表示・編集する。
+function rollcallFamilyName(fullName) {
+  return fullName.split(/[ 　]+/)[0];
+}
+
 function buildRollcallMemberButton(member) {
   const node = el.rollcallMemberTemplate.content.firstElementChild.cloneNode(true);
   node.dataset.id = member.id;
   node.classList.toggle('is-checked', member.checked);
-  node.querySelector('.rollcall-member-name').textContent = member.name;
+  node.title = member.name;
+  node.querySelector('.rollcall-member-name').textContent = rollcallFamilyName(member.name);
   const labels = rollcallBadgeLabelsForMember(member);
   node.querySelectorAll('.rollcall-member-tag-line').forEach((lineEl, i) => {
     // 空の段も見えない文字(nbsp)で埋めて、常に2段ぶんの高さを保つ。
