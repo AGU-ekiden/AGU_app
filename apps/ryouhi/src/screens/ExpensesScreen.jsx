@@ -450,7 +450,7 @@ export default function ExpensesScreen() {
             合宿を一括登録
           </Button>
           <Button variant="secondary" onClick={() => setBulkType('other')}>
-            <Tag className="h-4 w-4 text-[#8a6d1f]" />
+            <Tag className="h-4 w-4 text-[#3e8a88]" />
             その他費用を一括登録
           </Button>
         </div>
@@ -521,7 +521,7 @@ export default function ExpensesScreen() {
                       <tr
                         className={cn(
                           'border-b border-slate-100 hover:bg-slate-50/60',
-                          isOpen && 'bg-[#fdf8ec]/40'
+                          isOpen && 'bg-[#eaf5f4]/40'
                         )}
                       >
                         <td className="px-2 py-1.5">
@@ -889,7 +889,7 @@ function BulkAddDialog({
             ) : isCamp ? (
               <Tent className="h-4 w-4 text-emerald-500" />
             ) : (
-              <Tag className="h-4 w-4 text-[#8a6d1f]" />
+              <Tag className="h-4 w-4 text-[#3e8a88]" />
             )}
             {isTournament ? '大会情報' : isCamp ? '合宿情報' : 'その他費用情報'}
           </div>
@@ -1353,7 +1353,7 @@ function OtherEditor({ items, onAdd, onUpdate, onRemove }) {
     <div className="rounded-lg border border-slate-200 bg-white p-3">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
-          <Tag className="h-4 w-4 text-[#8a6d1f]" />
+          <Tag className="h-4 w-4 text-[#3e8a88]" />
           その他費用
         </div>
         <Button size="sm" variant="secondary" onClick={onAdd}>

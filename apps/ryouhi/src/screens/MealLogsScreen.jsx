@@ -919,7 +919,7 @@ export default function MealLogsScreen({ dorm, guestCategories = GUEST_CATEGORIE
                   isWeekend
                     ? dow === 0
                       ? 'bg-red-50 text-red-600'
-                      : 'bg-[#fdf8ec] text-[#10254a]'
+                      : 'bg-[#eaf5f4] text-[#2c6462]'
                     : 'bg-slate-100 text-slate-600'
                 )}
               >
@@ -1103,7 +1103,7 @@ export default function MealLogsScreen({ dorm, guestCategories = GUEST_CATEGORIE
         <CardContent className="p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
-              <GraduationCap className="h-4 w-4 text-[#8a6d1f]" />
+              <GraduationCap className="h-4 w-4 text-[#3e8a88]" />
               寮生以外の食数 · {dorm}（{month}月{day}日 {WEEKDAY_JA[dow]}）
             </div>
             <div className="flex items-center gap-2">

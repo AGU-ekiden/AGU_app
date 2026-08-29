@@ -67,7 +67,7 @@ function Page({ dorm, year, month, days, rows, pageIndex, pageCount }) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-end',
-          borderBottom: '3px solid #2563eb',
+          borderBottom: '3px solid #3e8a88',
           paddingBottom: 8,
           marginBottom: 8,
         }}
@@ -155,11 +155,11 @@ function Page({ dorm, year, month, days, rows, pageIndex, pageCount }) {
                 width: 130,
                 textAlign: 'left',
                 padding: '4px 8px',
-                borderBottom: '2px solid #1e40af',
-                borderRight: '2px solid #1e40af',
+                borderBottom: '2px solid #2c6462',
+                borderRight: '2px solid #2c6462',
                 fontSize: 12,
-                color: '#1e40af',
-                background: '#eff6ff',
+                color: '#2c6462',
+                background: '#eaf5f4',
               }}
             >
               氏名
@@ -172,18 +172,18 @@ function Page({ dorm, year, month, days, rows, pageIndex, pageCount }) {
                   key={d}
                   style={{
                     padding: '3px 0',
-                    borderBottom: '2px solid #1e40af',
+                    borderBottom: '2px solid #2c6462',
                     fontSize: 9.5,
                     fontWeight: 700,
                     background: weekend
                       ? dow === 0
                         ? '#fef2f2'
-                        : '#eff6ff'
+                        : '#eaf5f4'
                       : '#f8fafc',
                     color: weekend
                       ? dow === 0
                         ? '#dc2626'
-                        : '#2563eb'
+                        : '#3e8a88'
                       : '#334155',
                   }}
                 >
@@ -201,7 +201,7 @@ function Page({ dorm, year, month, days, rows, pageIndex, pageCount }) {
                 style={{
                   padding: '3px 8px',
                   borderBottom: '1px solid #e2e8f0',
-                  borderRight: '2px solid #1e40af',
+                  borderRight: '2px solid #2c6462',
                   fontSize: 12.5,
                   fontWeight: 700,
                   whiteSpace: 'nowrap',

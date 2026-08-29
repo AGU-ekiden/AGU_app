@@ -64,7 +64,7 @@ export default function MonthlyMealMatrix({
                           weekend
                             ? dow === 0
                               ? 'bg-red-50 text-red-500'
-                              : 'bg-[#fdf8ec] text-[#8a6d1f]'
+                              : 'bg-[#eaf5f4] text-[#3e8a88]'
                             : 'bg-slate-50 text-slate-500'
                         )}
                       >
@@ -90,13 +90,13 @@ export default function MonthlyMealMatrix({
                         className="px-0.5 py-1 text-center"
                       >
                         <div className="mx-auto flex w-fit flex-col items-center gap-0.5 text-[9px] leading-tight">
-                          <span className="text-[#10254a]">{c.breakfast}</span>
+                          <span className="text-[#2c6462]">{c.breakfast}</span>
                           <span className="text-emerald-600">{c.dinner}</span>
                         </div>
                       </td>
                     ))}
                     <td className="sticky right-0 z-10 border-l border-slate-200 bg-slate-100 px-2 py-1.5 text-right">
-                      <span className="text-[#10254a]">{grandBreakfast}</span>
+                      <span className="text-[#2c6462]">{grandBreakfast}</span>
                       <span className="text-slate-300">/</span>
                       <span className="text-emerald-600">{grandDinner}</span>
                     </td>
@@ -110,7 +110,7 @@ export default function MonthlyMealMatrix({
                       row.isCrossDorm
                         ? 'bg-amber-50/40'
                         : row.isGuest
-                        ? 'bg-[#fdf8ec]/40'
+                        ? 'bg-[#eaf5f4]/40'
                         : idx % 2 === 1 && 'bg-slate-50/30'
                     )}
                   >
@@ -120,7 +120,7 @@ export default function MonthlyMealMatrix({
                         row.isCrossDorm
                           ? 'bg-amber-50'
                           : row.isGuest
-                          ? 'bg-[#fdf8ec]'
+                          ? 'bg-[#eaf5f4]'
                           : idx % 2 === 1
                           ? 'bg-slate-50'
                           : 'bg-white'
@@ -133,7 +133,7 @@ export default function MonthlyMealMatrix({
                         </div>
                       )}
                       {row.isGuest && (
-                        <div className="text-[10px] font-normal text-[#10254a]">
+                        <div className="text-[10px] font-normal text-[#2c6462]">
                           {row.category}
                         </div>
                       )}
@@ -154,7 +154,7 @@ export default function MonthlyMealMatrix({
                               title={`${cell.day}日 朝食: ${cell.breakfast ? '食べた' : '—'}`}
                               className={cn(
                                 'h-2 w-5 rounded-sm',
-                                cell.breakfast ? 'bg-[#8a6d1f]' : 'bg-slate-200'
+                                cell.breakfast ? 'bg-[#3e8a88]' : 'bg-slate-200'
                               )}
                             />
                             <span
@@ -174,7 +174,7 @@ export default function MonthlyMealMatrix({
                         row.isCrossDorm ? 'bg-amber-50' : idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'
                       )}
                     >
-                      <span className="font-semibold text-[#10254a]">
+                      <span className="font-semibold text-[#2c6462]">
                         {row.totalBreakfast}
                       </span>
                       <span className="text-slate-300">/</span>
@@ -207,13 +207,13 @@ export default function MonthlyMealMatrix({
                         className="border-t border-slate-200 px-0.5 py-1 text-center"
                       >
                         <div className="mx-auto flex w-fit flex-col items-center gap-0.5 text-[9px] leading-tight">
-                          <span className="text-[#10254a]">{c.breakfast}</span>
+                          <span className="text-[#2c6462]">{c.breakfast}</span>
                           <span className="text-emerald-600">{c.dinner}</span>
                         </div>
                       </td>
                     ))}
                     <td className="sticky right-0 z-10 border-l border-t border-slate-200 bg-slate-100 px-2 py-1.5 text-right">
-                      <span className="text-[#10254a]">{grandBreakfast}</span>
+                      <span className="text-[#2c6462]">{grandBreakfast}</span>
                       <span className="text-slate-300">/</span>
                       <span className="text-emerald-600">{grandDinner}</span>
                     </td>
@@ -228,7 +228,7 @@ export default function MonthlyMealMatrix({
       {/* 凡例 */}
       <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
-          <span className="h-2 w-5 rounded-sm bg-[#8a6d1f]" /> 朝食（上段）
+          <span className="h-2 w-5 rounded-sm bg-[#3e8a88]" /> 朝食（上段）
         </span>
         <span className="flex items-center gap-1">
           <span className="h-2 w-5 rounded-sm bg-emerald-500" /> 夕食（下段）

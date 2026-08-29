@@ -6,16 +6,16 @@ export default {
       colors: {
         border: 'hsl(214.3 31.8% 91.4%)',
         input: 'hsl(214.3 31.8% 91.4%)',
-        ring: 'hsl(46 67% 47%)',
-        background: 'hsl(0 0% 100%)',
+        ring: '#3e8a88',
+        background: '#ffffff',
         foreground: 'hsl(222.2 47.4% 11.2%)',
         primary: {
-          DEFAULT: 'hsl(218 64% 18%)',
-          foreground: 'hsl(45 60% 92%)',
+          DEFAULT: '#3e8a88',
+          foreground: '#ffffff',
         },
         accent: {
-          DEFAULT: 'hsl(46 67% 47%)',
-          foreground: 'hsl(218 64% 18%)',
+          DEFAULT: '#2c6462',
+          foreground: '#eaf5f4',
         },
         secondary: {
           DEFAULT: 'hsl(210 40% 96.1%)',

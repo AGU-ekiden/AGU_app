@@ -147,7 +147,7 @@ function Page({ items, cols, fontSize, pageIndex, pageCount, year, month, config
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-end',
-          borderBottom: '2.5px solid #2563eb',
+          borderBottom: '2.5px solid #3e8a88',
           paddingBottom: 6,
           marginBottom: 6,
         }}
@@ -182,16 +182,16 @@ function Page({ items, cols, fontSize, pageIndex, pageCount, year, month, config
         }}
       >
         <thead>
-          <tr style={{ background: '#eff6ff' }}>
+          <tr style={{ background: '#eaf5f4' }}>
             {cols.map((c) => (
               <th
                 key={c.key}
                 style={{
                   textAlign: c.align,
                   padding: '5px 4px',
-                  borderBottom: '1.5px solid #bfdbfe',
+                  borderBottom: '1.5px solid #b3dbd9',
                   fontSize: '1em',
-                  color: '#1e40af',
+                  color: '#2c6462',
                   fontWeight: 700,
                   wordBreak: 'break-all',
                 }}
@@ -248,7 +248,7 @@ function MemberRow({ row, cols, zebra }) {
               padding: '3px 4px',
               borderBottom: '1px solid #e2e8f0',
               fontWeight: c.accent ? 700 : c.key === 'name' ? 600 : 400,
-              color: c.isSubsidy && raw ? '#dc2626' : c.accent ? '#2563eb' : '#0f172a',
+              color: c.isSubsidy && raw ? '#dc2626' : c.accent ? '#3e8a88' : '#0f172a',
               fontVariantNumeric: 'tabular-nums',
               wordBreak: 'break-all',
               verticalAlign: 'top',
@@ -264,7 +264,7 @@ function MemberRow({ row, cols, zebra }) {
 
 function TotalRow({ label, sums, cols, grand }) {
   return (
-    <tr style={{ background: grand ? '#dbeafe' : '#f1f5f9' }}>
+    <tr style={{ background: grand ? '#d4ebea' : '#f1f5f9' }}>
       {cols.map((c, i) => {
         if (i === 0) {
           return (
@@ -274,10 +274,10 @@ function TotalRow({ label, sums, cols, grand }) {
               style={{
                 textAlign: 'left',
                 padding: '4px 4px',
-                borderBottom: grand ? '2px solid #93c5fd' : '1px solid #cbd5e1',
-                borderTop: grand ? '2px solid #93c5fd' : 'none',
+                borderBottom: grand ? '2px solid #8cc9c6' : '1px solid #cbd5e1',
+                borderTop: grand ? '2px solid #8cc9c6' : 'none',
                 fontWeight: 700,
-                color: grand ? '#1e3a8a' : '#475569',
+                color: grand ? '#234f4d' : '#475569',
               }}
             >
               {label}
@@ -297,15 +297,15 @@ function TotalRow({ label, sums, cols, grand }) {
             style={{
               textAlign: c.align,
               padding: '4px 4px',
-              borderBottom: grand ? '2px solid #93c5fd' : '1px solid #cbd5e1',
-              borderTop: grand ? '2px solid #93c5fd' : 'none',
+              borderBottom: grand ? '2px solid #8cc9c6' : '1px solid #cbd5e1',
+              borderTop: grand ? '2px solid #8cc9c6' : 'none',
               fontWeight: 700,
               color: c.isSubsidy && val
                 ? '#dc2626'
                 : c.accent
-                ? '#1e40af'
+                ? '#2c6462'
                 : grand
-                ? '#1e3a8a'
+                ? '#234f4d'
                 : '#334155',
               fontVariantNumeric: 'tabular-nums',
             }}
