@@ -75,7 +75,6 @@ const el = {
   rollcallMemberTemplate: document.getElementById('rollcallMemberTemplate'),
   rollcallRegisterModal: document.getElementById('rollcallRegisterModal'),
   rollcallRegisterCloseBtn: document.getElementById('rollcallRegisterCloseBtn'),
-  rollcallShareBtn: document.getElementById('rollcallShareBtn'),
   rollcallTagManageList: document.getElementById('rollcallTagManageList'),
   rollcallNewTagName: document.getElementById('rollcallNewTagName'),
   rollcallNewTagBtn: document.getElementById('rollcallNewTagBtn'),
@@ -2980,113 +2979,86 @@ function saveRollcallMembers() {
   }
 }
 
-/* ----- タグの管理(マスターリスト) -----
+/* ----- タグの管理(マスターリスト、Notion「点呼タグ管理」DB) -----
    タグは自由入力ではなく、ここで登録したタグの中から選手ごとにチェック
-   ボックスで選ぶ方式。各タグは { name, showBadge } の形で持ち、showBadge
-   がtrueのタグだけ点呼タブ本体の名前ボタンに小さな略称バッジとして表示
-   される(全部のタグを表示すると、タグの有無でボタンの高さがバラバラに
-   なって使いにくいため)。新しく追加したタグは既定でOFFなので、今後
-   タグを増やしても名前ボタンの見た目が勝手に崩れることはない。 */
-const ROLLCALL_TAGS_STORAGE_KEY = 'stopwatch_rollcall_tags_v1';
-const ROLLCALL_DEFAULT_TAGS = ['故障者', 'イレギュラー'];
+   ボックスで選ぶ方式。各タグは { id, name, showBadge } の形で持ち、
+   showBadgeがtrueのタグだけ点呼タブ本体の名前ボタンに小さな略称バッジ
+   として表示される(全部のタグを表示すると、タグの有無でボタンの高さが
+   バラバラになって使いにくいため)。タグ一覧・showBadge設定はNotionの
+   専用DBに保存され全端末で共有される(Xserverは使わない)。選手・一時的な
+   参加者ごとのタグの割り当ては、部員DB・一時参加者DBの各ページの
+   「点呼タグ」列に保存され、それぞれの取得処理(loadAthleteRosterFromNotion
+   等)で一緒に読み込まれる。 */
+let rollcallTags = [];
 
-function tagsUsedByMembers() {
-  const set = new Set();
-  rollcallMembers.forEach((m) => m.tags.forEach((t) => set.add(t)));
-  return Array.from(set);
-}
+const ROLLCALL_TAGS_API_URL = '/api/rollcall-tags';
+const ROLLCALL_TAGS_ASSIGN_API_URL = '/api/rollcall-tags/assign';
 
-function loadRollcallTags() {
+async function loadRollcallTagsFromNotion() {
   try {
-    const raw = localStorage.getItem(ROLLCALL_TAGS_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        // 旧バージョン(タグ名の文字列だけの配列)からの移行。
-        return parsed.map((t) => (typeof t === 'string' ? { name: t, showBadge: false } : t));
-      }
-    }
-  } catch (e) {
-    /* 壊れた保存データは無視する */
-  }
-  return Array.from(new Set([...ROLLCALL_DEFAULT_TAGS, ...tagsUsedByMembers()])).map((name) => ({
-    name,
-    showBadge: false,
-  }));
-}
-
-let rollcallTags = loadRollcallTags();
-
-function saveRollcallTags() {
-  try {
-    localStorage.setItem(ROLLCALL_TAGS_STORAGE_KEY, JSON.stringify(rollcallTags));
-  } catch (e) {
-    /* localStorage unavailable — 保存だけ諦める */
-  }
-}
-
-/* ----- 名簿(氏名・学年・タグ)のチーム共有 -----
-   名簿の登録・編集データ(このタブで管理する氏名・学年・タグ)は、録音の
-   チーム共有と同じXserver(itonomakiアプリの /api/rollcall-roster)に
-   アップロードしてチームで共有する。合言葉は不要(誰でも編集・共有できる
-   仕様)。一方、実際に点呼した/していないのチェック状態(checked /
-   checkedSeq)は各端末だけのローカル情報のままにする(この端末で今まさに
-   点呼中の状態を他の端末の値で上書きしないよう、共有データを取り込む時は
-   チェック状態だけ元のものを残す)。 */
-const ROLLCALL_ROSTER_API_URL = '/itonomaki/api/rollcall-roster';
-
-function rollcallRosterPayload() {
-  return {
-    members: rollcallMembers.map((m) => ({
-      id: m.id,
-      name: m.name,
-      grade: m.grade,
-      isTemp: !!m.isTemp,
-      tags: m.tags,
-      sortIndex: m.sortIndex,
-    })),
-    tags: rollcallTags,
-  };
-}
-
-// サーバーから取得した共有名簿を、この端末の点呼チェック状態はそのまま
-// 保ちつつ取り込む(id が一致する選手はchecked/checkedSeqを引き継ぐ)。
-// 氏名・学年(部員DB由来)や一時的な参加者(一時参加者DB由来)自体は、
-// この直後にそれぞれの取得処理で最新の内容に上書きされる — ここでは
-// タグ・並び順の端末間共有のためだけに使う。
-function applySharedRollcallRoster(shared) {
-  if (!shared || !Array.isArray(shared.members)) return;
-  const localById = new Map(rollcallMembers.map((m) => [m.id, m]));
-  rollcallMembers = shared.members.map((m) => {
-    const local = localById.get(m.id);
-    return {
-      id: m.id,
-      name: m.name,
-      grade: m.grade,
-      isTemp: !!m.isTemp,
-      tags: Array.isArray(m.tags) ? m.tags : [],
-      sortIndex: typeof m.sortIndex === 'number' ? m.sortIndex : 0,
-      checked: local ? local.checked : false,
-      checkedSeq: local ? local.checkedSeq : 0,
-    };
-  });
-  if (Array.isArray(shared.tags)) {
-    rollcallTags = shared.tags.map((t) => (typeof t === 'string' ? { name: t, showBadge: false } : t));
-  }
-  rollcallNextCheckedSeq = 1 + rollcallMembers.reduce((max, m) => Math.max(max, m.checkedSeq || 0), 0);
-  rollcallNextSortIndex = 1 + rollcallMembers.reduce((max, m) => Math.max(max, m.sortIndex || 0), -1);
-  saveRollcallMembers();
-  saveRollcallTags();
-}
-
-async function loadSharedRollcallRoster() {
-  try {
-    const res = await fetch(ROLLCALL_ROSTER_API_URL, { cache: 'no-store' });
+    const res = await fetch(ROLLCALL_TAGS_API_URL, { cache: 'no-store' });
     if (!res.ok) return;
     const body = await res.json();
-    if (body && body.data) applySharedRollcallRoster(body.data);
+    if (Array.isArray(body.tags)) rollcallTags = body.tags;
   } catch {
-    // オフライン、またはサーバー未応答 — この端末のローカルデータのまま使う。
+    // オフライン、またはサーバー未応答 — この端末に既にあるタグ一覧のまま使う。
+  }
+}
+
+async function createRollcallTagOnServer(name) {
+  try {
+    const res = await fetch(ROLLCALL_TAGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
+    return { ok: true, tag: body.tag };
+  } catch {
+    return { ok: false, error: 'サーバーに接続できませんでした(オフライン等)' };
+  }
+}
+
+async function updateRollcallTagBadgeOnServer(id, showBadge) {
+  try {
+    const res = await fetch(`${ROLLCALL_TAGS_API_URL}/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ showBadge }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'サーバーに接続できませんでした(オフライン等)' };
+  }
+}
+
+async function deleteRollcallTagOnServer(id) {
+  try {
+    const res = await fetch(`${ROLLCALL_TAGS_API_URL}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'サーバーに接続できませんでした(オフライン等)' };
+  }
+}
+
+// 選手・一時的な参加者どちらのページIDでも渡せる(サーバー側が判別する)。
+async function assignPersonTagsOnServer(pageId, tags) {
+  try {
+    const res = await fetch(ROLLCALL_TAGS_ASSIGN_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pageId, tags }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'サーバーに接続できませんでした(オフライン等)' };
   }
 }
 
@@ -3117,13 +3089,14 @@ function applyNotionAthleteRoster(athletes) {
 
   const athleteMembers = valid.map((a) => {
     const existing = byId.get(a.id) || byName.get(a.name);
-    if (existing) return { ...existing, id: a.id, name: a.name, grade: a.grade, isTemp: false };
+    const tags = Array.isArray(a.tags) ? a.tags : [];
+    if (existing) return { ...existing, id: a.id, name: a.name, grade: a.grade, isTemp: false, tags };
     return {
       id: a.id,
       name: a.name,
       grade: a.grade,
       isTemp: false,
-      tags: [],
+      tags,
       checked: false,
       checkedSeq: 0,
       sortIndex: rollcallNextSortIndex++,
@@ -3164,13 +3137,14 @@ function applyTempParticipantsRoster(participants) {
 
   const tempMembers = valid.map((p) => {
     const existing = byId.get(p.id);
-    if (existing) return { ...existing, name: p.name };
+    const tags = Array.isArray(p.tags) ? p.tags : [];
+    if (existing) return { ...existing, name: p.name, tags };
     return {
       id: p.id,
       name: p.name,
       grade: null,
       isTemp: true,
-      tags: [],
+      tags,
       checked: false,
       checkedSeq: 0,
       sortIndex: rollcallNextSortIndex++,
@@ -3243,23 +3217,6 @@ async function deleteTempParticipantOnServer(id) {
   }
 }
 
-async function uploadRollcallRosterToServer() {
-  try {
-    const res = await fetch(ROLLCALL_ROSTER_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(rollcallRosterPayload()),
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      return { ok: false, error: body.error || `サーバーエラー(status ${res.status})` };
-    }
-    return { ok: true };
-  } catch {
-    return { ok: false, error: 'サーバーに接続できませんでした(オフライン等)' }; // この端末には保存済みなのでそのまま続行
-  }
-}
-
 async function addRollcallTag(name) {
   const trimmed = name.trim();
   if (!trimmed) return false;
@@ -3267,37 +3224,44 @@ async function addRollcallTag(name) {
     alert('そのタグは既に登録されています。');
     return false;
   }
-  rollcallTags.push({ name: trimmed, showBadge: false });
-  saveRollcallTags();
+  const result = await createRollcallTagOnServer(trimmed);
+  if (!result.ok) {
+    alert(`タグの追加に失敗しました: ${result.error}`);
+    return false;
+  }
+  rollcallTags.push(result.tag);
   return true;
 }
 
 async function deleteRollcallTag(name) {
-  if (!confirm(`タグ「${name}」を削除しますか?(このタグが付いている全選手からも外れます)`)) return;
+  if (!confirm(`タグ「${name}」を削除しますか?(このタグが付いている全員からも外れます)`)) return;
+  const tag = rollcallTags.find((t) => t.name === name);
+  if (!tag) return;
+  const result = await deleteRollcallTagOnServer(tag.id);
+  if (!result.ok) {
+    alert(`タグの削除に失敗しました: ${result.error}`);
+    return;
+  }
   rollcallTags = rollcallTags.filter((t) => t.name !== name);
   rollcallMembers.forEach((m) => {
     m.tags = m.tags.filter((t) => t !== name);
   });
-  saveRollcallTags();
   saveRollcallMembers();
   renderRollcallList();
   renderRollcallRegisterView();
-  const shareResult = await uploadRollcallRosterToServer();
-  if (!shareResult.ok) {
-    alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
-  }
 }
 
 async function setRollcallTagShowBadge(name, showBadge) {
   const tag = rollcallTags.find((t) => t.name === name);
   if (!tag) return;
-  tag.showBadge = showBadge;
-  saveRollcallTags();
-  renderRollcallList();
-  const shareResult = await uploadRollcallRosterToServer();
-  if (!shareResult.ok) {
-    alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
+  const result = await updateRollcallTagBadgeOnServer(tag.id, showBadge);
+  if (!result.ok) {
+    alert(`設定の更新に失敗しました: ${result.error}`);
+    renderRollcallTagManageList(); // チェックボックスの見た目を元に戻す
+    return;
   }
+  tag.showBadge = showBadge;
+  renderRollcallList();
 }
 
 function renderRollcallTagManageList() {
@@ -3376,10 +3340,6 @@ el.rollcallNewTagBtn.addEventListener('click', async () => {
   renderTagFilterOptions(el.rollcallTagFilter);
   renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
   renderRollcallList();
-  const shareResult = await uploadRollcallRosterToServer();
-  if (!shareResult.ok) {
-    alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
-  }
 });
 
 // タグ絞り込み用<select>の選択肢を、登録済みタグ一覧(rollcallTags)から
@@ -3550,9 +3510,9 @@ function setRollcallRegisterModalOpen(open) {
     renderRollcallTagManageList();
     renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
     renderRollcallRegisterView();
-    // 開くたびに最新の共有名簿・部員DBの選手名簿・一時参加者名簿を
+    // 開くたびに最新のタグ一覧・部員DBの選手名簿・一時参加者名簿を
     // 読み直す(他の端末での編集や、各DB側の変更を拾う)。
-    loadSharedRollcallRoster()
+    loadRollcallTagsFromNotion()
       .then(loadAthleteRosterFromNotion)
       .then(loadTempParticipantsFromNotion)
       .then(() => {
@@ -3565,14 +3525,6 @@ function setRollcallRegisterModalOpen(open) {
 }
 el.rollcallRegisterToggle.addEventListener('click', () => setRollcallRegisterModalOpen(true));
 el.rollcallRegisterCloseBtn.addEventListener('click', () => setRollcallRegisterModalOpen(false));
-
-// 通常は編集操作のたびに自動でアップロードされるが、それとは別に「この
-// 端末が今持っている名簿をそのままチームに共有し直したい」場合(他の
-// 端末がまだ古い名簿のままの時など)のための手動ボタン。
-el.rollcallShareBtn.addEventListener('click', async () => {
-  const shareResult = await uploadRollcallRosterToServer();
-  alert(shareResult.ok ? 'この端末の名簿をチームに共有しました。' : `チームへの共有に失敗しました: ${shareResult.error}`);
-});
 
 // 選手(部員DB由来)は氏名・学年を点呼アプリ側から編集できない
 // (部員DBが唯一の情報源のため)。編集できるのはタグのみで、削除もできない
@@ -3621,26 +3573,32 @@ function buildRollcallRegisterRow(member) {
       }
     }
     const newTags = readCheckedTags(node.querySelector('.rollcall-edit-tag-checkboxes'));
+    const tagsChanged = JSON.stringify(newTags.slice().sort()) !== JSON.stringify(member.tags.slice().sort());
 
+    saveBtn.disabled = true;
     if (member.isTemp && newName !== member.name) {
-      saveBtn.disabled = true;
       const result = await renameTempParticipantOnServer(member.id, newName);
-      saveBtn.disabled = false;
       if (!result.ok) {
+        saveBtn.disabled = false;
         alert(`氏名の更新に失敗しました: ${result.error}`);
         return;
       }
     }
+    if (tagsChanged) {
+      const result = await assignPersonTagsOnServer(member.id, newTags);
+      if (!result.ok) {
+        saveBtn.disabled = false;
+        alert(`タグの更新に失敗しました: ${result.error}`);
+        return;
+      }
+    }
+    saveBtn.disabled = false;
 
     member.name = newName;
     member.tags = newTags;
     saveRollcallMembers();
     renderRollcallRegisterView();
     renderRollcallList();
-    const shareResult = await uploadRollcallRosterToServer();
-    if (!shareResult.ok) {
-      alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
-    }
   });
   deleteBtn.addEventListener('click', async () => {
     if (!member.isTemp) return; // 選手は削除ボタン自体を表示していない(念のため)
@@ -3654,10 +3612,6 @@ function buildRollcallRegisterRow(member) {
     saveRollcallMembers();
     renderRollcallRegisterView();
     renderRollcallList();
-    const shareResult = await uploadRollcallRosterToServer();
-    if (!shareResult.ok) {
-      alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
-    }
   });
 
   return node;
@@ -3691,18 +3645,26 @@ el.rollcallAddBtn.addEventListener('click', async () => {
   }
   el.rollcallAddBtn.disabled = true;
   const result = await createTempParticipantOnServer(name);
-  el.rollcallAddBtn.disabled = false;
   if (!result.ok) {
+    el.rollcallAddBtn.disabled = false;
     alert(`追加に失敗しました: ${result.error}`);
     return;
   }
   const { participant } = result;
+  const initialTags = readCheckedTags(el.rollcallAddTagCheckboxes);
+  if (initialTags.length > 0) {
+    const tagResult = await assignPersonTagsOnServer(participant.id, initialTags);
+    if (!tagResult.ok) {
+      alert(`タグの設定に失敗しました(氏名は追加済みです): ${tagResult.error}`);
+    }
+  }
+  el.rollcallAddBtn.disabled = false;
   rollcallMembers.push({
     id: participant.id,
     name: participant.name,
     grade: null,
     isTemp: true,
-    tags: readCheckedTags(el.rollcallAddTagCheckboxes),
+    tags: initialTags,
     checked: false,
     checkedSeq: 0,
     sortIndex: rollcallNextSortIndex++,
@@ -3712,14 +3674,10 @@ el.rollcallAddBtn.addEventListener('click', async () => {
   renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
   renderRollcallRegisterView();
   renderRollcallList();
-  const shareResult = await uploadRollcallRosterToServer();
-  if (!shareResult.ok) {
-    alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
-  }
 });
 
 renderRollcallList();
-loadSharedRollcallRoster()
+loadRollcallTagsFromNotion()
   .then(loadAthleteRosterFromNotion)
   .then(loadTempParticipantsFromNotion)
   .then(() => {
