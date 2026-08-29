@@ -252,23 +252,18 @@
         <div class="rollcall-register-row-info">
           <span class="rollcall-register-row-name"></span>
           <span class="rollcall-register-row-grade"></span>
-          <span class="rollcall-register-row-tags"></span>
         </div>
         <div class="rollcall-register-row-buttons">
-          <button type="button" class="btn btn-ghost btn-sm rollcall-edit-btn">✎ 編集</button>
+          <button type="button" class="btn btn-ghost btn-sm rollcall-rename-btn">✎ 名前を編集</button>
           <button type="button" class="btn btn-ghost btn-sm rollcall-delete-btn">🗑 削除</button>
         </div>
       </div>
-      <div class="rollcall-register-row-edit" hidden>
-        <div class="rollcall-add-form-row rollcall-edit-name-row">
-          <input type="text" class="rollcall-edit-name" />
-        </div>
-        <div class="rollcall-tag-checkboxes rollcall-edit-tag-checkboxes"></div>
-        <div class="rollcall-register-row-buttons">
-          <button type="button" class="btn btn-primary btn-sm rollcall-save-btn">保存</button>
-          <button type="button" class="btn btn-ghost btn-sm rollcall-cancel-btn">キャンセル</button>
-        </div>
+      <div class="rollcall-add-form-row rollcall-edit-name-row" hidden>
+        <input type="text" class="rollcall-edit-name" />
+        <button type="button" class="btn btn-primary btn-sm rollcall-save-name-btn">保存</button>
+        <button type="button" class="btn btn-ghost btn-sm rollcall-cancel-name-btn">キャンセル</button>
       </div>
+      <div class="rollcall-tag-checkboxes rollcall-row-tag-checkboxes"></div>
     </div>
   </template>
 

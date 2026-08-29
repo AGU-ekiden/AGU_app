@@ -1358,6 +1358,11 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background: rgba(90, 150, 190, 0.12);
+  border: 1px solid rgba(90, 150, 190, 0.35);
+  border-left: 3px solid #5a96be;
+  border-radius: 10px;
+  padding: 8px 10px;
 }
 .rollcall-add-form-row {
   display: flex;
@@ -1413,6 +1418,11 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  background: rgba(201, 162, 39, 0.1);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  padding: 8px 10px;
 }
 .rollcall-tag-manage-heading {
   font-size: 11px;
@@ -1430,13 +1440,17 @@ html, body {
 }
 .rollcall-tag-chip-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 4px;
+  padding-bottom: 2px; /* 横スクロールバーが内容に重ならないよう少し余白を取る */
 }
 .rollcall-tag-chip {
   display: flex;
   align-items: center;
   gap: 3px;
+  flex: 0 0 auto;
+  white-space: nowrap;
   background: var(--panel-2);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -1535,21 +1549,9 @@ html, body {
   font-size: 11px;
   color: var(--text-dim);
 }
-.rollcall-register-row-tags {
-  font-size: 11px;
-  color: var(--accent);
-}
 .rollcall-register-row-buttons {
   display: flex;
   gap: 6px;
   flex: 0 0 auto;
-}
-.rollcall-register-row-edit {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.rollcall-register-row-edit[hidden] {
-  display: none;
 }
 

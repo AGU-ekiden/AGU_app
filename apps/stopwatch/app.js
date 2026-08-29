@@ -3407,12 +3407,17 @@ function buildRollcallMemberButton(member) {
 // 学年の欄(見出し+一覧)を1つ作って親要素に追加する。isSub は「その他
 // (一時的な参加者)」のように、同じ列の中で別の学年欄の下に続けて表示する
 // 小見出しかどうか。
+// 学年ごとの50音順(あ→ん)並び替え用。一時的な参加者(その他)は
+// 追加した順(sortIndex)のまま扱うため、こちらは学年欄でのみ使う。
+const rollcallNameCollator = new Intl.Collator('ja');
+
 function appendRollcallGroup(container, label, members, isSub) {
-  // 未点呼(checked=false)は元の並び順のまま上に、点呼済みは押した順に
-  // 下に積み上がっていく(直近に押した人ほど一番下)。
+  // 未点呼(checked=false)は、学年欄なら50音順(あ→ん)、その他(一時的な
+  // 参加者)なら追加した順のまま上に並べる。点呼済みは押した順に下に
+  // 積み上がっていく(直近に押した人ほど一番下)。
   const unchecked = members
     .filter((m) => !m.checked)
-    .sort((a, b) => a.sortIndex - b.sortIndex);
+    .sort(isSub ? (a, b) => a.sortIndex - b.sortIndex : (a, b) => rollcallNameCollator.compare(a.name, b.name));
   const checked = members
     .filter((m) => m.checked)
     .sort((a, b) => a.checkedSeq - b.checkedSeq);
@@ -3527,81 +3532,80 @@ el.rollcallRegisterToggle.addEventListener('click', () => setRollcallRegisterMod
 el.rollcallRegisterCloseBtn.addEventListener('click', () => setRollcallRegisterModalOpen(false));
 
 // 選手(部員DB由来)は氏名・学年を点呼アプリ側から編集できない
-// (部員DBが唯一の情報源のため)。編集できるのはタグのみで、削除もできない
-// (部員DBの区分が変われば次回取得時に自動で名簿から外れる)。
-// 一時的な参加者(isTemp)だけ、氏名の変更・削除も含めてフル編集できる。
+// (部員DBが唯一の情報源のため)。氏名編集・削除もできない(部員DBの区分が
+// 変われば次回取得時に自動で名簿から外れる)。一時的な参加者(isTemp)だけ、
+// 氏名の変更・削除もできる。タグは選手・一時的な参加者どちらも、
+// 「編集」のような開閉操作を挟まず常に表示されたチェックボックスで選べ、
+// 変更した瞬間にサーバー(Notion)へ自動保存される。
 function buildRollcallRegisterRow(member) {
   const node = el.rollcallRegisterRowTemplate.content.firstElementChild.cloneNode(true);
-  const viewEl = node.querySelector('.rollcall-register-row-view');
-  const editEl = node.querySelector('.rollcall-register-row-edit');
-  const nameRowEl = node.querySelector('.rollcall-edit-name-row');
+  const nameEditRow = node.querySelector('.rollcall-edit-name-row');
   const deleteBtn = node.querySelector('.rollcall-delete-btn');
-  const editBtn = node.querySelector('.rollcall-edit-btn');
+  const renameBtn = node.querySelector('.rollcall-rename-btn');
+  const tagCheckboxesEl = node.querySelector('.rollcall-row-tag-checkboxes');
 
   node.querySelector('.rollcall-register-row-name').textContent = member.name;
   node.querySelector('.rollcall-register-row-grade').textContent = member.isTemp ? 'その他' : `${member.grade}年`;
-  node.querySelector('.rollcall-register-row-tags').textContent = member.tags.join(' / ');
+
+  renderTagCheckboxes(tagCheckboxesEl, member.tags);
+  tagCheckboxesEl.addEventListener('change', async (e) => {
+    const checkbox = e.target;
+    if (!(checkbox instanceof HTMLInputElement)) return;
+    checkbox.disabled = true;
+    const newTags = readCheckedTags(tagCheckboxesEl);
+    const result = await assignPersonTagsOnServer(member.id, newTags);
+    checkbox.disabled = false;
+    if (!result.ok) {
+      alert(`タグの更新に失敗しました: ${result.error}`);
+      checkbox.checked = !checkbox.checked; // 反映できなかったのでチェックを元に戻す
+      return;
+    }
+    member.tags = newTags;
+    saveRollcallMembers();
+    renderRollcallList();
+  });
 
   if (!member.isTemp) {
+    renameBtn.hidden = true;
     deleteBtn.hidden = true;
-    editBtn.textContent = '🏷️ タグを編集';
     const note = document.createElement('div');
     note.className = 'rollcall-register-row-note';
     note.textContent = '氏名・学年は部員DB(Notion)で管理されています';
     node.querySelector('.rollcall-register-row-info').appendChild(note);
+    return node;
   }
 
-  editBtn.addEventListener('click', () => {
-    nameRowEl.hidden = !member.isTemp;
-    if (member.isTemp) node.querySelector('.rollcall-edit-name').value = member.name;
-    renderTagCheckboxes(node.querySelector('.rollcall-edit-tag-checkboxes'), member.tags);
-    viewEl.hidden = true;
-    editEl.hidden = false;
+  renameBtn.addEventListener('click', () => {
+    node.querySelector('.rollcall-edit-name').value = member.name;
+    nameEditRow.hidden = false;
   });
-  node.querySelector('.rollcall-cancel-btn').addEventListener('click', () => {
-    viewEl.hidden = false;
-    editEl.hidden = true;
+  node.querySelector('.rollcall-cancel-name-btn').addEventListener('click', () => {
+    nameEditRow.hidden = true;
   });
-  node.querySelector('.rollcall-save-btn').addEventListener('click', async () => {
-    const saveBtn = node.querySelector('.rollcall-save-btn');
-    let newName = member.name;
-    if (member.isTemp) {
-      newName = node.querySelector('.rollcall-edit-name').value.trim();
-      if (!newName) {
-        alert('氏名を入力してください。');
-        return;
-      }
+  node.querySelector('.rollcall-save-name-btn').addEventListener('click', async () => {
+    const newName = node.querySelector('.rollcall-edit-name').value.trim();
+    if (!newName) {
+      alert('氏名を入力してください。');
+      return;
     }
-    const newTags = readCheckedTags(node.querySelector('.rollcall-edit-tag-checkboxes'));
-    const tagsChanged = JSON.stringify(newTags.slice().sort()) !== JSON.stringify(member.tags.slice().sort());
-
+    if (newName === member.name) {
+      nameEditRow.hidden = true;
+      return;
+    }
+    const saveBtn = node.querySelector('.rollcall-save-name-btn');
     saveBtn.disabled = true;
-    if (member.isTemp && newName !== member.name) {
-      const result = await renameTempParticipantOnServer(member.id, newName);
-      if (!result.ok) {
-        saveBtn.disabled = false;
-        alert(`氏名の更新に失敗しました: ${result.error}`);
-        return;
-      }
-    }
-    if (tagsChanged) {
-      const result = await assignPersonTagsOnServer(member.id, newTags);
-      if (!result.ok) {
-        saveBtn.disabled = false;
-        alert(`タグの更新に失敗しました: ${result.error}`);
-        return;
-      }
-    }
+    const result = await renameTempParticipantOnServer(member.id, newName);
     saveBtn.disabled = false;
-
+    if (!result.ok) {
+      alert(`氏名の更新に失敗しました: ${result.error}`);
+      return;
+    }
     member.name = newName;
-    member.tags = newTags;
     saveRollcallMembers();
     renderRollcallRegisterView();
     renderRollcallList();
   });
   deleteBtn.addEventListener('click', async () => {
-    if (!member.isTemp) return; // 選手は削除ボタン自体を表示していない(念のため)
     if (!confirm(`「${member.name}」を名簿から削除しますか?`)) return;
     const result = await deleteTempParticipantOnServer(member.id);
     if (!result.ok) {
