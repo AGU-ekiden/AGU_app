@@ -6,13 +6,13 @@ interface RaceResultCardProps {
 
 const FLAG_COLORS: Record<string, string> = {
   PB: "bg-red-100 text-red-600 border-red-200",
-  SB: "bg-[#f4e6bd] text-[#10254a] border-[#e9d38f]",
+  SB: "bg-amber-100 text-amber-800 border-amber-200",
   "優勝": "bg-yellow-100 text-yellow-700 border-yellow-200",
   "入賞": "bg-orange-100 text-orange-600 border-orange-200",
   "準優勝": "bg-gray-100 text-gray-600 border-gray-200",
   "決勝進出": "bg-red-100 text-red-600 border-red-200",
   "区間賞": "bg-pink-100 text-pink-600 border-pink-200",
-  "青学記録": "bg-[#f4e6bd] text-[#0a1930] border-[#e9d38f]",
+  "青学記録": "bg-amber-100 text-amber-800 border-amber-200",
   "初レース": "bg-pink-100 text-pink-500 border-pink-200",
   "大会新": "bg-orange-100 text-orange-700 border-orange-200",
 };

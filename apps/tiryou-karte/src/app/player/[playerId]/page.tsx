@@ -378,7 +378,7 @@ export default function KarteRecordPage() {
                   </span>
                 )}
                 {personalRecords.length > 0 && (
-                  <span className="bg-[#f4e6bd] text-[#10254a] text-xs font-semibold px-2 py-0.5 rounded-full">
+                  <span className="bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-0.5 rounded-full">
                     パーソナル {personalRecords.length}件
                   </span>
                 )}

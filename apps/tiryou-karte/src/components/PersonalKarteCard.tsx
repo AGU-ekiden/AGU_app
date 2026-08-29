@@ -21,9 +21,9 @@ function formatTime(iso: string): string {
 
 export default function PersonalKarteCard({ record }: PersonalKarteCardProps) {
   return (
-    <div data-anchor-id={`personal-${record.id}`} className="bg-[#fdf8ec] border border-[#f4e6bd] rounded-xl p-4 shadow-sm">
+    <div data-anchor-id={`personal-${record.id}`} className="bg-amber-50 border border-amber-100 rounded-xl p-4 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
-        <span className="bg-[#f4e6bd] text-[#10254a] text-xs font-bold px-2 py-0.5 rounded-full">パーソナル</span>
+        <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">パーソナル</span>
         <span className="text-xs text-gray-400">
           {formatDate(record.createdAt)} {formatTime(record.createdAt)}
         </span>
@@ -45,7 +45,7 @@ export default function PersonalKarteCard({ record }: PersonalKarteCardProps) {
             <p className="text-xs text-gray-400 mb-0.5">タグ</p>
             <div className="flex flex-wrap gap-1">
               {record.tags.map((tag) => (
-                <span key={tag} className="text-[10px] bg-white text-[#10254a] px-1.5 py-0.5 rounded-full font-medium border border-[#f4e6bd]">
+                <span key={tag} className="text-[10px] bg-white text-amber-800 px-1.5 py-0.5 rounded-full font-medium border border-amber-100">
                   {tag}
                 </span>
               ))}
@@ -74,7 +74,7 @@ export default function PersonalKarteCard({ record }: PersonalKarteCardProps) {
       )}
       {record.trainingContent && (
         <div className="mb-2">
-          <p className="text-xs font-semibold text-[#8a6d1f] mb-0.5">トレーニング内容</p>
+          <p className="text-xs font-semibold text-amber-700 mb-0.5">トレーニング内容</p>
           <p className="text-xs text-gray-600 whitespace-pre-wrap leading-relaxed">{record.trainingContent}</p>
         </div>
       )}

@@ -5,6 +5,28 @@
   --foreground: #171717;
 }
 
+/*
+ * Brand palette (matches the portal's green+white theme).
+ * Overrides Tailwind's built-in `green` scale so every existing
+ * bg-green-*/text-green-*/border-green-*/ring-green-* utility in this
+ * app (headers, primary buttons, active tabs, links, focus rings, and
+ * the "medical karte" record-type accent) resolves to the shared brand
+ * green instead of Tailwind's default grass-green.
+ */
+@theme {
+  --color-green-50: #eaf5f4;
+  --color-green-100: #d3e9e7;
+  --color-green-200: #a8d3cf;
+  --color-green-300: #7dbdb7;
+  --color-green-400: #5aa19b;
+  --color-green-500: #468f8a;
+  --color-green-600: #3e8a88;
+  --color-green-700: #2c6462;
+  --color-green-800: #204b49;
+  --color-green-900: #163534;
+  --color-green-950: #0c1f1e;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

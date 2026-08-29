@@ -30,7 +30,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <a
           href="/"
-          className="fixed top-2 left-2 z-50 inline-flex items-center rounded-md bg-[#c9a227] px-2 py-1 text-xs font-bold text-[#10254a] shadow-sm hover:bg-[#dbbd57]"
+          className="fixed top-2 left-2 z-50 inline-flex items-center rounded-md bg-green-700 px-2 py-1 text-xs font-bold text-white shadow-sm hover:bg-green-600"
         >
           ← ポータル
         </a>
