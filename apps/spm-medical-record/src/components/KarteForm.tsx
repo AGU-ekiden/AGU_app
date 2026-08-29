@@ -269,7 +269,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
           value={form.treatmentDate}
           onChange={handleChange}
           required
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white text-gray-800"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white text-gray-800"
         />
       </div>
 
@@ -283,7 +283,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
           value={form.trainerName}
           onChange={handleChange}
           required
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white text-gray-800"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white text-gray-800"
         >
           <option value="">トレーナーを選択...</option>
           {trainerOptions.map((name) => (
@@ -299,7 +299,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
           name="location"
           value={form.location}
           onChange={handleChange}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white text-gray-800"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white text-gray-800"
         >
           <option value="">場所を選択...</option>
           {locationOptions.map((name) => (
@@ -320,8 +320,8 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
                 onClick={() => toggleTag(tag)}
                 className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
                   selectedTags.includes(tag)
-                    ? "bg-[#10254a] text-white border-[#10254a] font-medium"
-                    : "bg-white text-gray-500 border-gray-200 hover:border-[#dbbd57] hover:text-[#8a6d1f]"
+                    ? "bg-[#3e8a88] text-white border-[#3e8a88] font-medium"
+                    : "bg-white text-gray-500 border-gray-200 hover:border-[#3e8a88] hover:text-[#2c6462]"
                 }`}
               >
                 {tag}
@@ -336,13 +336,13 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
             onChange={(e) => setNewTagInput(e.target.value)}
             onKeyDown={handleNewTagKeyDown}
             placeholder="新しいタグを入力..."
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white"
+            className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white"
           />
           <button
             type="button"
             onClick={addNewTag}
             disabled={!newTagInput.trim()}
-            className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-[#fdf8ec] hover:text-[#10254a] text-gray-500 font-medium transition-colors disabled:opacity-40"
+            className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-[#f2f8f7] hover:text-[#3e8a88] text-gray-500 font-medium transition-colors disabled:opacity-40"
           >
             追加
           </button>
@@ -359,7 +359,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
           onChange={handleChange}
           rows={15}
           placeholder="今日の体調や気になる箇所、目標など..."
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white resize-none overflow-hidden"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white resize-none overflow-hidden"
         />
       </div>
 
@@ -374,7 +374,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
           onChange={handleChange}
           rows={3}
           placeholder="可動域やアライメントなど、フィジカルチェックの所見..."
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white resize-none"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white resize-none"
         />
       </div>
 
@@ -389,7 +389,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
           onChange={handleChange}
           rows={3}
           placeholder="施術・ケアとして実施した内容..."
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white resize-none"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white resize-none"
         />
       </div>
 
@@ -405,7 +405,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
           onChange={handleChange}
           rows={15}
           placeholder="実施したメニュー、セット数、重量、フォームのポイントなど..."
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white resize-none overflow-hidden"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white resize-none overflow-hidden"
         />
       </div>
 
@@ -418,7 +418,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
           onChange={handleChange}
           rows={3}
           placeholder="今日のセッション全体の評価、次回へのメモなど..."
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white resize-none"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white resize-none"
         />
       </div>
 
@@ -489,7 +489,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-200 hover:border-[#dbbd57] flex items-center justify-center text-gray-300 hover:text-[#c9a227] transition-colors shrink-0"
+              className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-200 hover:border-[#3e8a88] flex items-center justify-center text-gray-300 hover:text-[#2c6462] transition-colors shrink-0"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
@@ -503,7 +503,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-gray-200 hover:border-[#dbbd57] rounded-lg py-4 flex flex-col items-center gap-1.5 text-gray-400 hover:text-[#c9a227] transition-colors"
+            className="border-2 border-dashed border-gray-200 hover:border-[#3e8a88] rounded-lg py-4 flex flex-col items-center gap-1.5 text-gray-400 hover:text-[#2c6462] transition-colors"
           >
             <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -536,7 +536,7 @@ export default function KarteForm({ playerId, playerName, initialTags, initialTr
         <button
           type="submit"
           disabled={saving}
-          className={`${isEditing ? "flex-1" : "w-full"} bg-[#10254a] hover:bg-[#0a1930] active:bg-[#071224] disabled:bg-[#dbbd57] text-white font-semibold py-3 rounded-lg transition-colors text-sm shadow-sm flex items-center justify-center gap-2`}
+          className={`${isEditing ? "flex-1" : "w-full"} bg-[#3e8a88] hover:bg-[#2c6462] active:bg-[#1f4443] disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition-colors text-sm shadow-sm flex items-center justify-center gap-2`}
         >
           {saving && (
             <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

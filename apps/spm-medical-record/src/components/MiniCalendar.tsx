@@ -82,7 +82,7 @@ export default function MiniCalendar({
         {DAY_NAMES.map((d, i) => (
           <div
             key={d}
-            className={`text-center text-[10px] font-medium py-0.5 ${i === 0 ? "text-red-400" : i === 6 ? "text-[#c9a227]" : "text-gray-400"}`}
+            className={`text-center text-[10px] font-medium py-0.5 ${i === 0 ? "text-red-400" : i === 6 ? "text-[#2c6462]" : "text-gray-400"}`}
           >
             {d}
           </div>
@@ -105,7 +105,7 @@ export default function MiniCalendar({
           const textColor = col === 0
             ? "text-red-400"
             : col === 6
-            ? "text-[#8a6d1f]"
+            ? "text-[#2c6462]"
             : hasActivity
             ? "text-gray-700"
             : "text-gray-300";
@@ -118,13 +118,13 @@ export default function MiniCalendar({
               className={`
                 flex flex-col items-center pt-1 pb-1 px-0.5 w-full rounded transition-colors min-h-[2.75rem]
                 ${hasActivity ? "hover:bg-gray-100 cursor-pointer" : "cursor-default"}
-                ${isToday ? "ring-1 ring-[#c9a227]" : ""}
+                ${isToday ? "ring-1 ring-[#2c6462]" : ""}
               `}
             >
               <span className={`text-[11px] font-medium leading-none mb-0.5 ${textColor}`}>{day}</span>
 
               {hasKarte && (
-                <span className="text-[7px] font-bold text-center px-0.5 py-0.5 rounded leading-none w-full truncate mb-0.5 bg-[#f4e6bd] text-[#10254a]">
+                <span className="text-[7px] font-bold text-center px-0.5 py-0.5 rounded leading-none w-full truncate mb-0.5 bg-[#eaf5f4] text-[#3e8a88]">
                   パーソナル
                 </span>
               )}

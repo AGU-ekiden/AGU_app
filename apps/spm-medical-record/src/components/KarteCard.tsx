@@ -46,7 +46,7 @@ export default function KarteCard({ record, index, onCopyTags, onCopyTrainingCon
     <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="bg-[#f4e6bd] text-[#0a1930] text-xs font-bold px-2 py-0.5 rounded-full">
+          <span className="bg-[#eaf5f4] text-[#2c6462] text-xs font-bold px-2 py-0.5 rounded-full">
             #{index + 1}
           </span>
           <span className="text-xs text-gray-400">
@@ -56,7 +56,7 @@ export default function KarteCard({ record, index, onCopyTags, onCopyTrainingCon
         {onEdit && (
           <button
             onClick={() => onEdit(record)}
-            className="text-gray-400 hover:text-[#10254a] p-1 -m-1 transition-colors"
+            className="text-gray-400 hover:text-[#3e8a88] p-1 -m-1 transition-colors"
             aria-label="編集"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +94,7 @@ export default function KarteCard({ record, index, onCopyTags, onCopyTrainingCon
                 className={`text-[10px] font-semibold px-1.5 py-0.5 rounded transition-colors ${
                   copiedTags
                     ? "bg-green-100 text-green-600"
-                    : "bg-gray-100 text-gray-400 hover:bg-[#fdf8ec] hover:text-[#8a6d1f]"
+                    : "bg-gray-100 text-gray-400 hover:bg-[#f2f8f7] hover:text-[#2c6462]"
                 }`}
               >
                 {copiedTags ? "✓ コピー済" : "コピー"}
@@ -105,7 +105,7 @@ export default function KarteCard({ record, index, onCopyTags, onCopyTrainingCon
             {record.tags.map((tag) => (
               <span
                 key={tag}
-                className="text-[10px] bg-[#fdf8ec] text-[#10254a] px-2 py-0.5 rounded-full font-medium border border-[#f4e6bd]"
+                className="text-[10px] bg-[#f2f8f7] text-[#3e8a88] px-2 py-0.5 rounded-full font-medium border border-[#eaf5f4]"
               >
                 {tag}
               </span>
@@ -129,7 +129,7 @@ export default function KarteCard({ record, index, onCopyTags, onCopyTrainingCon
           {record.trainingContent ? (
             <>
               <div className="flex items-center gap-1.5 mb-0.5">
-                <p className="text-xs font-semibold text-[#8a6d1f]">トレーニング内容</p>
+                <p className="text-xs font-semibold text-[#2c6462]">トレーニング内容</p>
                 {onCopyTrainingContent && (
                   <button
                     type="button"
@@ -137,7 +137,7 @@ export default function KarteCard({ record, index, onCopyTags, onCopyTrainingCon
                     className={`text-[10px] font-semibold px-1.5 py-0.5 rounded transition-colors ${
                       copiedContent
                         ? "bg-green-100 text-green-600"
-                        : "bg-gray-100 text-gray-400 hover:bg-[#fdf8ec] hover:text-[#8a6d1f]"
+                        : "bg-gray-100 text-gray-400 hover:bg-[#f2f8f7] hover:text-[#2c6462]"
                     }`}
                   >
                     {copiedContent ? "✓ コピー済" : "コピー"}

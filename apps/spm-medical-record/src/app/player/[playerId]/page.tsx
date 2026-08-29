@@ -24,13 +24,13 @@ function Spinner() {
 
 const FLAG_COLORS: Record<string, string> = {
   PB: "bg-red-100 text-red-600 border-red-200",
-  SB: "bg-[#f4e6bd] text-[#10254a] border-[#e9d38f]",
+  SB: "bg-[#eaf5f4] text-[#3e8a88] border-[#a9d6d3]",
   "優勝": "bg-yellow-100 text-yellow-700 border-yellow-200",
   "入賞": "bg-orange-100 text-orange-600 border-orange-200",
   "準優勝": "bg-gray-100 text-gray-600 border-gray-200",
   "決勝進出": "bg-red-100 text-red-600 border-red-200",
   "区間賞": "bg-pink-100 text-pink-600 border-pink-200",
-  "青学記録": "bg-[#f4e6bd] text-[#0a1930] border-[#e9d38f]",
+  "青学記録": "bg-[#eaf5f4] text-[#2c6462] border-[#a9d6d3]",
   "初レース": "bg-pink-100 text-pink-500 border-pink-200",
   "大会新": "bg-orange-100 text-orange-700 border-orange-200",
 };
@@ -216,7 +216,7 @@ export default function KarteRecordPage() {
   ) : historyError ? (
     <div className="flex flex-col items-center gap-2 py-8">
       <p className="text-sm text-red-400">{historyError}</p>
-      <button onClick={fetchRecords} className="text-xs text-[#8a6d1f] underline">再試行</button>
+      <button onClick={fetchRecords} className="text-xs text-[#2c6462] underline">再試行</button>
     </div>
   ) : allItems.length === 0 ? (
     <div className="flex flex-col items-center justify-center h-32 text-gray-300 gap-3">
@@ -261,7 +261,7 @@ export default function KarteRecordPage() {
       <button
         onClick={() => setHistoryView("compare")}
         className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1.5 ${
-          historyView === "compare" ? "bg-white text-[#10254a] shadow-sm" : "text-gray-400 hover:text-gray-600"
+          historyView === "compare" ? "bg-white text-[#3e8a88] shadow-sm" : "text-gray-400 hover:text-gray-600"
         }`}
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -272,7 +272,7 @@ export default function KarteRecordPage() {
       <button
         onClick={() => setHistoryView("list")}
         className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1.5 ${
-          historyView === "list" ? "bg-white text-[#10254a] shadow-sm" : "text-gray-400 hover:text-gray-600"
+          historyView === "list" ? "bg-white text-[#3e8a88] shadow-sm" : "text-gray-400 hover:text-gray-600"
         }`}
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -297,7 +297,7 @@ export default function KarteRecordPage() {
       ) : historyError ? (
         <div className="flex flex-col items-center gap-2 py-8">
           <p className="text-sm text-red-400">{historyError}</p>
-          <button onClick={fetchRecords} className="text-xs text-[#8a6d1f] underline">再試行</button>
+          <button onClick={fetchRecords} className="text-xs text-[#2c6462] underline">再試行</button>
         </div>
       ) : (
         <div className="flex-1 min-h-0">
@@ -332,7 +332,7 @@ export default function KarteRecordPage() {
       <button
         onClick={() => setFormTab("karte")}
         className={`flex-1 py-2 text-xs font-semibold transition-colors border-b-2 ${
-          formTab === "karte" ? "border-[#10254a] text-[#10254a]" : "border-transparent text-gray-400"
+          formTab === "karte" ? "border-[#3e8a88] text-[#3e8a88]" : "border-transparent text-gray-400"
         }`}
       >
         新規カルテ
@@ -363,12 +363,12 @@ export default function KarteRecordPage() {
   return (
     <div className="h-screen overflow-hidden bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shadow-sm">
-        <div className="bg-[#10254a] text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0">S</div>
+        <div className="bg-[#3e8a88] text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0">S</div>
         <div className="flex items-center gap-1.5 text-xs text-gray-400 min-w-0">
           {player?.category === "OBOG" ? (
-            <Link href="/obog" className="hover:text-[#8a6d1f] transition-colors shrink-0">OB・OG</Link>
+            <Link href="/obog" className="hover:text-[#2c6462] transition-colors shrink-0">OB・OG</Link>
           ) : (
-            <Link href="/" className="hover:text-[#8a6d1f] transition-colors shrink-0">選手一覧</Link>
+            <Link href="/" className="hover:text-[#2c6462] transition-colors shrink-0">選手一覧</Link>
           )}
           <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -388,7 +388,7 @@ export default function KarteRecordPage() {
         <button
           onClick={() => setActiveTab("form")}
           className={`flex-1 py-3 text-sm font-semibold transition-colors border-b-2 ${
-            activeTab === "form" ? "border-[#10254a] text-[#10254a]" : "border-transparent text-gray-400"
+            activeTab === "form" ? "border-[#3e8a88] text-[#3e8a88]" : "border-transparent text-gray-400"
           }`}
         >
           新規カルテ
@@ -396,13 +396,13 @@ export default function KarteRecordPage() {
         <button
           onClick={() => setActiveTab("history")}
           className={`flex-1 py-3 text-sm font-semibold transition-colors border-b-2 flex items-center justify-center gap-1.5 ${
-            activeTab === "history" ? "border-[#10254a] text-[#10254a]" : "border-transparent text-gray-400"
+            activeTab === "history" ? "border-[#3e8a88] text-[#3e8a88]" : "border-transparent text-gray-400"
           }`}
         >
           記録
           {allItems.length > 0 && (
             <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
-              activeTab === "history" ? "bg-[#f4e6bd] text-[#10254a]" : "bg-gray-100 text-gray-400"
+              activeTab === "history" ? "bg-[#eaf5f4] text-[#3e8a88]" : "bg-gray-100 text-gray-400"
             }`}>
               {allItems.length}
             </span>
@@ -486,7 +486,7 @@ export default function KarteRecordPage() {
                   </span>
                 )}
                 {records.length > 0 && (
-                  <span className="bg-[#f4e6bd] text-[#10254a] text-xs font-semibold px-2 py-0.5 rounded-full">
+                  <span className="bg-[#eaf5f4] text-[#3e8a88] text-xs font-semibold px-2 py-0.5 rounded-full">
                     カルテ {records.length}件
                   </span>
                 )}

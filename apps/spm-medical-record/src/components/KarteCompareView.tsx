@@ -30,7 +30,7 @@ const FIELD_ROWS: FieldRow[] = [
   { key: "chiefComplaint", label: "主訴", labelClass: "text-orange-500" },
   { key: "physicalCheck", label: "状態（フィジカルチェック）", labelClass: "text-purple-500" },
   { key: "procedureContent", label: "実施内容", labelClass: "text-teal-500" },
-  { key: "trainingContent", label: "トレーニング内容", labelClass: "text-[#8a6d1f]" },
+  { key: "trainingContent", label: "トレーニング内容", labelClass: "text-[#2c6462]" },
   { key: "memo", label: "memo", labelClass: "text-green-500" },
 ];
 
@@ -42,7 +42,7 @@ function CopyButton({ copied, onClick }: { copied: boolean; onClick: () => void 
       className={`text-[10px] font-semibold px-1.5 py-0.5 rounded transition-colors shrink-0 ${
         copied
           ? "bg-green-100 text-green-600"
-          : "bg-gray-100 text-gray-400 hover:bg-[#fdf8ec] hover:text-[#8a6d1f]"
+          : "bg-gray-100 text-gray-400 hover:bg-[#f2f8f7] hover:text-[#2c6462]"
       }`}
     >
       {copied ? "✓" : "コピー"}
@@ -106,22 +106,22 @@ export default function KarteCompareView({ records, onCopyTags, onCopyTrainingCo
             key={record.id}
             data-anchor-id={`karte-${record.id}`}
             className={`sticky top-0 z-20 border-b border-gray-200 px-3 py-2 ${
-              i === 0 ? "bg-[#fdf8ec]/95" : "bg-gray-50/95"
+              i === 0 ? "bg-[#f2f8f7]/95" : "bg-gray-50/95"
             } ${i < records.length - 1 ? "border-r border-r-gray-100" : ""} backdrop-blur-sm`}
           >
             <div className="flex items-center justify-between gap-1.5">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className={`text-xs font-bold ${i === 0 ? "text-[#0a1930]" : "text-gray-700"}`}>
+                <span className={`text-xs font-bold ${i === 0 ? "text-[#2c6462]" : "text-gray-700"}`}>
                   {formatDate(record.createdAt)}
                 </span>
                 {i === 0 && (
-                  <span className="bg-[#10254a] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">最新</span>
+                  <span className="bg-[#3e8a88] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">最新</span>
                 )}
               </div>
               {onEdit && (
                 <button
                   onClick={() => onEdit(record)}
-                  className="text-gray-400 hover:text-[#10254a] p-0.5 -m-0.5 transition-colors shrink-0"
+                  className="text-gray-400 hover:text-[#3e8a88] p-0.5 -m-0.5 transition-colors shrink-0"
                   aria-label="編集"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,7 +143,7 @@ export default function KarteCompareView({ records, onCopyTags, onCopyTrainingCo
             {record.tags && record.tags.length > 0 && (
               <div className="flex items-center gap-1 flex-wrap mt-1">
                 {record.tags.map((tag) => (
-                  <span key={tag} className="text-[10px] bg-[#fdf8ec] text-[#10254a] px-1.5 py-0.5 rounded-full font-medium border border-[#f4e6bd]">
+                  <span key={tag} className="text-[10px] bg-[#f2f8f7] text-[#3e8a88] px-1.5 py-0.5 rounded-full font-medium border border-[#eaf5f4]">
                     {tag}
                   </span>
                 ))}
@@ -173,7 +173,7 @@ export default function KarteCompareView({ records, onCopyTags, onCopyTrainingCo
                 <div
                   key={record.id}
                   className={`border-b border-gray-100 px-3 py-2 align-top ${
-                    i === 0 ? "bg-[#fdf8ec]/30" : ""
+                    i === 0 ? "bg-[#f2f8f7]/30" : ""
                   } ${i < records.length - 1 ? "border-r border-r-gray-100" : ""}`}
                 >
                   {value ? (
@@ -216,7 +216,7 @@ export default function KarteCompareView({ records, onCopyTags, onCopyTrainingCo
               <div
                 key={record.id}
                 className={`border-b border-gray-100 px-3 py-2 ${
-                  i === 0 ? "bg-[#fdf8ec]/30" : ""
+                  i === 0 ? "bg-[#f2f8f7]/30" : ""
                 } ${i < records.length - 1 ? "border-r border-r-gray-100" : ""}`}
               >
                 {record.mediaUrls && record.mediaUrls.length > 0 ? (

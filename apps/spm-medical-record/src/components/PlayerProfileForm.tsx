@@ -93,7 +93,7 @@ export default function PlayerProfileForm({ playerId, playerName }: PlayerProfil
     return (
       <div className="flex flex-col items-center gap-2 py-12">
         <p className="text-sm text-red-400">プロフィールの読み込みに失敗しました</p>
-        <button onClick={loadProfile} className="text-xs text-[#8a6d1f] underline">再試行</button>
+        <button onClick={loadProfile} className="text-xs text-[#2c6462] underline">再試行</button>
       </div>
     );
   }
@@ -113,7 +113,7 @@ export default function PlayerProfileForm({ playerId, playerName }: PlayerProfil
           onChange={(e) => setExistingConditions(e.target.value)}
           rows={5}
           placeholder="過去の怪我、手術歴、慢性疾患など..."
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white resize-none"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white resize-none"
         />
       </div>
 
@@ -124,14 +124,14 @@ export default function PlayerProfileForm({ playerId, playerName }: PlayerProfil
           onChange={(e) => setMedications(e.target.value)}
           rows={5}
           placeholder="現在服用中の薬、サプリメントなど..."
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dbbd57] focus:border-transparent bg-white resize-none"
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3e8a88] focus:border-transparent bg-white resize-none"
         />
       </div>
 
       <button
         type="submit"
         disabled={saving}
-        className="mt-auto bg-[#10254a] hover:bg-[#0a1930] active:bg-[#071224] disabled:bg-[#dbbd57] text-white font-semibold py-3 rounded-lg transition-colors text-sm shadow-sm flex items-center justify-center gap-2"
+        className="mt-auto bg-[#3e8a88] hover:bg-[#2c6462] active:bg-[#1f4443] disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition-colors text-sm shadow-sm flex items-center justify-center gap-2"
       >
         {saving && (
           <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

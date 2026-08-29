@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0D0D0D",
+  themeColor: "#3e8a88",
 };
 
 export default function RootLayout({
@@ -40,7 +40,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <a
           href="/"
-          className="fixed top-2 left-2 z-50 inline-flex items-center rounded-md bg-[#c9a227] px-2 py-1 text-xs font-bold text-[#10254a] shadow-sm hover:bg-[#dbbd57]"
+          className="fixed top-2 left-2 z-50 inline-flex items-center rounded-md bg-[#3e8a88] px-2 py-1 text-xs font-bold text-white shadow-sm hover:bg-[#2c6462]"
         >
           ← ポータル
         </a>
