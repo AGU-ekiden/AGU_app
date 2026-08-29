@@ -55,6 +55,11 @@ html, body {
   gap: 16px;
   min-height: 100vh;
 }
+/* 点呼タブは「固定」ボタン自体を表示しないので、そのための上部余白は
+   不要(他のタブと同じ通常のパディングに詰める)。 */
+.app.no-lock-padding {
+  padding-top: 16px;
+}
 
 .stopwatch-list {
   display: flex;

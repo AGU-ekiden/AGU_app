@@ -123,6 +123,9 @@ function selectTab(tabName) {
     el.lockToggleBtn.classList.remove('is-locked');
     el.lockToggleBtn.textContent = '固定';
   }
+  // 「固定」ボタンが無い点呼タブでは、そのボタン用に空けていた上部余白も
+  // 詰める(他のタブはボタンとの重なり防止のため余白を残す)。
+  document.querySelector('.app').classList.toggle('no-lock-padding', isRollcallTab);
   return true;
 }
 
