@@ -3250,9 +3250,13 @@ async function uploadRollcallRosterToServer() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(rollcallRosterPayload()),
     });
-    return res.ok;
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      return { ok: false, error: body.error || `サーバーエラー(status ${res.status})` };
+    }
+    return { ok: true };
   } catch {
-    return false; // オフライン等 — この端末には保存済みなのでそのまま続行
+    return { ok: false, error: 'サーバーに接続できませんでした(オフライン等)' }; // この端末には保存済みなのでそのまま続行
   }
 }
 
@@ -3278,8 +3282,9 @@ async function deleteRollcallTag(name) {
   saveRollcallMembers();
   renderRollcallList();
   renderRollcallRegisterView();
-  if (!(await uploadRollcallRosterToServer())) {
-    alert('チームへの共有に失敗しました(この端末には保存されています)。');
+  const shareResult = await uploadRollcallRosterToServer();
+  if (!shareResult.ok) {
+    alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
   }
 }
 
@@ -3289,8 +3294,9 @@ async function setRollcallTagShowBadge(name, showBadge) {
   tag.showBadge = showBadge;
   saveRollcallTags();
   renderRollcallList();
-  if (!(await uploadRollcallRosterToServer())) {
-    alert('チームへの共有に失敗しました(この端末には保存されています)。');
+  const shareResult = await uploadRollcallRosterToServer();
+  if (!shareResult.ok) {
+    alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
   }
 }
 
@@ -3370,8 +3376,9 @@ el.rollcallNewTagBtn.addEventListener('click', async () => {
   renderTagFilterOptions(el.rollcallTagFilter);
   renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
   renderRollcallList();
-  if (!(await uploadRollcallRosterToServer())) {
-    alert('チームへの共有に失敗しました(この端末には保存されています)。');
+  const shareResult = await uploadRollcallRosterToServer();
+  if (!shareResult.ok) {
+    alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
   }
 });
 
@@ -3563,8 +3570,8 @@ el.rollcallRegisterCloseBtn.addEventListener('click', () => setRollcallRegisterM
 // 端末が今持っている名簿をそのままチームに共有し直したい」場合(他の
 // 端末がまだ古い名簿のままの時など)のための手動ボタン。
 el.rollcallShareBtn.addEventListener('click', async () => {
-  const ok = await uploadRollcallRosterToServer();
-  alert(ok ? 'この端末の名簿をチームに共有しました。' : 'チームへの共有に失敗しました。');
+  const shareResult = await uploadRollcallRosterToServer();
+  alert(shareResult.ok ? 'この端末の名簿をチームに共有しました。' : `チームへの共有に失敗しました: ${shareResult.error}`);
 });
 
 // 選手(部員DB由来)は氏名・学年を点呼アプリ側から編集できない
@@ -3630,8 +3637,9 @@ function buildRollcallRegisterRow(member) {
     saveRollcallMembers();
     renderRollcallRegisterView();
     renderRollcallList();
-    if (!(await uploadRollcallRosterToServer())) {
-      alert('チームへの共有に失敗しました(この端末には保存されています)。');
+    const shareResult = await uploadRollcallRosterToServer();
+    if (!shareResult.ok) {
+      alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
     }
   });
   deleteBtn.addEventListener('click', async () => {
@@ -3646,8 +3654,9 @@ function buildRollcallRegisterRow(member) {
     saveRollcallMembers();
     renderRollcallRegisterView();
     renderRollcallList();
-    if (!(await uploadRollcallRosterToServer())) {
-      alert('チームへの共有に失敗しました(この端末には保存されています)。');
+    const shareResult = await uploadRollcallRosterToServer();
+    if (!shareResult.ok) {
+      alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
     }
   });
 
@@ -3703,8 +3712,9 @@ el.rollcallAddBtn.addEventListener('click', async () => {
   renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
   renderRollcallRegisterView();
   renderRollcallList();
-  if (!(await uploadRollcallRosterToServer())) {
-    alert('チームへの共有に失敗しました(この端末には保存されています)。');
+  const shareResult = await uploadRollcallRosterToServer();
+  if (!shareResult.ok) {
+    alert(`チームへの共有に失敗しました(この端末には保存されています): ${shareResult.error}`);
   }
 });
 
