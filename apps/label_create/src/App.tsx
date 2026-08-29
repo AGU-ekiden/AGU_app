@@ -45,8 +45,8 @@ export default function App() {
             position: 'absolute', top: 16, right: 28,
             display: 'inline-flex', alignItems: 'center',
             height: 28, padding: '0 10px', borderRadius: 8,
-            background: '#c9a227',
-            color: '#10254a', fontSize: 12, fontWeight: 700, textDecoration: 'none',
+            background: 'var(--primary-light)',
+            color: 'var(--primary-dark)', fontSize: 12, fontWeight: 700, textDecoration: 'none',
           }}
         >
           ← ポータル

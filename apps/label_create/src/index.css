@@ -1,6 +1,9 @@
 :root {
   color-scheme: light;
   font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
+  --primary: #3e8a88;
+  --primary-dark: #2c6462;
+  --primary-light: #eaf5f4;
 }
 
 * {
