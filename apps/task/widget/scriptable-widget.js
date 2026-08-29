@@ -24,7 +24,7 @@ const TOKEN   = 'jaoagpagauzify7aouw';
 // タップで開くアプリ（Vercel）のURL
 const APP_URL = 'https://task-git-main-itoaogakus-projects.vercel.app';
 // アクセントカラー（アプリと同じ緑）
-const ACCENT  = '#068c89';
+const ACCENT  = '#3e8a88';
 // 何分ごとに更新を試みるか
 const REFRESH_MINUTES = 30;
 
