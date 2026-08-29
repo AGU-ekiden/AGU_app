@@ -1,18 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
 
 :root {
-  --navy: #10254a;
-  --navy-dark: #0a1930;
-  --header-teal: #068c89;
-  --gold: #c9a227;
-  --gold-light: #f4e6bd;
+  --primary: #3e8a88;
+  --primary-dark: #2c6462;
+  --primary-light: #eaf5f4;
   --text: #1a1a1a;
-  --text-sub: #666;
-  --text-hint: #999;
-  --border: rgba(0,0,0,0.1);
-  --bg: #f5f5f3;
+  --text-sub: #5c706f;
+  --text-hint: #8fa19f;
+  --border: rgba(62,138,136,0.18);
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f0f0ee;
+  --surface-2: #f2f8f7;
   --radius: 14px;
   --radius-lg: 18px;
 }
@@ -32,7 +30,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--header-teal);
+  background: var(--primary);
   color: #fff;
   box-shadow: 0 2px 12px rgba(0,0,0,0.15);
 }
@@ -58,7 +56,7 @@ body {
   font-weight: 900;
   font-size: 1.4rem;
   letter-spacing: 0.04em;
-  color: var(--gold);
+  color: var(--primary);
 }
 
 .brand-sub {
@@ -79,7 +77,7 @@ body {
 .nav-current {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--primary);
   margin-right: 0.3rem;
 }
 
@@ -97,7 +95,7 @@ body {
 
 .nav-btn:hover, .nav-btn:focus-visible {
   background: rgba(255,255,255,0.2);
-  border-color: var(--gold);
+  border-color: var(--primary);
 }
 
 /* Main */
@@ -140,7 +138,7 @@ body {
 .card:hover, .card:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(16, 37, 74, 0.1);
-  border-color: var(--gold);
+  border-color: var(--primary);
 }
 
 .card-top {
@@ -187,8 +185,8 @@ body {
 }
 
 .card-status.live {
-  background: var(--gold-light);
-  color: #8a6d00;
+  background: var(--primary-light);
+  color: #1f5654;
 }
 
 .card-status.guess {
@@ -267,7 +265,7 @@ body {
 }
 
 .field input:focus {
-  border-color: var(--gold);
+  border-color: var(--primary);
   background: var(--surface);
 }
 
@@ -285,7 +283,7 @@ body {
   font-size: 0.95rem;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   border: none;
   border-radius: 999px;
   padding: 0.75rem 1rem;
@@ -321,7 +319,7 @@ body {
 .feature-item:not(.is-disabled):focus-visible {
   transform: translateX(3px);
   box-shadow: 0 6px 16px rgba(16, 37, 74, 0.08);
-  border-color: var(--gold);
+  border-color: var(--primary);
 }
 
 .feature-item.is-disabled {
@@ -350,7 +348,7 @@ body {
   border-radius: 999px;
 }
 
-.feature-status.live { background: var(--gold-light); color: #8a6d00; }
+.feature-status.live { background: var(--primary-light); color: #1f5654; }
 .feature-status.guess { background: #fde8d8; color: #a3540f; }
 .feature-status.repo { background: var(--surface-2); color: var(--text-sub); }
 .feature-status.pending { background: var(--surface-2); color: var(--text-hint); }
