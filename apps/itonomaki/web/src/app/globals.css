@@ -4,15 +4,15 @@
   --font-body: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans",
     "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", Meiryo,
     "Segoe UI", Roboto, sans-serif;
-  --bg: #fbfaf8;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f3f1ec;
-  --border: #e7e3da;
+  --surface-2: #f2f8f7;
+  --border: rgba(62, 138, 136, 0.18);
   --fg: #2b2a27;
   --fg-strong: #17160f;
   --muted: #8a8578;
-  --accent: #c9a227;
-  --accent-fg: #10254a;
+  --accent: #3e8a88;
+  --accent-fg: #ffffff;
   --code-bg: #efece3;
   --code-fg: #4a4638;
   --shadow-color: 30 25 10;
@@ -32,8 +32,8 @@
   --fg: #eae7db;
   --fg-strong: #fbfaf5;
   --muted: #a4a08c;
-  --accent: #d9b64a;
-  --accent-fg: #0a1930;
+  --accent: #4fb0ad;
+  --accent-fg: #08201f;
   --code-bg: #2a2818;
   --code-fg: #d8d3bd;
   --shadow-color: 0 0 0;
@@ -54,8 +54,8 @@
     --fg: #eae7db;
     --fg-strong: #fbfaf5;
     --muted: #a4a08c;
-    --accent: #d9b64a;
-    --accent-fg: #0a1930;
+    --accent: #4fb0ad;
+    --accent-fg: #08201f;
     --code-bg: #2a2818;
     --code-fg: #d8d3bd;
     --shadow-color: 0 0 0;
@@ -160,13 +160,13 @@ body {
   :root {
     --bg: #ffffff;
     --surface: #ffffff;
-    --surface-2: #f3f1ec;
-    --border: #d8d3c5;
+    --surface-2: #f2f8f7;
+    --border: #dceaea;
     --fg: #2b2a27;
     --fg-strong: #17160f;
     --muted: #6b675a;
-    --accent: #c9a227;
-    --accent-fg: #10254a;
+    --accent: #3e8a88;
+    --accent-fg: #ffffff;
     --callout-info-bg: #f0fdfa;
     --callout-info-border: #99e6d9;
     --callout-info-fg: #042f2e;
