@@ -3407,18 +3407,14 @@ function buildRollcallMemberButton(member) {
 // 学年の欄(見出し+一覧)を1つ作って親要素に追加する。isSub は「その他
 // (一時的な参加者)」のように、同じ列の中で別の学年欄の下に続けて表示する
 // 小見出しかどうか。
-// 学年ごとの50音順(あ→ん)並び替え用。一時的な参加者(その他)は
-// 追加した順(sortIndex)のまま扱うため、こちらは学年欄でのみ使う。
-const rollcallNameCollator = new Intl.Collator('ja');
-
 function appendRollcallGroup(container, label, members, isSub) {
-  // 未点呼(checked=false)は、学年欄なら50音順、その他(一時的な参加者)
-  // なら追加した順を基準にしつつ、それぞれ上下を逆(ん→あ、追加が新しい
-  // 順)にして並べる。点呼済みは押した順に下に積み上がっていく(直近に
-  // 押した人ほど一番下)。
+  // 未点呼(checked=false)は、学年欄・その他(一時的な参加者)のどちらも
+  // 追加した順(sortIndex)を基準にしつつ、上下を逆(新しく追加された人が
+  // 上)にして並べる。50音順(近似)は表示が不自然だったため廃止した。
+  // 点呼済みは押した順に下に積み上がっていく(直近に押した人ほど一番下)。
   const unchecked = members
     .filter((m) => !m.checked)
-    .sort(isSub ? (a, b) => a.sortIndex - b.sortIndex : (a, b) => rollcallNameCollator.compare(a.name, b.name))
+    .sort((a, b) => a.sortIndex - b.sortIndex)
     .reverse();
   const checked = members
     .filter((m) => m.checked)
