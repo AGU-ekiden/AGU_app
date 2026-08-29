@@ -3022,10 +3022,10 @@ async function createRollcallTagOnServer(name) {
 
 async function updateRollcallTagBadgeOnServer(id, showBadge) {
   try {
-    const res = await fetch(`${ROLLCALL_TAGS_API_URL}/${encodeURIComponent(id)}`, {
+    const res = await fetch(ROLLCALL_TAGS_API_URL, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ showBadge }),
+      body: JSON.stringify({ id, showBadge }),
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
@@ -3037,7 +3037,7 @@ async function updateRollcallTagBadgeOnServer(id, showBadge) {
 
 async function deleteRollcallTagOnServer(id) {
   try {
-    const res = await fetch(`${ROLLCALL_TAGS_API_URL}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    const res = await fetch(`${ROLLCALL_TAGS_API_URL}?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
     return { ok: true };
@@ -3191,10 +3191,10 @@ async function createTempParticipantOnServer(name) {
 
 async function renameTempParticipantOnServer(id, name) {
   try {
-    const res = await fetch(`${ROLLCALL_TEMP_PARTICIPANTS_API_URL}/${encodeURIComponent(id)}`, {
+    const res = await fetch(ROLLCALL_TEMP_PARTICIPANTS_API_URL, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ id, name }),
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) return { ok: false, error: body.error || `サーバーエラー(${res.status})` };
@@ -3206,7 +3206,7 @@ async function renameTempParticipantOnServer(id, name) {
 
 async function deleteTempParticipantOnServer(id) {
   try {
-    const res = await fetch(`${ROLLCALL_TEMP_PARTICIPANTS_API_URL}/${encodeURIComponent(id)}`, {
+    const res = await fetch(`${ROLLCALL_TEMP_PARTICIPANTS_API_URL}?id=${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
     const body = await res.json().catch(() => ({}));
