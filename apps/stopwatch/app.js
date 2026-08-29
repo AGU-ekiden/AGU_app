@@ -3412,12 +3412,14 @@ function buildRollcallMemberButton(member) {
 const rollcallNameCollator = new Intl.Collator('ja');
 
 function appendRollcallGroup(container, label, members, isSub) {
-  // 未点呼(checked=false)は、学年欄なら50音順(あ→ん)、その他(一時的な
-  // 参加者)なら追加した順のまま上に並べる。点呼済みは押した順に下に
-  // 積み上がっていく(直近に押した人ほど一番下)。
+  // 未点呼(checked=false)は、学年欄なら50音順、その他(一時的な参加者)
+  // なら追加した順を基準にしつつ、それぞれ上下を逆(ん→あ、追加が新しい
+  // 順)にして並べる。点呼済みは押した順に下に積み上がっていく(直近に
+  // 押した人ほど一番下)。
   const unchecked = members
     .filter((m) => !m.checked)
-    .sort(isSub ? (a, b) => a.sortIndex - b.sortIndex : (a, b) => rollcallNameCollator.compare(a.name, b.name));
+    .sort(isSub ? (a, b) => a.sortIndex - b.sortIndex : (a, b) => rollcallNameCollator.compare(a.name, b.name))
+    .reverse();
   const checked = members
     .filter((m) => m.checked)
     .sort((a, b) => a.checkedSeq - b.checkedSeq);
