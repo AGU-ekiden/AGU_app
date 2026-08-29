@@ -73,6 +73,10 @@ async function findAthletes() {
       headers: notionHeaders(),
       body: JSON.stringify({
         filter: { property: CATEGORY_PROPERTY, select: { equals: '選手' } },
+        // ソート指定が無いとNotion側の順序がページ編集(タグの付け外し等)
+        // のたびに変わってしまう(last_edited_time相当で揺れる)ため、
+        // 「追加した順」を安定させるべく作成日時の昇順を明示する。
+        sorts: [{ timestamp: 'created_time', direction: 'ascending' }],
         page_size: 100,
         ...(cursor ? { start_cursor: cursor } : {}),
       }),
@@ -116,6 +120,9 @@ async function listTempParticipants() {
       method: 'POST',
       headers: notionHeaders(),
       body: JSON.stringify({
+        // 追加した順を安定させるため作成日時の昇順を明示する(理由は
+        // findAthletes と同じ)。
+        sorts: [{ timestamp: 'created_time', direction: 'ascending' }],
         page_size: 100,
         ...(cursor ? { start_cursor: cursor } : {}),
       }),

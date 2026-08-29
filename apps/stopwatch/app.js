@@ -3087,10 +3087,13 @@ function applyNotionAthleteRoster(athletes) {
   const byId = new Map(existingAthletes.map((m) => [m.id, m]));
   const byName = new Map(existingAthletes.map((m) => [m.name, m]));
 
-  const athleteMembers = valid.map((a) => {
+  // 部員DB側のクエリを作成日時の昇順で固定しているため、取得した配列の
+  // 並び順そのものが「追加した順」として安定している。sortIndexは毎回
+  // この並び順で上書きする(以前の(不安定だった頃の)値を引きずらない)。
+  const athleteMembers = valid.map((a, index) => {
     const existing = byId.get(a.id) || byName.get(a.name);
     const tags = Array.isArray(a.tags) ? a.tags : [];
-    if (existing) return { ...existing, id: a.id, name: a.name, grade: a.grade, isTemp: false, tags };
+    if (existing) return { ...existing, id: a.id, name: a.name, grade: a.grade, isTemp: false, tags, sortIndex: index };
     return {
       id: a.id,
       name: a.name,
@@ -3099,7 +3102,7 @@ function applyNotionAthleteRoster(athletes) {
       tags,
       checked: false,
       checkedSeq: 0,
-      sortIndex: rollcallNextSortIndex++,
+      sortIndex: index,
     };
   });
 
@@ -3135,10 +3138,12 @@ function applyTempParticipantsRoster(participants) {
   const existingTemp = rollcallMembers.filter((m) => m.isTemp);
   const byId = new Map(existingTemp.map((m) => [m.id, m]));
 
-  const tempMembers = valid.map((p) => {
+  // 一時参加者DB側のクエリも作成日時の昇順で固定しているため、
+  // sortIndexは毎回この並び順で上書きする(理由はathleteMembersと同じ)。
+  const tempMembers = valid.map((p, index) => {
     const existing = byId.get(p.id);
     const tags = Array.isArray(p.tags) ? p.tags : [];
-    if (existing) return { ...existing, name: p.name, tags };
+    if (existing) return { ...existing, name: p.name, tags, sortIndex: index };
     return {
       id: p.id,
       name: p.name,
@@ -3147,7 +3152,7 @@ function applyTempParticipantsRoster(participants) {
       tags,
       checked: false,
       checkedSeq: 0,
-      sortIndex: rollcallNextSortIndex++,
+      sortIndex: index,
     };
   });
 
