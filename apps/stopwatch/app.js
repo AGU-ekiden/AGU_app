@@ -3620,8 +3620,10 @@ function buildRollcallRegisterRow(member) {
 
 // 「その他(一時的な参加者)」が4年のすぐ下に来るよう、実際の学年(4〜1)の
 // 次に位置する仮想の並び順キーを割り当てる。
+// 4年→3年→2年→1年の順に並べ、一時的な参加者(その他)は学年の数値より
+// 小さい値にしておくことで、必ず1年の後(一番最後)に来るようにする。
 function registerSortKey(member) {
-  return member.isTemp ? 3.5 : member.grade;
+  return member.isTemp ? 0 : member.grade;
 }
 
 function renderRollcallRegisterView() {
