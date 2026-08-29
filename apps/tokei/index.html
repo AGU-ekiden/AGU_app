@@ -20,52 +20,52 @@
   }
 
   :root {
-    /* ---- Device body (the black plastic case) ---- */
-    --bg-page: #16181b;
-    --bg-card: #24272c;
-    --key-face: #33373e;      /* button face */
-    --sub-body: #1b2733;      /* sub case: cool slate vs the main's neutral charcoal */
-    --sub-body-hi: #223140;
-    --sub-border: #37506a;
-    --key-face-hi: #3d424a;   /* button pressed/hover */
-    --border: #3a3f47;
-    --edge: #101216;
+    /* ---- Device body (brand green + white, matching the portal) ---- */
+    --bg-page: #ffffff;
+    --bg-card: #ffffff;
+    --key-face: #eaf5f4;      /* button face */
+    --sub-body: #f2f8f7;      /* sub case: light green-tinted panel */
+    --sub-body-hi: #dcefed;
+    --sub-border: rgba(62, 138, 136, 0.35);
+    --key-face-hi: #dcefed;   /* button pressed/hover */
+    --border: rgba(62, 138, 136, 0.18);
+    --edge: #eaf5f4;
 
     /* ---- Legends printed on the case ---- */
-    --text-0: #eef1f5;
-    --text-1: #a7aeb8;
-    --text-2: #767d87;
+    --text-0: #1a1a1a;
+    --text-1: #5c706f;
+    --text-2: #8fa19f;
 
     /* ---- LCD panel ---- */
-    --lcd-bg: #b9c5aa;
-    --lcd-bg-2: #a9b79a;
-    --lcd-border: #6f7c66;
-    --lcd-ink: #171f18;
-    --lcd-faint: #4a5a49;
-    --lcd-ghost: rgba(23, 31, 24, 0.11);
+    --lcd-bg: #d7efec;
+    --lcd-bg-2: #c2e5e1;
+    --lcd-border: #8fc9c5;
+    --lcd-ink: #163f3d;
+    --lcd-faint: #5c8f8c;
+    --lcd-ghost: rgba(22, 63, 61, 0.12);
 
     /* ---- Accents: colored legends on neutral keys ---- */
-    --green: #4ade80;
+    --green: #3e8a88;
     --green-bg: var(--key-face);
-    --green-border: #2f6b45;
-    --red: #ff6b6f;
+    --green-border: #2c6462;
+    --red: #7a3033;
     --red-bg: var(--key-face);
-    --red-border: #7a3033;
-    --blue: #7ab5ff;
+    --red-border: #d9534f;
+    --blue: #2f5183;
     --blue-bg: var(--key-face);
-    --blue-border: #2f5183;
-    --amber: #ffb454;
+    --blue-border: #6ea8dc;
+    --amber: #7d5622;
     --amber-bg: var(--key-face);
-    --amber-border: #7d5622;
-    --purple: #b78cff;
+    --amber-border: #e0a458;
+    --purple: #4d3a80;
     --purple-bg: var(--key-face);
-    --purple-border: #4d3a80;
-    --pink: #ff8ac0;
+    --purple-border: #a98fe0;
+    --pink: #7d3a5e;
     --pink-bg: var(--key-face);
-    --pink-border: #7d3a5e;
-    --teal: #4fd6c4;
+    --pink-border: #e0a0c0;
+    --teal: #2a6d66;
     --teal-bg: var(--key-face);
-    --teal-border: #2a6d66;
+    --teal-border: #7ecac2;
 
     --blue-wash: #1c2330;
     --amber-wash: #2c2517;
@@ -345,7 +345,7 @@
     background: linear-gradient(180deg, var(--lcd-bg) 0%, var(--lcd-bg-2) 100%);
     color: var(--lcd-ink);
     border: 1px solid var(--lcd-border);
-    border-top-color: #5c6854;
+    border-top-color: #6fa8a3;
     border-radius: 7px;
     padding: 9px 4px 7px;
     box-shadow: inset 0 2px 6px rgba(18, 26, 18, 0.45);
@@ -529,7 +529,7 @@
   .lock-btn.locked {
     background: var(--red);
     border-color: var(--red);
-    color: #1a0e0f;
+    color: #fff;
   }
 
   .lock-overlay {
@@ -560,9 +560,9 @@
        bounces straight back and they cannot be reached at all. */
     min-width: 0;
     scroll-snap-align: center;
-    background: linear-gradient(180deg, #2b2f35 0%, var(--bg-card) 55%);
+    background: linear-gradient(180deg, #f2f8f7 0%, var(--bg-card) 55%);
     border: 1px solid var(--border);
-    border-top-color: #454b54;
+    border-top-color: #cfe8e5;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 4px 7px 6px;
@@ -577,7 +577,7 @@
   .sw-card.sub {
     background: linear-gradient(180deg, var(--sub-body-hi) 0%, var(--sub-body) 55%);
     border-color: var(--sub-border);
-    border-top-color: #4a6584;
+    border-top-color: #8fc9c5;
   }
   .sw-card.sub.running { border-color: var(--green-border); }
 
@@ -591,17 +591,17 @@
     padding: 2px 6px;
     border-radius: 5px;
     color: var(--text-2);
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(44, 100, 98, 0.06);
     border: 1px solid var(--border);
   }
   .sw-card.sub .sw-kind {
-    color: #8fc4ff;
+    color: #2f5183;
     background: rgba(80, 150, 235, 0.16);
     border-color: var(--sub-border);
   }
-  .sw-card.sub .sw-name { color: #cfe2f5; }
-  .sw-card.sub .btn { background: #2a3a4a; }
-  .sw-card.sub .btn:disabled { background: #232f3c; }
+  .sw-card.sub .sw-name { color: #2f5183; }
+  .sw-card.sub .btn { background: #dceaf5; }
+  .sw-card.sub .btn:disabled { background: #eef2f5; }
 
   .sw-head {
     display: flex;
@@ -617,7 +617,7 @@
     color: var(--text-1);
     padding: 2px 5px;
     border-radius: 5px;
-    border: 1px dashed rgba(255, 255, 255, 0.16);
+    border: 1px dashed rgba(44, 100, 98, 0.25);
     cursor: text;
     /* Never wrap: the rep counter shares this row and must not push the
        name onto a second line, which would grow the whole card. */
@@ -626,7 +626,7 @@
     text-overflow: ellipsis;
     max-width: 88px;
   }
-  .sw-name:hover { border-color: rgba(255, 255, 255, 0.4); color: var(--text-0); }
+  .sw-name:hover { border-color: rgba(44, 100, 98, 0.5); color: var(--text-0); }
 
   .sw-name-input {
     font-family: var(--sans);
@@ -653,7 +653,7 @@
     position: relative;
     background: linear-gradient(180deg, var(--lcd-bg) 0%, var(--lcd-bg-2) 100%);
     border: 1px solid var(--lcd-border);
-    border-top-color: #5c6854;
+    border-top-color: #6fa8a3;
     border-radius: 7px;
     box-shadow: inset 0 2px 6px rgba(18, 26, 18, 0.45);
     overflow: hidden;
@@ -1233,7 +1233,7 @@
   .calc-display-card {
     background: linear-gradient(180deg, var(--lcd-bg) 0%, var(--lcd-bg-2) 100%);
     border: 1px solid var(--lcd-border);
-    border-top-color: #5c6854;
+    border-top-color: #6fa8a3;
     border-radius: 10px;
     box-shadow: inset 0 2px 6px rgba(18, 26, 18, 0.45);
     padding: 14px 16px 12px;
@@ -1357,7 +1357,7 @@
     border-radius: 6px;
     background: linear-gradient(180deg, var(--lcd-bg) 0%, var(--lcd-bg-2) 100%);
     border: 1px solid var(--lcd-border);
-    border-top-color: #5c6854;
+    border-top-color: #6fa8a3;
     box-shadow: inset 0 1px 4px rgba(18, 26, 18, 0.4);
   }
 
@@ -1390,9 +1390,9 @@
   .pace-compact-input:focus { outline: none; }
   /* An empty field has to look unlit — in a segment face a solid "0"
      placeholder is indistinguishable from an entered zero. */
-  .pace-compact-input::placeholder { color: rgba(23, 31, 24, 0.2); }
-  .pace-compact-input::selection { background: rgba(23, 31, 24, 0.25); }
-  .pace-row.computed .pace-compact-input { color: #1c6b3a; }
+  .pace-compact-input::placeholder { color: rgba(22, 63, 61, 0.2); }
+  .pace-compact-input::selection { background: rgba(22, 63, 61, 0.25); }
+  .pace-row.computed .pace-compact-input { color: #2c6462; }
 
   .pace-compact-input-wide { width: 108px; }
 
@@ -1469,7 +1469,7 @@
     font-size: 16px;
     font-weight: 700;
     color: var(--lcd-ink);
-    border-bottom: 1px solid rgba(23, 31, 24, 0.12);
+    border-bottom: 1px solid rgba(22, 63, 61, 0.12);
   }
   .pace-table tr:last-child td { border-bottom: none; }
   .pace-table .pt-pace { width: 1%; white-space: nowrap; }
@@ -1482,12 +1482,12 @@
     margin-left: 3px;
   }
   /* A pace the user added themselves stands out from the 3:00-5:00 grid. */
-  .pace-table tr.custom td { background: rgba(40, 90, 55, 0.16); }
+  .pace-table tr.custom td { background: rgba(44, 100, 98, 0.16); }
   .pace-table tr.custom .pt-pace::after {
     content: '★';
     font-size: 9px;
     margin-left: 4px;
-    color: #1c6b3a;
+    color: #2c6462;
   }
   .pace-table .pt-empty {
     text-align: center;
@@ -1513,7 +1513,7 @@
     border-radius: 5px;
     outline: none;
   }
-  .pace-custom-input::placeholder { color: rgba(23, 31, 24, 0.2); }
+  .pace-custom-input::placeholder { color: rgba(22, 63, 61, 0.2); }
   .pace-custom-colon { font-family: var(--seg); font-weight: 700; color: var(--text-2); }
   .pace-custom-unit { font-size: 10px; font-weight: 700; color: var(--text-2); margin: 0 6px 0 3px; }
   .pace-custom-row .pace-chip { margin-left: auto; }
@@ -1998,9 +1998,9 @@
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
-    background: #0e1013;
-    color: var(--text-0);
-    border: 1px solid var(--border);
+    background: #16413f;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     padding: 9px 18px;
     border-radius: 999px;
     font-size: 13px;
@@ -2009,7 +2009,7 @@
     pointer-events: none;
     transition: all 0.3s ease;
     z-index: 50;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -2169,9 +2169,9 @@
     top: calc(var(--gy) * var(--lay-cell-h));
     width: calc(var(--gw) * var(--lay-cell-w));
     height: calc(var(--gh) * var(--lay-cell-h));
-    border: 2px dashed var(--green); background: rgba(74, 222, 128, 0.16);
+    border: 2px dashed var(--green); background: rgba(62, 138, 136, 0.16);
   }
-  .layout-ghost.bad { border-color: var(--red); background: rgba(255, 107, 111, 0.16); }
+  .layout-ghost.bad { border-color: var(--red); background: rgba(122, 48, 51, 0.16); }
   .layout-title {
     background: var(--sub-body); border: 1px solid var(--sub-border);
     border-radius: 8px; padding: 7px 10px; margin-bottom: 10px;
