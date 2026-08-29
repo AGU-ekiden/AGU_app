@@ -1,20 +1,21 @@
 /* ===== iOS 風・洗練モバイルデザイン（ライト/ダーク自動対応） ===== */
 :root {
-  /* ライト（iOS グループ化リスト） */
-  --bg: #f2f2f7;
+  /* ライト（グリーン基調・ポータル準拠。ダークモードは持たず常にライト表示） */
+  --bg: #ffffff;
   --card: #ffffff;
-  --card-2: #e9e9ef;
+  --card-2: #eaf5f4;
   --text: #000000;
   --muted: #8e8e93;
   --muted-2: #aeaeb2;
-  --sep: rgba(60, 60, 67, 0.18);
-  --accent: #068c89;
+  --sep: rgba(62, 138, 136, 0.18);
+  --accent: #3e8a88;
+  --accent-dark: #2c6462;
   --green: #34c759;
   --red: #ff3b30;
-  --seg-bg: rgba(118, 118, 128, 0.12);
+  --seg-bg: rgba(62, 138, 136, 0.10);
   --seg-active: #ffffff;
   --field: #ffffff;
-  --header-bg: rgba(242, 242, 247, 0.8);
+  --header-bg: rgba(255, 255, 255, 0.85);
   --shadow: 0 0.5px 2px rgba(0, 0, 0, 0.12);
   --done-ring: rgba(60, 60, 67, 0.35);
   --done-check: #7a7a7f;
@@ -33,35 +34,6 @@
   --app-max: 900px;
   /* 左右の余白（狭めにして表示領域を広く） */
   --pad-x: 6px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #000000;
-    --card: #1c1c1e;
-    --card-2: #2c2c2e;
-    --text: #ffffff;
-    --muted: #8e8e93;
-    --muted-2: #636366;
-    --sep: rgba(84, 84, 88, 0.6);
-    --accent: #0aa5a1;
-    --green: #30d158;
-    --red: #ff453a;
-    --seg-bg: rgba(118, 118, 128, 0.24);
-    --seg-active: #636366;
-    --field: #1c1c1e;
-    --header-bg: rgba(0, 0, 0, 0.7);
-    --shadow: none;
-    --done-ring: rgba(120, 120, 128, 0.45);
-    --done-check: #ffffff;
-    --assignee-bg: rgba(255, 214, 10, 0.20);
-    --assignee-fg: #ffd60a;
-
-    --pri-s: #ff453a;
-    --pri-1: #ff9f0a;
-    --pri-2: #0a84ff;
-    --pri-3: #8e8e93;
-  }
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -183,6 +155,7 @@ html, body {
 
 .group {
   background: var(--card);
+  border: 1px solid var(--sep);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: var(--shadow);
@@ -589,6 +562,7 @@ html, body {
   padding: 14px;
   margin-bottom: 16px;
   background: var(--card);
+  border: 1px solid var(--sep);
   border-radius: 12px;
   box-shadow: var(--shadow);
 }
@@ -717,7 +691,7 @@ html, body {
   padding: 4px 10px;
   font-size: 14px;
   font-weight: 700;
-  color: #2ab7b1;
+  color: var(--accent);
   background: transparent;
   border: none;
   border-radius: 8px;

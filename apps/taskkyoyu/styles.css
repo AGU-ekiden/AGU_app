@@ -1,4 +1,4 @@
-/* ===== iOS 風・洗練モバイルデザイン（ライト/ダーク自動対応） ===== */
+/* ===== iOS 風・洗練モバイルデザイン（グリーン×ホワイト・ライト固定） ===== */
 :root {
   /* ライト（iOS グループ化リスト） */
   --bg: #f2f2f7;
@@ -8,7 +8,9 @@
   --muted: #8e8e93;
   --muted-2: #aeaeb2;
   --sep: rgba(60, 60, 67, 0.18);
-  --accent: #10254a;
+  --accent: #3e8a88;
+  --accent-dark: #2c6462;
+  --accent-light: #eaf5f4;
   --green: #34c759;
   --red: #ff3b30;
   --seg-bg: rgba(118, 118, 128, 0.12);
@@ -35,34 +37,8 @@
   --pad-x: 6px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #000000;
-    --card: #1c1c1e;
-    --card-2: #2c2c2e;
-    --text: #ffffff;
-    --muted: #8e8e93;
-    --muted-2: #636366;
-    --sep: rgba(84, 84, 88, 0.6);
-    --accent: #d9b64a;
-    --green: #30d158;
-    --red: #ff453a;
-    --seg-bg: rgba(118, 118, 128, 0.24);
-    --seg-active: #636366;
-    --field: #1c1c1e;
-    --header-bg: rgba(0, 0, 0, 0.7);
-    --shadow: none;
-    --done-ring: rgba(120, 120, 128, 0.45);
-    --done-check: #ffffff;
-    --assignee-bg: rgba(255, 214, 10, 0.20);
-    --assignee-fg: #ffd60a;
-
-    --pri-s: #ff453a;
-    --pri-1: #ff9f0a;
-    --pri-2: #0a84ff;
-    --pri-3: #8e8e93;
-  }
-}
+/* ポータル全体で採用しているグリーン×ホワイトのブランドに合わせ、
+   ライトテーマ固定とする（ダークテーマへの切り替えは行わない）。 */
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -720,7 +696,8 @@ html, body {
   padding: 4px 10px;
   font-size: 14px;
   font-weight: 700;
-  color: #2ab7b1;
+  /* undo-bar は常に濃色背景なので、視認性のため accent より明るいグリーンにする */
+  color: color-mix(in srgb, var(--accent) 65%, white);
   background: transparent;
   border: none;
   border-radius: 8px;
