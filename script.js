@@ -72,7 +72,6 @@
     const parts = [];
     if (view === 'role' && role) {
       parts.push(`<span class="nav-current">${role.icon} ${escapeHtml(role.name)} メニュー</span>`);
-      parts.push('<button type="button" class="nav-btn" data-action="show-all">すべてのアプリ</button>');
     } else if (view === 'all') {
       if (role) {
         parts.push(`<button type="button" class="nav-btn" data-action="back-to-role">${role.icon} ${escapeHtml(role.name)}メニューに戻る</button>`);
