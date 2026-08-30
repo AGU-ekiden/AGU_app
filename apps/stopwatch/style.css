@@ -157,7 +157,7 @@ html, body {
 }
 /* 本体(実機)のような外枠を追加。 */
 #timerTab .stopwatch-card:not(.is-child) .watch-body {
-  border: 1mm solid #202020;
+  border: 1mm solid #2f2f2f;
 }
 /* スタートボタンだけ添付画像の一番上の色に。 */
 #timerTab .stopwatch-card:not(.is-child) .sw-toggle {
@@ -166,7 +166,7 @@ html, body {
 }
 /* ウォッチ内部の区切り線の色も外枠と揃える。 */
 #timerTab .stopwatch-card:not(.is-child) .split-columns {
-  border-top-color: #202020;
+  border-top-color: #2f2f2f;
 }
 /* リセットの上下の線(secondary-actions/records-panel)とAB間の
    縦線は、リセットボタン自体の明るい色に合わせる。 */
