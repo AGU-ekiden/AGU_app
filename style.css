@@ -74,13 +74,6 @@ body {
   flex-wrap: wrap;
 }
 
-.nav-current {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-right: 0.3rem;
-}
-
 .nav-btn {
   font-family: inherit;
   font-size: 0.78rem;
