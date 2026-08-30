@@ -170,6 +170,14 @@ html, body {
 #timerTab .stopwatch-card:not(.is-child) .records-panel {
   border-top-color: #202020;
 }
+/* AとB(記録欄)の間の縦線も同じ色に、「区間タイム/累計タイム」の
+   文字も黒に。 */
+#timerTab .stopwatch-card:not(.is-child) .records-col + .records-col {
+  border-left-color: #202020;
+}
+#timerTab .stopwatch-card:not(.is-child) .legend {
+  color: #000000;
+}
 /* ケースが濃いグレーになった分、透明だったゴーストボタン(リセット/
    Excel保存)が背景に埋もれて見えなくなるので、視認できる背景・枠線を
    付ける。 */
@@ -306,7 +314,7 @@ html, body {
   gap: 12px;
   width: 100%;
   padding-top: 6px;
-  border-top: 1mm solid rgba(44, 100, 98, 0.15);
+  border-top: 0.5mm solid rgba(44, 100, 98, 0.15);
 }
 
 .split-col {
@@ -412,7 +420,7 @@ html, body {
   display: flex;
   width: 100%;
   gap: 6px;
-  border-top: 1mm solid var(--border);
+  border-top: 0.5mm solid var(--border);
   padding-top: 8px;
 }
 .secondary-actions .btn {
@@ -482,7 +490,7 @@ html, body {
 }
 
 .records-panel {
-  border-top: 1mm solid var(--border);
+  border-top: 0.5mm solid var(--border);
   padding: 10px 12px 12px;
 }
 
