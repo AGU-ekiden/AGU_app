@@ -1246,10 +1246,10 @@ html, body {
 
 /* ---------- 点呼(ロールコール) ---------- */
 .rollcall-app {
-  background: var(--panel);
+  background: var(--accent);
   border: 1px solid var(--border);
   border-radius: 16px;
-  color: var(--text);
+  color: #ffffff;
   padding: 20px 16px;
   display: flex;
   flex-direction: column;
@@ -1261,12 +1261,16 @@ html, body {
   flex-wrap: wrap;
   gap: 8px;
 }
+.rollcall-app .btn-ghost {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
 .rollcall-progress {
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
   font-size: 13px;
   font-weight: 700;
-  color: var(--text-dim);
+  color: #ffffff;
   margin-right: auto;
 }
 
@@ -1277,9 +1281,6 @@ html, body {
   grid-template-columns: repeat(4, 1fr);
   gap: 10px 8px;
   align-items: start;
-  background: var(--accent);
-  border-radius: 12px;
-  padding: 12px 10px;
 }
 .rollcall-grade-section {
   display: flex;
@@ -1409,6 +1410,9 @@ html, body {
   font-size: 10px;
   color: var(--text-dim);
   font-weight: 700;
+}
+.rollcall-app .rollcall-filter span {
+  color: #ffffff;
 }
 .rollcall-filter select {
   width: 100%;
