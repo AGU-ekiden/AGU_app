@@ -162,7 +162,7 @@ html, body {
 }
 /* 本体(実機)のような外枠を追加。 */
 #timerTab .stopwatch-card:not(.is-child) .watch-body {
-  border: 1mm solid #2f2f2f;
+  border: 0.5mm solid #2f2f2f;
 }
 /* スタートボタン(計測中の「ストップ」表示時は除く)だけ添付画像の
    一番上の色に。ストップ表示時まで塗りつぶすと、暗い文字(--danger)が
@@ -225,7 +225,7 @@ html, body {
   --lcd-ink-dim: #6d6f64;
 }
 #timerTab .stopwatch-card.is-child .watch-body {
-  border: 1mm solid var(--child-accent);
+  border: 0.5mm solid var(--child-accent);
 }
 #timerTab .stopwatch-card.is-child .sw-toggle.btn-primary {
   background: var(--child-accent);
