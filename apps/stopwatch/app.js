@@ -81,7 +81,6 @@ const el = {
   rollcallAddName: document.getElementById('rollcallAddName'),
   rollcallAddTagCheckboxes: document.getElementById('rollcallAddTagCheckboxes'),
   rollcallAddBtn: document.getElementById('rollcallAddBtn'),
-  rollcallTagFilter: document.getElementById('rollcallTagFilter'),
   rollcallRegisterList: document.getElementById('rollcallRegisterList'),
   rollcallRegisterRowTemplate: document.getElementById('rollcallRegisterRowTemplate'),
 };
@@ -3345,7 +3344,6 @@ el.rollcallNewTagBtn.addEventListener('click', async () => {
   if (!added) return;
   el.rollcallNewTagName.value = '';
   renderRollcallTagManageList();
-  renderTagFilterOptions(el.rollcallTagFilter);
   renderTagCheckboxes(el.rollcallAddTagCheckboxes, []);
   renderRollcallList();
 });
@@ -3636,18 +3634,13 @@ function registerSortKey(member) {
 }
 
 function renderRollcallRegisterView() {
-  renderTagFilterOptions(el.rollcallTagFilter);
-  const filterTag = el.rollcallTagFilter.value;
   const members = rollcallMembers
-    .filter((m) => !filterTag || m.tags.includes(filterTag))
     .slice()
     .sort((a, b) => (registerSortKey(b) - registerSortKey(a)) || (a.sortIndex - b.sortIndex));
 
   el.rollcallRegisterList.innerHTML = '';
   members.forEach((member) => el.rollcallRegisterList.appendChild(buildRollcallRegisterRow(member)));
 }
-
-el.rollcallTagFilter.addEventListener('change', renderRollcallRegisterView);
 
 el.rollcallAddBtn.addEventListener('click', async () => {
   const name = el.rollcallAddName.value.trim();
