@@ -149,7 +149,7 @@ html, body {
    まま(--accentは上書きしない)。複製されたストップウォッチ(.is-child)
    は親と区別するための青のまま変更しない。 */
 #timerTab .stopwatch-card:not(.is-child) {
-  --panel: #74797f;
+  --panel: #b5b5b5;
   --text-dim: #eceded;
 }
 /* ケースが濃いグレーになった分、透明だったゴーストボタン(リセット/
