@@ -151,6 +151,13 @@ html, body {
 #timerTab .stopwatch-card:not(.is-child) {
   --panel: #b5b5b5;
   --text-dim: #eceded;
+  --lcd-bg: #c9cec3;
+  --lcd-ink: #35362f;
+  --lcd-ink-dim: #6d6f64;
+}
+/* 本体(実機)のような黒い外枠を追加。 */
+#timerTab .stopwatch-card:not(.is-child) .watch-body {
+  border: 7px solid #000000;
 }
 /* ケースが濃いグレーになった分、透明だったゴーストボタン(リセット/
    Excel保存)が背景に埋もれて見えなくなるので、視認できる背景・枠線を
