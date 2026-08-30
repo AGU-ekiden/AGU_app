@@ -144,13 +144,18 @@ html, body {
   --border: var(--child-border);
 }
 
-/* 計測タブの(複製ではない)本体ストップウォッチだけ、白いケース部分
-   (watch-body)をグレーに。スタート/ラップボタンやLCD画面はグリーンの
-   まま(--accentは上書きしない)。複製されたストップウォッチ(.is-child)
-   は親と区別するための青のまま変更しない。 */
+/* 計測タブの(複製ではない)本体ストップウォッチだけ、実機のような
+   白・黒・グレーだけの配色に統一する(緑のブランドカラーは使わない)。
+   複製されたストップウォッチ(.is-child)は親と区別するための青のまま
+   変更しない。 */
 #timerTab .stopwatch-card:not(.is-child) {
   --panel: #b5b5b5;
-  --text-dim: #eceded;
+  --panel-2: #e3e5e7;
+  --accent: #3a3a3a;
+  --accent-dim: #d6d8da;
+  --accent-dark: #202020;
+  --danger: #3a3a3a;
+  --danger-dim: #e3e5e7;
   --lcd-bg: #c9cec3;
   --lcd-ink: #35362f;
   --lcd-ink-dim: #6d6f64;
@@ -159,8 +164,10 @@ html, body {
 #timerTab .stopwatch-card:not(.is-child) .watch-body {
   border: 1mm solid #2f2f2f;
 }
-/* スタートボタンだけ添付画像の一番上の色に。 */
-#timerTab .stopwatch-card:not(.is-child) .sw-toggle {
+/* スタートボタン(計測中の「ストップ」表示時は除く)だけ添付画像の
+   一番上の色に。ストップ表示時まで塗りつぶすと、暗い文字(--danger)が
+   読めなくなるため、btn-primaryの時だけに限定する。 */
+#timerTab .stopwatch-card:not(.is-child) .sw-toggle.btn-primary {
   background: #2f2f2f;
   border-color: #2f2f2f;
 }
@@ -178,15 +185,32 @@ html, body {
   border-left-color: rgba(255, 255, 255, 0.65);
 }
 #timerTab .stopwatch-card:not(.is-child) .legend {
-  color: #000000;
+  color: #1a1a1a;
 }
 /* ケースが濃いグレーになった分、透明だったゴーストボタン(リセット/
    Excel保存)が背景に埋もれて見えなくなるので、視認できる背景・枠線を
-   付ける。 */
+   付ける。ゴーストボタンは:disabledでも読めるよう、通常の.btn:disabled
+   の薄さ(opacity 0.35)を上書きしておく。 */
 #timerTab .stopwatch-card:not(.is-child) .secondary-actions .btn-ghost {
   background: rgba(255, 255, 255, 0.65);
   border-color: rgba(255, 255, 255, 0.5);
   color: #1a1a1a;
+}
+#timerTab .stopwatch-card:not(.is-child) .secondary-actions .btn-ghost:disabled {
+  opacity: 0.7;
+}
+/* watch-body(グレー地)に直接乗る文字(計測中...・記録見出し)は、
+   共有変数の--text-dimを上書きすると記録一覧(明るい地)側が読めなく
+   なるので、ここだけ個別に明るい色を指定する。 */
+#timerTab .stopwatch-card:not(.is-child) .status,
+#timerTab .stopwatch-card:not(.is-child) .records-header h2 {
+  color: #f2f2f2;
+}
+/* ラップ記録は行ごとに背景の有無がまちまちだと(奇数行だけ.panel-2)、
+   偶数行はグレーの地が直接透けて番号や合計タイムが読みにくくなるため、
+   全行に同じ薄いグレーの背景を敷いて統一する。 */
+#timerTab .stopwatch-card:not(.is-child) .record-row {
+  background: var(--panel-2);
 }
 
 .sw-header {
