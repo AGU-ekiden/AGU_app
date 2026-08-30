@@ -1311,8 +1311,8 @@ html, body {
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  background: var(--accent);
-  border: 1px solid var(--accent);
+  background: #5fa6a4;
+  border: 1px solid #5fa6a4;
   border-radius: 10px;
   padding: 8px;
   color: #ffffff;
