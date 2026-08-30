@@ -1488,8 +1488,8 @@ html, body {
    広く取れるようにする。 */
 #rollcallRegisterModal.stretch-recordings-modal .stretch-recordings-modal-panel {
   gap: 6px;
-  height: 100vh;
-  max-height: 100vh;
+  height: calc(100vh - 8px);
+  max-height: calc(100vh - 8px);
 }
 .rollcall-tag-badge-toggle {
   display: flex;
