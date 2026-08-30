@@ -39,6 +39,9 @@
     { "source": "/spm-medical-record/(.*)", "destination": "https://agu-spm-medical-record-nine.vercel.app/spm-medical-record/$1" },
 
     { "source": "/itonomaki/", "destination": "https://agu-itonomaki.vercel.app/itonomaki/" },
-    { "source": "/itonomaki/(.*)", "destination": "https://agu-itonomaki.vercel.app/itonomaki/$1" }
+    { "source": "/itonomaki/(.*)", "destination": "https://agu-itonomaki.vercel.app/itonomaki/$1" },
+
+    { "source": "/keihi-seisan/", "destination": "https://agu-keihi-seisan.vercel.app/keihi-seisan/" },
+    { "source": "/keihi-seisan/(.*)", "destination": "https://agu-keihi-seisan.vercel.app/keihi-seisan/$1" }
   ]
 }

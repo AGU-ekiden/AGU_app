@@ -128,7 +128,7 @@ window.APPS = [
     category: 'ops',
     icon: '💳',
     repoUrl: `${REPO_TREE}/apps/keihi-seisan`,
-    liveUrl: null,
+    liveUrl: '/keihi-seisan/',
     stack: 'Next.js + GAS(各自のスプレッドシート)',
   },
 ];
