@@ -21,14 +21,15 @@
   --lcd-ink-dim: #6b9c9a;
   --mono: "SF Mono", "Menlo", "Consolas", "Roboto Mono", monospace;
 
-  /* A stopwatch duplicated while running becomes a blue "child" case,
-     grouped under its parent, so it reads as clearly related but distinct
-     from the green parent, while staying on the same light card look. */
-  --child-accent: #3a5aa8;
-  --child-accent-dim: #e8ecf7;
+  /* A stopwatch duplicated while running becomes a "child" case, grouped
+     under its parent. The parent's own case is now gray/black, so the
+     child is marked instead with the portal's brand green (the same
+     green as the "← ポータル" link) to stay clearly identifiable. */
+  --child-accent: #3e8a88;
+  --child-accent-dim: #eaf5f4;
   --child-panel: #ffffff;
   --child-panel-2: #eef1fa;
-  --child-border: rgba(58, 90, 168, 0.25);
+  --child-border: rgba(62, 138, 136, 0.25);
 
   /* TABATA: green = go hard, blue = recover — glanceable from a distance
      without reading the phase label, and kept clear of the work-phase green. */
