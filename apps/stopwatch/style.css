@@ -1246,7 +1246,7 @@ html, body {
 
 /* ---------- 点呼(ロールコール) ---------- */
 .rollcall-app {
-  background: var(--accent);
+  background: #5fa6a4;
   border: 1px solid var(--border);
   border-radius: 16px;
   color: #ffffff;
