@@ -803,7 +803,7 @@ html, body {
 /* ---------- Pace calculator ---------- */
 .pace-app {
   background: var(--panel);
-  border: 0.5mm solid var(--border);
+  border: 0.5mm solid var(--accent);
   border-radius: 16px;
   color: var(--text);
   padding: 20px 16px;
@@ -994,7 +994,7 @@ html, body {
 /* ---------- Stretch-count timer ---------- */
 .stretch-app {
   background: var(--panel);
-  border: 0.5mm solid var(--border);
+  border: 0.5mm solid var(--accent);
   border-radius: 16px;
   color: var(--text);
   padding: 20px 16px;
@@ -1292,7 +1292,7 @@ html, body {
 /* ---------- TABATA timer ---------- */
 .tabata-app {
   background: var(--panel);
-  border: 0.5mm solid var(--border);
+  border: 0.5mm solid var(--accent);
   border-radius: 16px;
   color: var(--text);
   padding: 20px 16px;
