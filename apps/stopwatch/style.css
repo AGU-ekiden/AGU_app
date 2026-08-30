@@ -149,7 +149,7 @@ html, body {
    まま(--accentは上書きしない)。複製されたストップウォッチ(.is-child)
    は親と区別するための青のまま変更しない。 */
 #timerTab .stopwatch-card:not(.is-child) {
-  --panel: #e2e4e7;
+  --panel: #9aa0a6;
 }
 
 .sw-header {
