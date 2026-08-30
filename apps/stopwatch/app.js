@@ -428,7 +428,7 @@ function createStopwatch(seed) {
   if (sw.parentId) node.classList.add('is-child');
   sw.dom.duplicateParentBtn.hidden = id !== firstStopwatchId;
   if (id === firstStopwatchId) {
-    sw.dom.actions.insertBefore(el.exportAllBtn, sw.dom.duplicateBtn);
+    sw.dom.actions.insertBefore(el.exportAllBtn, sw.dom.duplicateParentBtn);
   }
 
   sw.dom.label.textContent = sw.label;
@@ -525,7 +525,7 @@ function removeStopwatch(sw) {
       (card) => card !== sw.dom.root
     );
     if (nextCard) {
-      nextCard.querySelector('.sw-actions').insertBefore(el.exportAllBtn, nextCard.querySelector('.sw-duplicate'));
+      nextCard.querySelector('.sw-actions').insertBefore(el.exportAllBtn, nextCard.querySelector('.sw-duplicate-parent'));
     }
   }
   sw.dom.root.remove();

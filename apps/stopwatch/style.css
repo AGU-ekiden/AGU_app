@@ -213,6 +213,53 @@ html, body {
   background: var(--panel-2);
 }
 
+/* 子ストップウォッチも親と同じグレー系の配色・可読性の修正を適用する。
+   ただし親と見分けられるよう、外枠・スタートボタン・LCDの区切り線・
+   タグ等の「アイデンティティ」部分だけ元の青(--child-accent)を残す。 */
+#timerTab .stopwatch-card.is-child {
+  --panel: #b5b5b5;
+  --panel-2: #e3e5e7;
+  --accent-dim: var(--child-accent-dim);
+  --lcd-bg: #c9cec3;
+  --lcd-ink: #35362f;
+  --lcd-ink-dim: #6d6f64;
+}
+#timerTab .stopwatch-card.is-child .watch-body {
+  border: 1mm solid var(--child-accent);
+}
+#timerTab .stopwatch-card.is-child .sw-toggle.btn-primary {
+  background: var(--child-accent);
+  border-color: var(--child-accent);
+}
+#timerTab .stopwatch-card.is-child .split-columns {
+  border-top-color: var(--child-accent);
+}
+#timerTab .stopwatch-card.is-child .secondary-actions,
+#timerTab .stopwatch-card.is-child .records-panel {
+  border-top-color: rgba(255, 255, 255, 0.65);
+}
+#timerTab .stopwatch-card.is-child .records-col + .records-col {
+  border-left-color: rgba(255, 255, 255, 0.65);
+}
+#timerTab .stopwatch-card.is-child .legend {
+  color: #1a1a1a;
+}
+#timerTab .stopwatch-card.is-child .secondary-actions .btn-ghost {
+  background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #1a1a1a;
+}
+#timerTab .stopwatch-card.is-child .secondary-actions .btn-ghost:disabled {
+  opacity: 0.7;
+}
+#timerTab .stopwatch-card.is-child .status,
+#timerTab .stopwatch-card.is-child .records-header h2 {
+  color: #f2f2f2;
+}
+#timerTab .stopwatch-card.is-child .record-row {
+  background: var(--panel-2);
+}
+
 .sw-header {
   display: flex;
   align-items: center;
