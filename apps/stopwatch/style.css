@@ -155,9 +155,14 @@ html, body {
   --lcd-ink: #35362f;
   --lcd-ink-dim: #6d6f64;
 }
-/* 本体(実機)のような黒い外枠を追加。 */
+/* 本体(実機)のような外枠を追加。 */
 #timerTab .stopwatch-card:not(.is-child) .watch-body {
-  border: 7px solid #000000;
+  border: 1mm solid #202020;
+}
+/* スタートボタンだけ添付画像の一番上の色に。 */
+#timerTab .stopwatch-card:not(.is-child) .sw-toggle {
+  background: #2c2c2a;
+  border-color: #2c2c2a;
 }
 /* ケースが濃いグレーになった分、透明だったゴーストボタン(リセット/
    Excel保存)が背景に埋もれて見えなくなるので、視認できる背景・枠線を
@@ -295,7 +300,7 @@ html, body {
   gap: 12px;
   width: 100%;
   padding-top: 6px;
-  border-top: 1px solid rgba(44, 100, 98, 0.15);
+  border-top: 0.5mm solid rgba(44, 100, 98, 0.15);
 }
 
 .split-col {
@@ -401,7 +406,7 @@ html, body {
   display: flex;
   width: 100%;
   gap: 6px;
-  border-top: 1px solid var(--border);
+  border-top: 0.5mm solid var(--border);
   padding-top: 8px;
 }
 .secondary-actions .btn {
@@ -471,7 +476,7 @@ html, body {
 }
 
 .records-panel {
-  border-top: 1px solid var(--border);
+  border-top: 0.5mm solid var(--border);
   padding: 10px 12px 12px;
 }
 
