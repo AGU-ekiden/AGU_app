@@ -3414,14 +3414,13 @@ function buildRollcallMemberButton(member) {
 // (一時的な参加者)」のように、同じ列の中で別の学年欄の下に続けて表示する
 // 小見出しかどうか。
 function appendRollcallGroup(container, label, members, isSub) {
-  // 未点呼(checked=false)は、学年欄は追加した順の上下を逆(新しく追加
-  // された人が上)に、その他(一時的な参加者)は追加した順のまま上から
-  // 並べる。50音順(近似)は表示が不自然だったため廃止した。点呼済みは
-  // 押した順に下に積み上がっていく(直近に押した人ほど一番下)。
+  // 未点呼(checked=false)は、学年欄・その他(一時的な参加者)どちらも
+  // sortIndex(部員DBの並び)昇順のまま上から並べる。50音順(近似)は
+  // 表示が不自然だったため廃止した。点呼済みは押した順に下に積み
+  // 上がっていく(直近に押した人ほど一番下)。
   const unchecked = members
     .filter((m) => !m.checked)
     .sort((a, b) => a.sortIndex - b.sortIndex);
-  if (!isSub) unchecked.reverse();
   const checked = members
     .filter((m) => m.checked)
     .sort((a, b) => a.checkedSeq - b.checkedSeq);
