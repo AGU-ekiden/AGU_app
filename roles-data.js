@@ -30,6 +30,7 @@ window.FEATURES = {
   physical_karte_input: { name: 'フィジカルカルテ打ち込み', icon: '💊', target: 'spm-medical-record', note: null },
   physical_karte_view: { name: 'フィジカルカルテ確認', icon: '💊', target: 'tiryou-karte', note: null },
   injury_report: { name: '故障者報告確認', icon: '🚑', target: null, note: '未構築(今後追加予定)' },
+  keihi: { name: '経費精算', icon: '💳', target: 'keihi-seisan', note: null },
 };
 
 window.ROLES = [
@@ -57,7 +58,7 @@ window.ROLES = [
       'reinforce', 'stopwatch_main', 'rollcall', 'tabata', 'stretch',
       'physical_karte_view', 'medical_karte_view', 'crossing', 'pace', 'aotore',
       'ryouhi', 'task_manage', 'injury_report', 'blood', 'race_result', 'label',
-      'racing_watch', 'meal_count',
+      'racing_watch', 'meal_count', 'keihi',
     ],
   },
   {

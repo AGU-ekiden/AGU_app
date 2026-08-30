@@ -121,4 +121,14 @@ window.APPS = [
     liveUrl: '/spm-medical-record/',
     stack: 'Next.js + Notion API',
   },
+  {
+    id: 'keihi-seisan',
+    name: '経費精算',
+    description: 'クレジットカード明細から経費精算PDF・出張報告書を作成するアプリ。サーバー側にDBを持たず、各自のGoogleスプレッドシートに保存する。',
+    category: 'ops',
+    icon: '💳',
+    repoUrl: `${REPO_TREE}/apps/keihi-seisan`,
+    liveUrl: null,
+    stack: 'Next.js + GAS(各自のスプレッドシート)',
+  },
 ];
