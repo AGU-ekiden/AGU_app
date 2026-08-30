@@ -161,8 +161,8 @@ html, body {
 }
 /* スタートボタンだけ添付画像の一番上の色に。 */
 #timerTab .stopwatch-card:not(.is-child) .sw-toggle {
-  background: #2c2c2a;
-  border-color: #2c2c2a;
+  background: #2f2f2f;
+  border-color: #2f2f2f;
 }
 /* ウォッチ内部の区切り線の色も外枠と揃える。 */
 #timerTab .stopwatch-card:not(.is-child) .split-columns {
