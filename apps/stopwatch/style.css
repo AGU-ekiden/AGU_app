@@ -164,6 +164,12 @@ html, body {
   background: #2c2c2a;
   border-color: #2c2c2a;
 }
+/* ウォッチ内部の区切り線の色も外枠と揃える。 */
+#timerTab .stopwatch-card:not(.is-child) .split-columns,
+#timerTab .stopwatch-card:not(.is-child) .secondary-actions,
+#timerTab .stopwatch-card:not(.is-child) .records-panel {
+  border-top-color: #202020;
+}
 /* ケースが濃いグレーになった分、透明だったゴーストボタン(リセット/
    Excel保存)が背景に埋もれて見えなくなるので、視認できる背景・枠線を
    付ける。 */
@@ -300,7 +306,7 @@ html, body {
   gap: 12px;
   width: 100%;
   padding-top: 6px;
-  border-top: 0.5mm solid rgba(44, 100, 98, 0.15);
+  border-top: 1mm solid rgba(44, 100, 98, 0.15);
 }
 
 .split-col {
@@ -406,7 +412,7 @@ html, body {
   display: flex;
   width: 100%;
   gap: 6px;
-  border-top: 0.5mm solid var(--border);
+  border-top: 1mm solid var(--border);
   padding-top: 8px;
 }
 .secondary-actions .btn {
@@ -476,7 +482,7 @@ html, body {
 }
 
 .records-panel {
-  border-top: 0.5mm solid var(--border);
+  border-top: 1mm solid var(--border);
   padding: 10px 12px 12px;
 }
 
