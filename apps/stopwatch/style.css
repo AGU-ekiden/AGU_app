@@ -149,7 +149,16 @@ html, body {
    まま(--accentは上書きしない)。複製されたストップウォッチ(.is-child)
    は親と区別するための青のまま変更しない。 */
 #timerTab .stopwatch-card:not(.is-child) {
-  --panel: #9aa0a6;
+  --panel: #74797f;
+  --text-dim: #eceded;
+}
+/* ケースが濃いグレーになった分、透明だったゴーストボタン(リセット/
+   Excel保存)が背景に埋もれて見えなくなるので、視認できる背景・枠線を
+   付ける。 */
+#timerTab .stopwatch-card:not(.is-child) .secondary-actions .btn-ghost {
+  background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #1a1a1a;
 }
 
 .sw-header {
