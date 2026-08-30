@@ -4,7 +4,7 @@
  * and a pale-green LCD panel with dark-green ink segments.
  */
 :root {
-  --bg: #ffffff;
+  --bg: linear-gradient(to bottom, #2d2b2c 0%, #4d4c4a 100%);
   --panel: #ffffff;
   --panel-2: #eaf5f4;
   --border: rgba(62, 138, 136, 0.18);
