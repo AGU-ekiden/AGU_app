@@ -67,6 +67,8 @@ const el = {
   tabataTimer: document.getElementById('tabataTimer'),
   tabataStartBtn: document.getElementById('tabataStartBtn'),
   tabataResetBtn: document.getElementById('tabataResetBtn'),
+  pulseTimerValue: document.getElementById('pulseTimerValue'),
+  pulseTimerStartBtn: document.getElementById('pulseTimerStartBtn'),
   rollcallProgress: document.getElementById('rollcallProgress'),
   rollcallMainTagFilter: document.getElementById('rollcallMainTagFilter'),
   rollcallList: document.getElementById('rollcallList'),
@@ -1133,16 +1135,16 @@ const REINFORCE_MENUS = {
     { group: '【11】ストレッチ', spec: '30秒', speech: 'ストレッチいきます、よーいはじめ', voice: 'ストレッチいきます、よーいはじめ', durationSec: 30 },
     { group: '【11】ストレッチ(脊柱起立筋)', spec: '30秒', speech: '次、脊柱起立筋(30秒)いきます、よーいはじめ', voice: '次、せきちゅうきりつきん、いきます、よーいはじめ', durationSec: 30 },
 
-    { group: '※2人組になる', spec: '', speech: '2人組になってください', voice: '2人組になってください', durationSec: null },
+    { group: '※2人組になる', spec: '', speech: '2人組になってください', voice: 'ふたりぐみになってください', durationSec: null },
 
-    { group: '【12】2人組腹斜筋', spec: '各10回4カウント×2', speech: '2人組腹斜筋いきます、外腹斜筋を意識してください、よーいはじめ', voice: '2人組ふくしゃきんいきます、がいふくしゃきんを意識してください、よーいはじめ', durationSec: null },
+    { group: '【12】2人組腹斜筋', spec: '各10回4カウント×2', speech: '2人組腹斜筋いきます、外腹斜筋を意識してください、よーいはじめ', voice: 'ふたりぐみふくしゃきんいきます、がいふくしゃきんを意識してください、よーいはじめ', durationSec: null },
     { group: '【12】2人組腹斜筋(反対)', spec: '各10回4カウント×2', speech: '反対', voice: '反対', durationSec: null },
 
     { group: '【13】スリップボード', spec: '45秒', speech: 'スリップボードいきます、バックラインを意識してください、よーいはじめ', voice: 'スリップボードいきます、バックラインを意識してください、よーいはじめ', durationSec: 45 },
 
     { group: '※2人組交代', spec: '腹斜筋に戻る', speech: '交代してください', voice: '交代してください', durationSec: null },
 
-    { group: '【14】2人組腹斜筋', spec: '各10回4カウント×2', speech: '2人組腹斜筋いきます、外腹斜筋を意識してください、よーいはじめ', voice: '2人組ふくしゃきんいきます、がいふくしゃきんを意識してください、よーいはじめ', durationSec: null },
+    { group: '【14】2人組腹斜筋', spec: '各10回4カウント×2', speech: '2人組腹斜筋いきます、外腹斜筋を意識してください、よーいはじめ', voice: 'ふたりぐみふくしゃきんいきます、がいふくしゃきんを意識してください、よーいはじめ', durationSec: null },
     { group: '【14】2人組腹斜筋(反対)', spec: '各10回4カウント×2', speech: '反対', voice: '反対', durationSec: null },
 
     { group: '【15】スリップボード', spec: '45秒', speech: 'スリップボードいきます、バックラインを意識してください、よーいはじめ', voice: 'スリップボードいきます、バックラインを意識してください、よーいはじめ', durationSec: 45 },
@@ -1175,7 +1177,7 @@ const REINFORCE_MENUS = {
     { group: '【23】サーキット⑤サイドプランクアブダクション(1/2セット)', spec: '10カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【23】サーキット⑥ジャックナイフ(1/2セット)', spec: '10回4カウント×2', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
 
-    { group: '【23】サーキット①腕振り(2/2セット)', spec: '10カウント', speech: 'サーキット右手下からいきます、(選手がコア入れたのを確認してから)よーいはじめ', voice: 'サーキット右手下からいきます、よーいはじめ', durationSec: null },
+    { group: '【23】サーキット①腕振り(2/2セット)', spec: '10カウント', speech: 'サーキット左手下からいきます、(選手がコア入れたのを確認してから)よーいはじめ', voice: 'サーキット左手下からいきます、よーいはじめ', durationSec: null },
     { group: '【23】サーキット②(2/2セット)', spec: '10カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【23】サーキット③腕をたたむ(2/2セット)', spec: '10回4カウント×2', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【23】サーキット④サイドバキューム(2/2セット)', spec: '6回4カウント×2', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
@@ -1189,34 +1191,45 @@ const REINFORCE_MENUS = {
     { group: '【4】プランク膝つき', spec: '10回4カウント', speech: 'プランク膝つきいきます、よーいはじめ', voice: 'プランクひざつきいきます、よーいはじめ', durationSec: null },
 
     { group: '【5】ダイアゴナル(縦振り)', spec: '30秒', speech: 'ダイアゴナル、縦振りいきます、よーいはじめ', voice: 'ダイアゴナル、縦振りいきます、よーいはじめ', durationSec: 30 },
-    { group: '【5】ダイアゴナル(縦振り・反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
     { group: '【5】ダイアゴナル(横振り)', spec: '30秒', speech: '横振りいきます、よーいはじめ', voice: '横振りいきます、よーいはじめ', durationSec: 30 },
+    { group: '【5】ダイアゴナル(縦振り・反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
     { group: '【5】ダイアゴナル(横振り・反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
 
-    { group: '【6】I字傾け', spec: '8回4カウント×5、各4回', speech: 'I字傾けいきます、よーいはじめ', voice: 'I字傾けいきます、よーいはじめ', durationSec: null },
+    { group: '【6】L字傾け', spec: '8回4カウント×5、各4回', speech: 'L字傾けいきます、よーいはじめ', voice: 'L字傾けいきます、よーいはじめ', durationSec: null },
 
-    { group: '【7】I字傾け(両手・縦振り)', spec: '30秒', speech: '両手縦振りいきます、よーいはじめ', voice: '両手縦振りいきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・縦振り反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・クロス)', spec: '30秒', speech: 'クロスいきます、よーいはじめ', voice: 'クロスいきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・クロス反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・横振り)', spec: '30秒', speech: '横振りいきます、よーいはじめ', voice: '横振りいきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・横振り反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
+    { group: '【7】L字傾け(両手・縦振り)', spec: '30秒', speech: '両手縦振りいきます、よーいはじめ', voice: '両手縦振りいきます、よーいはじめ', durationSec: 30 },
+    { group: '【7】L字傾け(両手・クロス)', spec: '30秒', speech: 'クロスいきます、よーいはじめ', voice: 'クロスいきます、よーいはじめ', durationSec: 30 },
+    { group: '【7】L字傾け(両手・横振り)', spec: '30秒', speech: '横振りいきます、よーいはじめ', voice: '横振りいきます、よーいはじめ', durationSec: 30 },
 
     { group: '【8】上体起こし', spec: '4カウント', speech: '上体起こしいきます、よーいはじめ', voice: '上体起こしいきます、よーいはじめ', durationSec: null },
 
-    { group: '【9】サーキット①サイドプランク腕ふり(1/2セット)', spec: '10回', speech: 'サーキットいきます、サイドプランク腕ふり、(選手の準備ができたのを確認してから)よーいはじめ', voice: 'サーキットいきます、サイドプランク腕ふり、よーいはじめ', durationSec: null },
+    { group: '【9】サーキット①サイドプランク腕ふり(1/2セット)', spec: '10回', speech: 'サーキット右手下からいきます、サイドプランク腕ふり、(選手の準備ができたのを確認してから)よーいはじめ', voice: 'サーキット右手下からいきます、サイドプランク腕ふり、よーいはじめ', durationSec: null },
     { group: '【9】サーキット②サイドプランク脚(1/2セット)', spec: '10回', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【9】サーキット③サイドプランクアダクション(1/2セット)', spec: '10回、片手片脚クロス', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【9】サーキット④サイドバキューム(1/2セット)', spec: '10回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【9】サーキット⑤ザ・ツイスト(1/2セット)', spec: '6回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【9】サーキット⑥ジャックナイフ(1/2セット)', spec: '10回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
 
-    { group: '【9】サーキット①サイドプランク腕ふり(2/2セット)', spec: '10回', speech: 'サーキット2セット目いきます、サイドプランク腕ふり、(選手の準備ができたのを確認してから)よーいはじめ', voice: 'サーキット2セット目いきます、サイドプランク腕ふり、よーいはじめ', durationSec: null },
+    { group: '【9】サーキット①サイドプランク腕ふり(2/2セット)', spec: '10回', speech: 'サーキット2セット目、左手下からいきます、サイドプランク腕ふり、(選手の準備ができたのを確認してから)よーいはじめ', voice: 'サーキット2セット目、左手下からいきます、サイドプランク腕ふり、よーいはじめ', durationSec: null },
     { group: '【9】サーキット②サイドプランク脚(2/2セット)', spec: '10回', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【9】サーキット③サイドプランクアダクション(2/2セット)', spec: '10回、片手片脚クロス', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【9】サーキット④サイドバキューム(2/2セット)', spec: '10回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【9】サーキット⑤ザ・ツイスト(2/2セット)', spec: '6回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
     { group: '【9】サーキット⑥ジャックナイフ(2/2セット)', spec: '10回4カウント、サーキット合計約5分', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+
+    { group: '【10】サーキット①サイドプランク腕ふり(1/2セット)', spec: '10回', speech: 'サーキット右手下からいきます、サイドプランク腕ふり、(選手の準備ができたのを確認してから)よーいはじめ', voice: 'サーキット右手下からいきます、サイドプランク腕ふり、よーいはじめ', durationSec: null },
+    { group: '【10】サーキット②サイドプランク脚(1/2セット)', spec: '10回', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+    { group: '【10】サーキット③サイドプランクアダクション(1/2セット)', spec: '10回、片手片脚クロス', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+    { group: '【10】サーキット④サイドバキューム(1/2セット)', spec: '10回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+    { group: '【10】サーキット⑤ザ・ツイスト(1/2セット)', spec: '6回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+    { group: '【10】サーキット⑥ジャックナイフ(1/2セット)', spec: '10回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+
+    { group: '【10】サーキット①サイドプランク腕ふり(2/2セット)', spec: '10回', speech: 'サーキット2セット目、左手下からいきます、サイドプランク腕ふり、(選手の準備ができたのを確認してから)よーいはじめ', voice: 'サーキット2セット目、左手下からいきます、サイドプランク腕ふり、よーいはじめ', durationSec: null },
+    { group: '【10】サーキット②サイドプランク脚(2/2セット)', spec: '10回', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+    { group: '【10】サーキット③サイドプランクアダクション(2/2セット)', spec: '10回、片手片脚クロス', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+    { group: '【10】サーキット④サイドバキューム(2/2セット)', spec: '10回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+    { group: '【10】サーキット⑤ザ・ツイスト(2/2セット)', spec: '6回4カウント', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
+    { group: '【10】サーキット⑥ジャックナイフ(2/2セット)', spec: '10回4カウント、サーキット合計約5分', speech: 'よーいはじめ', voice: 'よーいはじめ', durationSec: null },
   ],
   コアB: [
     { group: '【1】膝伸ばし', spec: '10回4カウント', speech: '膝伸ばしいきます、よーいはじめ', voice: 'ひざのばしいきます、よーいはじめ', durationSec: null },
@@ -1225,24 +1238,21 @@ const REINFORCE_MENUS = {
     { group: '【4】プランク膝つき', spec: '10回4カウント', speech: 'プランク膝つきいきます、よーいはじめ', voice: 'プランクひざつきいきます、よーいはじめ', durationSec: null },
 
     { group: '【5】ダイアゴナル(縦振り)', spec: '30秒', speech: 'ダイアゴナル、縦振りいきます、よーいはじめ', voice: 'ダイアゴナル、縦振りいきます、よーいはじめ', durationSec: 30 },
-    { group: '【5】ダイアゴナル(縦振り・反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
     { group: '【5】ダイアゴナル(横振り)', spec: '30秒', speech: '横振りいきます、よーいはじめ', voice: '横振りいきます、よーいはじめ', durationSec: 30 },
+    { group: '【5】ダイアゴナル(縦振り・反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
     { group: '【5】ダイアゴナル(横振り・反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
 
-    { group: '【6】I字傾け', spec: '8回4カウント×5、各4回', speech: 'I字傾けいきます、よーいはじめ', voice: 'I字傾けいきます、よーいはじめ', durationSec: null },
+    { group: '【6】L字傾け', spec: '8回4カウント×5、各4回', speech: 'L字傾けいきます、よーいはじめ', voice: 'L字傾けいきます、よーいはじめ', durationSec: null },
 
-    { group: '【7】I字傾け(両手・縦振り)', spec: '30秒', speech: '両手縦振りいきます、よーいはじめ', voice: '両手縦振りいきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・縦振り反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・クロス)', spec: '30秒', speech: 'クロスいきます、よーいはじめ', voice: 'クロスいきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・クロス反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・横振り)', spec: '30秒', speech: '横振りいきます、よーいはじめ', voice: '横振りいきます、よーいはじめ', durationSec: 30 },
-    { group: '【7】I字傾け(両手・横振り反対)', spec: '30秒', speech: '反対いきます、よーいはじめ', voice: '反対いきます、よーいはじめ', durationSec: 30 },
+    { group: '【7】L字傾け(両手・縦振り)', spec: '30秒', speech: '両手縦振りいきます、よーいはじめ', voice: '両手縦振りいきます、よーいはじめ', durationSec: 30 },
+    { group: '【7】L字傾け(両手・クロス)', spec: '30秒', speech: 'クロスいきます、よーいはじめ', voice: 'クロスいきます、よーいはじめ', durationSec: 30 },
+    { group: '【7】L字傾け(両手・横振り)', spec: '30秒', speech: '横振りいきます、よーいはじめ', voice: '横振りいきます、よーいはじめ', durationSec: 30 },
 
     { group: '【8】上体起こし', spec: '4カウント', speech: '上体起こしいきます、よーいはじめ', voice: '上体起こしいきます、よーいはじめ', durationSec: null },
 
-    { group: '※2人組になる', spec: '', speech: '2人組になってください', voice: '2人組になってください', durationSec: null },
+    { group: '※2人組になる', spec: '', speech: '2人組になってください', voice: 'ふたりぐみになってください', durationSec: null },
 
-    { group: '【9】2人組腹筋', spec: '各10回4カウント×2', speech: '2人組腹筋いきます、よーいはじめ', voice: '2人組腹筋いきます、よーいはじめ', durationSec: null },
+    { group: '【9】2人組腹筋', spec: '各10回4カウント×2', speech: '2人組腹筋いきます、よーいはじめ', voice: 'ふたりぐみ腹筋いきます、よーいはじめ', durationSec: null },
     { group: '【9】2人組腹筋(反対)', spec: '各10回4カウント×2', speech: '反対', voice: '反対', durationSec: null },
 
     { group: '【10】スリップボード', spec: '45秒', speech: 'スリップボードいきます、バックラインを意識してください、よーいはじめ', voice: 'スリップボードいきます、バックラインを意識してください、よーいはじめ', durationSec: 45 },
@@ -1263,8 +1273,8 @@ const REINFORCE_MENUS = {
     { group: '【15】下後鋸筋', spec: '', speech: '下後鋸筋いきます', voice: 'かこうきょきんいきます', durationSec: null },
   ],
   ループ: [
-    { group: '◎アップ(1)', spec: '腹横筋の感覚入力', speech: 'アップいきます、両膝を立てて両手を横から、よーいはじめ', voice: 'アップいきます、両ひざを立てて両手を横から、よーいはじめ', durationSec: null },
-    { group: '◎アップ(2)', spec: '腹横筋の感覚入力', speech: '続けて、両脚伸ばして両手を上から下まで、よーいはじめ', voice: '続けて、両あし伸ばして両手を上から下まで、よーいはじめ', durationSec: null },
+    { group: '◎アップ(1)膝立て', spec: '腹横筋の感覚入力', speech: '膝立ていきます、よーいはじめ', voice: 'ひざだていきます、よーいはじめ', durationSec: null },
+    { group: '◎アップ(2)バンザイ', spec: '腹横筋の感覚入力', speech: 'バンザイいきます、よーいはじめ', voice: 'バンザイいきます、よーいはじめ', durationSec: null },
 
     { group: '【1】スクリューレッグリフトフルレンジ(右上)', spec: '10回', speech: 'スクリューレッグリフトフルレンジ、右上いきます、よーいはじめ', voice: 'スクリューレッグリフトフルレンジ、右上いきます、よーいはじめ', durationSec: null },
     { group: '【1】スクリューレッグリフトフルレンジ(左上)', spec: '10回', speech: '左上、よーいはじめ', voice: '左上、よーいはじめ', durationSec: null },
@@ -1286,24 +1296,40 @@ const REINFORCE_MENUS = {
     { group: '【7】ショートT(キープ)', spec: '10秒', speech: 'キープ、よーいはじめ', voice: 'キープ、よーいはじめ', durationSec: 10 },
 
     { group: '【8】ショートV', spec: '15回(4カウント)', speech: 'ショートVいきます、よーいはじめ', voice: 'ショートVいきます、よーいはじめ', durationSec: null },
+    { group: '【8】ショートV(反対)', spec: '15回(4カウント)', speech: '反対', voice: '反対', durationSec: null },
 
     { group: '【9】ロングV', spec: '15回', speech: 'ロングVいきます、よーいはじめ', voice: 'ロングVいきます、よーいはじめ', durationSec: null },
+    { group: '【9】ロングV(反対)', spec: '15回', speech: '反対', voice: '反対', durationSec: null },
 
     { group: '【10】ピラーブリッジフロント(腕)', spec: '肘付き・5カウント', speech: 'ピラーブリッジフロント、肘付き、腕からいきます、よーいはじめ', voice: 'ピラーブリッジフロント、肘付き、腕からいきます、よーいはじめ', durationSec: null },
     { group: '【10】ピラーブリッジフロント(脚)', spec: '肘付き・5カウント', speech: '続けて脚、よーいはじめ', voice: '続けてあし、よーいはじめ', durationSec: null },
     { group: '【10】ピラーブリッジフロント(対角バランス)', spec: '2周・5カウント', speech: '対角バランス、2周いきます、よーいはじめ', voice: '対角バランス、2周いきます、よーいはじめ', durationSec: null },
   ],
   下肢: [
+    // ラダー形式(Lv.1→Lv.1反対→Lv.1→Lv.2→…→Lv.4反対)で、
+    // ラウンドを追う毎にLv.4まで種目を1つずつ増やしていく。
     { group: '【Lv.1】スプリットスクワット', spec: '片脚20回4カウント', speech: 'スプリットスクワットいきます、よーいはじめ', voice: 'スプリットスクワットいきます、よーいはじめ', durationSec: null },
     { group: '【Lv.1】スプリットスクワット(反対)', spec: '片脚20回4カウント', speech: '反対', voice: '反対', durationSec: null },
 
+    { group: '【Lv.1】スプリットスクワット', spec: '片脚20回4カウント', speech: 'スプリットスクワットいきます、よーいはじめ', voice: 'スプリットスクワットいきます、よーいはじめ', durationSec: null },
     { group: '【Lv.2】オーバーヘッドスプリットスクワット', spec: '片脚20回4カウント', speech: 'オーバーヘッドスプリットスクワットいきます、よーいはじめ', voice: 'オーバーヘッドスプリットスクワットいきます、よーいはじめ', durationSec: null },
+    { group: '【Lv.1】スプリットスクワット(反対)', spec: '片脚20回4カウント', speech: '反対', voice: '反対', durationSec: null },
     { group: '【Lv.2】オーバーヘッドスプリットスクワット(反対)', spec: '片脚20回4カウント', speech: '反対', voice: '反対', durationSec: null },
 
+    { group: '【Lv.1】スプリットスクワット', spec: '片脚20回4カウント', speech: 'スプリットスクワットいきます、よーいはじめ', voice: 'スプリットスクワットいきます、よーいはじめ', durationSec: null },
+    { group: '【Lv.2】オーバーヘッドスプリットスクワット', spec: '片脚20回4カウント', speech: 'オーバーヘッドスプリットスクワットいきます、よーいはじめ', voice: 'オーバーヘッドスプリットスクワットいきます、よーいはじめ', durationSec: null },
     { group: '【Lv.3】ダイアゴナル・シングルレッグニーアップ', spec: '片脚20回1カウント', speech: 'ダイアゴナル・シングルレッグニーアップいきます、よーいはじめ', voice: 'ダイアゴナル・シングルレッグニーアップいきます、よーいはじめ', durationSec: null },
+    { group: '【Lv.1】スプリットスクワット(反対)', spec: '片脚20回4カウント', speech: '反対', voice: '反対', durationSec: null },
+    { group: '【Lv.2】オーバーヘッドスプリットスクワット(反対)', spec: '片脚20回4カウント', speech: '反対', voice: '反対', durationSec: null },
     { group: '【Lv.3】ダイアゴナル・シングルレッグニーアップ(反対)', spec: '片脚20回1カウント', speech: '反対', voice: '反対', durationSec: null },
 
+    { group: '【Lv.1】スプリットスクワット', spec: '片脚20回4カウント', speech: 'スプリットスクワットいきます、よーいはじめ', voice: 'スプリットスクワットいきます、よーいはじめ', durationSec: null },
+    { group: '【Lv.2】オーバーヘッドスプリットスクワット', spec: '片脚20回4カウント', speech: 'オーバーヘッドスプリットスクワットいきます、よーいはじめ', voice: 'オーバーヘッドスプリットスクワットいきます、よーいはじめ', durationSec: null },
+    { group: '【Lv.3】ダイアゴナル・シングルレッグニーアップ', spec: '片脚20回1カウント', speech: 'ダイアゴナル・シングルレッグニーアップいきます、よーいはじめ', voice: 'ダイアゴナル・シングルレッグニーアップいきます、よーいはじめ', durationSec: null },
     { group: '【Lv.4】トゥリフト&カーフレイズ', spec: '片脚20回1カウント', speech: 'トゥリフトアンドカーフレイズいきます、よーいはじめ', voice: 'トゥリフトアンドカーフレイズいきます、よーいはじめ', durationSec: null },
+    { group: '【Lv.1】スプリットスクワット(反対)', spec: '片脚20回4カウント', speech: '反対', voice: '反対', durationSec: null },
+    { group: '【Lv.2】オーバーヘッドスプリットスクワット(反対)', spec: '片脚20回4カウント', speech: '反対', voice: '反対', durationSec: null },
+    { group: '【Lv.3】ダイアゴナル・シングルレッグニーアップ(反対)', spec: '片脚20回1カウント', speech: '反対', voice: '反対', durationSec: null },
     { group: '【Lv.4】トゥリフト&カーフレイズ(反対)', spec: '片脚20回1カウント', speech: '反対', voice: '反対', durationSec: null },
   ],
 };
@@ -2857,6 +2883,39 @@ function resetTabata() {
   renderTabataUI();
 }
 
+// 全セット終了後、脈拍を測るための15秒タイマー。タバタ本体とは独立して
+// 動く(セットが進行中でも押せる)。ボタンを押した瞬間にだけ動き始め、
+// 15秒経つと自動で止まる。
+const PULSE_TIMER_SEC = 15;
+let pulseTimerRunning = false;
+let pulseTimerStartEpoch = 0;
+
+function updatePulseTimerDisplay() {
+  if (!pulseTimerRunning) {
+    el.pulseTimerValue.textContent = String(PULSE_TIMER_SEC);
+    return;
+  }
+  const elapsedMs = Date.now() - pulseTimerStartEpoch;
+  const remainingSec = Math.max(0, PULSE_TIMER_SEC - Math.floor(elapsedMs / 1000));
+  el.pulseTimerValue.textContent = String(remainingSec);
+  if (remainingSec <= 0) {
+    pulseTimerRunning = false;
+    el.pulseTimerStartBtn.disabled = false;
+    el.pulseTimerStartBtn.textContent = 'スタート';
+    if ('vibrate' in navigator) navigator.vibrate([300, 100, 300]);
+  }
+}
+
+function startPulseTimer() {
+  if (pulseTimerRunning) return;
+  pulseTimerRunning = true;
+  pulseTimerStartEpoch = Date.now();
+  el.pulseTimerStartBtn.disabled = true;
+  el.pulseTimerStartBtn.textContent = '計測中';
+  updatePulseTimerDisplay();
+  if ('vibrate' in navigator) navigator.vibrate([200]);
+}
+
 function tickTabata() {
   if (tabataRunning && tabataIndex >= 0 && tabataIndex < TABATA_PHASES.length) {
     const phase = TABATA_PHASES[tabataIndex];
@@ -2866,11 +2925,13 @@ function tickTabata() {
       updateTabataTimerDisplay();
     }
   }
+  if (pulseTimerRunning) updatePulseTimerDisplay();
   requestAnimationFrame(tickTabata);
 }
 
 el.tabataStartBtn.addEventListener('click', startTabata);
 el.tabataResetBtn.addEventListener('click', resetTabata);
+el.pulseTimerStartBtn.addEventListener('click', startPulseTimer);
 
 renderTabataUI();
 requestAnimationFrame(tickTabata);
