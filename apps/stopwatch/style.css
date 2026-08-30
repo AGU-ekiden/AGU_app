@@ -144,19 +144,12 @@ html, body {
   --border: var(--child-border);
 }
 
-/* 計測タブの(複製ではない)本体ストップウォッチだけグレー基調に。
-   複製されたストップウォッチ(.is-child)は親と区別するための青の
-   まま変更しない。 */
+/* 計測タブの(複製ではない)本体ストップウォッチだけ、白いケース部分
+   (watch-body)をグレーに。スタート/ラップボタンやLCD画面はグリーンの
+   まま(--accentは上書きしない)。複製されたストップウォッチ(.is-child)
+   は親と区別するための青のまま変更しない。 */
 #timerTab .stopwatch-card:not(.is-child) {
-  --accent: #6b7280;
-  --accent-dim: #d1d5db;
-  --accent-dark: #4b5563;
-  --danger: #4b5563;
-  --danger-dim: #e5e7eb;
-  --lcd-bg: #e5e7eb;
-  --lcd-ink: #374151;
-  --lcd-ink-dim: #9ca3af;
-  --panel-2: #f0f1f3;
+  --panel: #e2e4e7;
 }
 
 .sw-header {
