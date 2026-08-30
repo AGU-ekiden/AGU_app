@@ -938,6 +938,37 @@
     background: var(--bg-card);
   }
 
+  /* Racing Watch keeps a solid-black camera view (.rw-* rules above use
+     hardcoded dark colors and are unaffected by the light/green retheme).
+     But the header above it and the stopwatch half below it (.rw-stopwatch-half,
+     .rw-laps-wrap, the live stat readout, the start/lap buttons) are built
+     from the app's general themed components, so they turned white when the
+     app was recolored -- jarring right above/below a black viewfinder.
+     Re-point the theme tokens back to the pre-recolor dark values (from
+     before commit b215a04) only while Racing Watch is on screen; every
+     other page keeps the new light+green theme untouched. */
+  body.rw-active {
+    --bg-page: #16181b;
+    --bg-card: #24272c;
+    --key-face: #33373e;
+    --key-face-hi: #3d424a;
+    --border: #3a3f47;
+    --text-0: #eef1f5;
+    --text-1: #a7aeb8;
+    --text-2: #767d87;
+    --lcd-bg: #b9c5aa;
+    --lcd-bg-2: #a9b79a;
+    --lcd-border: #6f7c66;
+    --lcd-ink: #171f18;
+    --lcd-faint: #4a5a49;
+    --green: #4ade80;
+    --green-border: #2f6b45;
+    --red: #ff6b6f;
+    --red-border: #7a3033;
+    --blue: #7ab5ff;
+    --blue-border: #2f5183;
+  }
+
   /* ---------- Timer Copy (second stopwatch) ---------- */
   .timer2-section {
     background: var(--bg-card);
@@ -2484,7 +2515,7 @@
 <div class="app">
 
   <header>
-    <a href="/" style="flex:0 0 auto;display:inline-flex;align-items:center;height:32px;padding:0 10px;margin-right:8px;border-radius:8px;background:#c9a227;color:#10254a;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">← ポータル</a>
+    <a href="/" style="flex:0 0 auto;display:inline-flex;align-items:center;height:32px;padding:0 10px;margin-right:8px;border-radius:8px;background:#3e8a88;color:#ffffff;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">← ポータル</a>
     <div class="brand">
       <button class="app-title-btn" id="appTitleBtn">
         <span class="title" id="appTitleText">Joy-Con Stopwatch</span>
