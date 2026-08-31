@@ -1,13 +1,12 @@
 // Stores the stopwatch app's team-shared cue voice recordings on the
-// trainer's existing Xserver hosting via FTP — same account/credentials as
-// ftpImages.ts, but under its own stretch-audio/ subdirectory so the two
-// don't mix.
+// trainer's Lolipop hosting via FTP (migrated from Xserver) — same
+// account/credentials as ftpImages.ts, but under its own stretch-audio/
+// subdirectory so the two don't mix.
 //
 // Filenames are a hash of (category, set, cue text), never the Japanese
-// text itself — confirmed by direct testing that this specific Xserver
-// account 404s on percent-encoded non-ASCII filenames (e.g.
-// stretch-audio/%E6%AC%A1...m4a) even though the exact same bytes under a
-// plain ASCII name in the exact same folder serve and play back fine. So a
+// text itself — this was originally worked around a Xserver-specific 404 on
+// percent-encoded non-ASCII filenames, but the ASCII-hash approach is safe
+// and host-agnostic, so it's kept as-is after the move to Lolipop. A
 // manifest.json file (also in stretch-audio/) is the single source of
 // truth mapping each hash back to its (category, set, text); listing reads
 // that file instead of listing/decoding directory contents.
@@ -26,7 +25,7 @@ import { PassThrough, Readable } from "node:stream";
 import { createHash } from "node:crypto";
 
 const AUDIO_DIR = "stretch-audio";
-const PUBLIC_BASE_URL = `https://acc-pg.com/library-images/${AUDIO_DIR}`;
+const PUBLIC_BASE_URL = `https://aogaku-tf.com/library-images/${AUDIO_DIR}`;
 const MANIFEST_FILENAME = "manifest.json";
 
 // Must match the stopwatch app's own DEFAULT_SET_NAME constant exactly —
@@ -95,10 +94,10 @@ async function writeManifest(client: Client, entries: ManifestEntry[]): Promise<
   await client.uploadFrom(Readable.from(Buffer.from(JSON.stringify(entries), "utf-8")), MANIFEST_FILENAME);
 }
 
-// Xserver's default Apache mime.types has no mapping for .m4a/.webm/.ogg —
-// confirmed by direct testing (a fresh Blob with an explicit type plays
-// fine locally; the identical bytes served from this host did not, until
-// this was added). An .htaccess with explicit AddType directives fixes it.
+// Default Apache mime.types on shared hosting commonly has no mapping for
+// .m4a/.webm/.ogg (confirmed on the previous Xserver host; kept here as a
+// defensive no-op after the move to Lolipop, since it's harmless either
+// way). An .htaccess with explicit AddType directives fixes it.
 const HTACCESS_CONTENT = "AddType audio/mp4 .m4a\nAddType audio/webm .webm\nAddType audio/ogg .ogg\nAddType audio/wav .wav\n";
 
 async function ensureAudioDir(client: Client): Promise<void> {
