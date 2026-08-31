@@ -20,6 +20,14 @@ const PUBLIC_BASE_URL = "https://aogaku-tf.com/library-images";
 const MAX_DIMENSION = 1600;
 const JPEG_QUALITY = 82;
 
+// Disables directory listing and asks crawlers not to index this folder —
+// filenames are timestamp-prefixed and unguessable, and nothing links to
+// them from a public page, but this is cheap defense-in-depth against
+// photos turning up in image search results. mod_headers is wrapped in
+// <IfModule> so this stays a no-op (rather than a 500) if that module
+// isn't enabled on the host.
+const HTACCESS_CONTENT = 'Options -Indexes\n<IfModule mod_headers.c>\nHeader set X-Robots-Tag "noindex, nofollow"\n</IfModule>\n';
+
 /** Trimmed to survive a trailing newline/space picked up when pasting into
  *  Vercel's env var field — the same issue seen with EDIT_PASSWORD. */
 function envOrThrow(name: string): string {
@@ -40,6 +48,12 @@ function sanitizeStem(originalName: string): string {
     .slice(0, 60);
 }
 
+async function ensureLibraryDir(client: Client): Promise<void> {
+  await client.ensureDir(REMOTE_DIR); // creates it if missing and cds into it
+  await client.sendIgnoringError("SITE CHMOD 755 .");
+  await client.uploadFrom(Readable.from(Buffer.from(HTACCESS_CONTENT, "utf-8")), ".htaccess").catch(() => {});
+}
+
 async function uploadBuffer(buffer: Buffer, filename: string): Promise<void> {
   // Read config env vars first so a missing/misconfigured var reports
   // clearly, rather than being swallowed into the generic network-error
@@ -51,8 +65,7 @@ async function uploadBuffer(buffer: Buffer, filename: string): Promise<void> {
   const client = new Client(15_000); // fail fast rather than leave the editor spinning
   try {
     await client.access({ host, user, password, secure: true });
-    await client.ensureDir(REMOTE_DIR); // creates it if missing and cds into it
-    await client.sendIgnoringError("SITE CHMOD 755 .");
+    await ensureLibraryDir(client);
     await client.uploadFrom(Readable.from(buffer), filename);
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
@@ -134,7 +147,7 @@ export async function rotateImage(url: string): Promise<string> {
   const client = new Client(15_000);
   try {
     await client.access({ host, user, password, secure: true });
-    await client.ensureDir(REMOTE_DIR);
+    await ensureLibraryDir(client);
     const original = await downloadBuffer(client, oldFilename);
     const rotated = await sharp(original).rotate(90).jpeg({ quality: JPEG_QUALITY }).toBuffer();
     await client.uploadFrom(Readable.from(rotated), newFilename);

@@ -110,7 +110,14 @@ async function writeManifest(client: Client, entries: ManifestEntry[]): Promise<
 // .m4a/.webm/.ogg (confirmed on the previous Xserver host; kept here as a
 // defensive no-op after the move to Lolipop, since it's harmless either
 // way). An .htaccess with explicit AddType directives fixes it.
-const HTACCESS_CONTENT = "AddType audio/mp4 .m4a\nAddType audio/webm .webm\nAddType audio/ogg .ogg\nAddType audio/wav .wav\n";
+//
+// Also disables directory listing and asks crawlers not to index this
+// folder — filenames are unguessable hashes and nothing links to them, but
+// this is cheap defense-in-depth against the recordings turning up in
+// search results. mod_headers is wrapped in <IfModule> so this stays a
+// no-op (rather than a 500) if that module isn't enabled on the host.
+const HTACCESS_CONTENT =
+  "AddType audio/mp4 .m4a\nAddType audio/webm .webm\nAddType audio/ogg .ogg\nAddType audio/wav .wav\nOptions -Indexes\n<IfModule mod_headers.c>\nHeader set X-Robots-Tag \"noindex, nofollow\"\n</IfModule>\n";
 
 async function ensureAudioDir(client: Client): Promise<void> {
   await client.ensureDir(REMOTE_DIR); // creates it if missing and cds into it
