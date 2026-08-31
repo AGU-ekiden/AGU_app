@@ -98,6 +98,15 @@ export async function uploadImage(fileBuffer: Buffer, originalName: string): Pro
   return `${PUBLIC_BASE_URL}/${filename}`;
 }
 
+/** Uploads a file byte-for-byte at an exact filename — no resize, no
+ *  timestamp prefix. Used only by the one-time legacy-host migration route,
+ *  where preserving the original filename means the markdown content
+ *  referencing it doesn't need to change, just its URL's host. */
+export async function uploadRawAtFilename(buffer: Buffer, filename: string): Promise<string> {
+  await uploadBuffer(buffer, filename);
+  return `${PUBLIC_BASE_URL}/${filename}`;
+}
+
 /** Uploads a PDF as-is (no conversion) and returns its public URL. Lands in
  *  the same library-images/ folder as photos — it's just a directory on the
  *  FTP account, not actually restricted to images. */
