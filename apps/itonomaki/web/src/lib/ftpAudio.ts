@@ -3,6 +3,14 @@
 // account/credentials as ftpImages.ts, but under its own stretch-audio/
 // subdirectory so the two don't mix.
 //
+// The FTP login's home directory is NOT the same as aogaku-tf.com's public
+// document root — on Lolipop, a custom domain is mapped to one specific
+// subfolder (configured under サーバーの管理・設定 → 独自ドメイン設定 →
+// 公開(アップロード)フォルダ), which for aogaku-tf.com is "aogaku". Anything
+// written outside that folder is invisible to the public site, so every
+// remote path here is rooted under REMOTE_DIR ("aogaku/stretch-audio"),
+// not just AUDIO_DIR.
+//
 // Filenames are a hash of (category, set, cue text), never the Japanese
 // text itself — this was originally worked around a Xserver-specific 404 on
 // percent-encoded non-ASCII filenames, but the ASCII-hash approach is safe
@@ -25,7 +33,11 @@ import { PassThrough, Readable } from "node:stream";
 import { createHash } from "node:crypto";
 
 const AUDIO_DIR = "stretch-audio";
-const PUBLIC_BASE_URL = `https://aogaku-tf.com/library-images/${AUDIO_DIR}`;
+// Kept parallel to (not nested under) library-images/ — ftpImages.ts's
+// photo library — per how the two are meant to sit side by side under
+// aogaku-tf.com's public folder.
+const REMOTE_DIR = `aogaku/${AUDIO_DIR}`;
+const PUBLIC_BASE_URL = `https://aogaku-tf.com/${AUDIO_DIR}`;
 const MANIFEST_FILENAME = "manifest.json";
 
 // Must match the stopwatch app's own DEFAULT_SET_NAME constant exactly —
@@ -101,7 +113,7 @@ async function writeManifest(client: Client, entries: ManifestEntry[]): Promise<
 const HTACCESS_CONTENT = "AddType audio/mp4 .m4a\nAddType audio/webm .webm\nAddType audio/ogg .ogg\nAddType audio/wav .wav\n";
 
 async function ensureAudioDir(client: Client): Promise<void> {
-  await client.ensureDir(AUDIO_DIR); // creates it if missing and cds into it
+  await client.ensureDir(REMOTE_DIR); // creates it if missing and cds into it
   await client.sendIgnoringError("SITE CHMOD 755 .");
   await client.uploadFrom(Readable.from(Buffer.from(HTACCESS_CONTENT, "utf-8")), ".htaccess").catch(() => {});
 }
@@ -118,7 +130,7 @@ export interface SharedRecording {
  *  yet. */
 export async function listSharedRecordings(): Promise<SharedRecording[]> {
   return withClient(async (client) => {
-    await client.ensureDir(AUDIO_DIR);
+    await client.ensureDir(REMOTE_DIR);
     const manifest = await readManifest(client);
     return manifest.map((e) => ({
       category: e.category,
@@ -169,7 +181,7 @@ export async function uploadSharedRecording(buffer: Buffer, category: string, se
  *  triple. */
 export async function deleteSharedRecording(category: string, setName: string, text: string): Promise<void> {
   await withClient(async (client) => {
-    await client.ensureDir(AUDIO_DIR);
+    await client.ensureDir(REMOTE_DIR);
     const manifest = await readManifest(client);
     const entry = manifest.find((e) => e.category === category && e.setName === setName && e.text === text);
     if (!entry) return;
@@ -184,7 +196,7 @@ export async function deleteSharedRecording(category: string, setName: string, t
 /** Deletes every recording belonging to the given (category, set). */
 export async function deleteSharedSet(category: string, setName: string): Promise<void> {
   await withClient(async (client) => {
-    await client.ensureDir(AUDIO_DIR);
+    await client.ensureDir(REMOTE_DIR);
     const manifest = await readManifest(client);
     const toRemove = manifest.filter((e) => e.category === category && e.setName === setName);
     for (const entry of toRemove) {

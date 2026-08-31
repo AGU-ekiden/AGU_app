@@ -1,14 +1,19 @@
-// Uploads library photos to the trainer's existing Xserver hosting via FTP,
-// rather than bundling them into the git repo / Vercel deployment (avoids
-// deployment size limits, and reuses hosting the trainer already pays for).
+// Uploads library photos to the trainer's Lolipop hosting via FTP (migrated
+// from Xserver), rather than bundling them into the git repo / Vercel
+// deployment (avoids deployment size limits, and reuses hosting the trainer
+// already pays for).
 import { Client } from "basic-ftp";
 import sharp from "sharp";
 import { PassThrough, Readable } from "node:stream";
 
-// The FTP account itself is scoped to library-images/ as its login root
-// (configured on the Xserver side), so uploads land directly there — no
-// subdirectory to create or change into.
-const PUBLIC_BASE_URL = "https://acc-pg.com/library-images";
+// The FTP login's home directory is NOT the same as aogaku-tf.com's public
+// document root — on Lolipop, a custom domain is mapped to one specific
+// subfolder (configured under サーバーの管理・設定 → 独自ドメイン設定 →
+// 公開(アップロード)フォルダ), which for aogaku-tf.com is "aogaku". Every
+// upload/download here is therefore rooted under REMOTE_DIR, not just at
+// the FTP login root as it was on the old Xserver account.
+const REMOTE_DIR = "aogaku/library-images";
+const PUBLIC_BASE_URL = "https://aogaku-tf.com/library-images";
 
 // Phone photos are routinely 3000px+ wide and several MB; this keeps the
 // published file small without visibly hurting quality for an article image.
@@ -46,6 +51,8 @@ async function uploadBuffer(buffer: Buffer, filename: string): Promise<void> {
   const client = new Client(15_000); // fail fast rather than leave the editor spinning
   try {
     await client.access({ host, user, password, secure: true });
+    await client.ensureDir(REMOTE_DIR); // creates it if missing and cds into it
+    await client.sendIgnoringError("SITE CHMOD 755 .");
     await client.uploadFrom(Readable.from(buffer), filename);
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
@@ -127,6 +134,7 @@ export async function rotateImage(url: string): Promise<string> {
   const client = new Client(15_000);
   try {
     await client.access({ host, user, password, secure: true });
+    await client.ensureDir(REMOTE_DIR);
     const original = await downloadBuffer(client, oldFilename);
     const rotated = await sharp(original).rotate(90).jpeg({ quality: JPEG_QUALITY }).toBuffer();
     await client.uploadFrom(Readable.from(rotated), newFilename);
