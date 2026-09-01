@@ -34,9 +34,10 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // The two migrate-legacy routes are excluded: they're one-time admin
-  // endpoints with their own Bearer-token check (EDIT_PASSWORD /
-  // STRETCH_AUDIO_TOKEN), and that Authorization header would otherwise
-  // collide with this Basic-auth check, which only understands "Basic ...".
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/stretch-audio/migrate-legacy|api/edit/migrate-legacy-images).*)"],
+  // /api/stretch-audio is excluded: the stopwatch app (a separate site)
+  // calls it cross-origin with no way to supply this site's Basic-auth
+  // credentials. It already has its own protection — GET is meant to be
+  // public (per its own doc comment), POST/DELETE require a bearer
+  // STRETCH_AUDIO_TOKEN — so this doesn't leave it open.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/stretch-audio).*)"],
 };
