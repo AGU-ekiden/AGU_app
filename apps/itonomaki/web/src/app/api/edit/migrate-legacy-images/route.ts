@@ -6,8 +6,16 @@ import { uploadRawFilesBatch, type BatchRawUploadItem } from "@/lib/ftpImages";
 // was slow enough to hit the function's time limit with 100+ files. Fetches
 // now run concurrently; uploads still go over one shared FTP connection
 // (uploadRawFilesBatch), since FTP itself doesn't parallelize safely over a
-// single connection.
+// single connection. Even so, Lolipop's FTPS handshake per file is slow
+// enough that all 100+ in one call can still time out, so each call also
+// (a) skips files already present on the new host (checked via a HEAD
+// request — cheap, and filenames are preserved 1:1 so this is a direct
+// lookup), so repeated calls make forward progress, and (b) only attempts
+// up to `limit` new files (query param, default 25) — call this endpoint
+// repeatedly until migratedCount stops growing.
 const FETCH_CONCURRENCY = 8;
+const DEFAULT_LIMIT = 25;
+const NEW_HOST_BASE_URL = "https://aogaku-tf.com/library-images";
 
 export const maxDuration = 60;
 
@@ -172,12 +180,32 @@ async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T)
   return results;
 }
 
+async function existsOnNewHost(filename: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${NEW_HOST_BASE_URL}/${filename}`, { method: "HEAD", cache: "no-store" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: Request) {
   if (!requireEditToken(request)) {
     return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
   }
 
-  const fetchResults = await mapWithConcurrency(LEGACY_FILENAMES, FETCH_CONCURRENCY, async (filename) => {
+  const presenceChecks = await mapWithConcurrency(LEGACY_FILENAMES, FETCH_CONCURRENCY, async (filename) => ({
+    filename,
+    exists: await existsOnNewHost(filename),
+  }));
+  const remaining = presenceChecks.filter((c) => !c.exists).map((c) => c.filename);
+  const alreadyCount = presenceChecks.length - remaining.length;
+
+  const limitParam = Number(new URL(request.url).searchParams.get("limit"));
+  const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : DEFAULT_LIMIT;
+  const toProcess = remaining.slice(0, limit);
+
+  const fetchResults = await mapWithConcurrency(toProcess, FETCH_CONCURRENCY, async (filename) => {
     try {
       const fileRes = await fetch(`${LEGACY_BASE_URL}/${filename}`, { cache: "no-store" });
       if (!fileRes.ok) throw new Error(`ファイル取得失敗(status: ${fileRes.status})`);
@@ -203,6 +231,9 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     totalInList: LEGACY_FILENAMES.length,
+    alreadyOnNewHostCount: alreadyCount,
+    attemptedThisCall: toProcess.length,
+    stillRemainingAfterThisCall: remaining.length - toProcess.length,
     migratedCount: migrated.length,
     migrated,
     failedCount: failed.length,

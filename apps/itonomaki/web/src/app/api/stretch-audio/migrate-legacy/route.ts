@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { uploadSharedRecordingsBatch, type BatchUploadItem } from "@/lib/ftpAudio";
+import { uploadSharedRecordingsBatch, listSharedRecordings, type BatchUploadItem } from "@/lib/ftpAudio";
 
 // One-time migration: copies every recording still sitting on the old
 // Xserver host (acc-pg.com) into the new Lolipop host, via ftpAudio.ts's
@@ -17,8 +17,14 @@ const LEGACY_BASE_URL = "https://acc-pg.com/library-images/stretch-audio";
 // connection each time) was slow enough to hit the function's time limit
 // with 50+ recordings. Fetches now run concurrently; uploads still go over
 // one shared FTP connection (uploadSharedRecordingsBatch), since FTP itself
-// doesn't parallelize safely over a single connection.
+// doesn't parallelize safely over a single connection. Even so, Lolipop's
+// FTPS handshake per file is slow enough that all 50+ in one call can still
+// time out, so each call also (a) skips entries already present on the new
+// host, so repeated calls make forward progress, and (b) only attempts up
+// to `limit` new entries (query param, default 15) — call this endpoint
+// repeatedly until migratedCount stops growing.
 const FETCH_CONCURRENCY = 8;
+const DEFAULT_LIMIT = 15;
 
 export const maxDuration = 60;
 
@@ -72,7 +78,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "旧サーバーのmanifest.jsonの形式が不正です" }, { status: 502 });
   }
 
-  const fetchResults = await mapWithConcurrency(manifest, FETCH_CONCURRENCY, async (entry) => {
+  const already = await listSharedRecordings();
+  const alreadyKeys = new Set(already.map((r) => `${r.category}/${r.setName}/${r.text}`));
+  const remaining = manifest.filter((e) => !alreadyKeys.has(`${e.category}/${e.setName}/${e.text}`));
+
+  const limitParam = Number(new URL(request.url).searchParams.get("limit"));
+  const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : DEFAULT_LIMIT;
+  const toProcess = remaining.slice(0, limit);
+
+  const fetchResults = await mapWithConcurrency(toProcess, FETCH_CONCURRENCY, async (entry) => {
     try {
       const fileRes = await fetch(`${LEGACY_BASE_URL}/${entry.filename}`, { cache: "no-store" });
       if (!fileRes.ok) throw new Error(`ファイル取得失敗(status: ${fileRes.status})`);
@@ -110,6 +124,9 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     totalInLegacyManifest: manifest.length,
+    alreadyOnNewHostCount: alreadyKeys.size,
+    attemptedThisCall: toProcess.length,
+    stillRemainingAfterThisCall: remaining.length - toProcess.length,
     migratedCount: migrated.length,
     migrated,
     failedCount: failed.length,
