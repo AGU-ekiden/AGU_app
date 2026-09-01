@@ -315,9 +315,9 @@ function Editor({ sections, onLogout }: { sections: Section[]; onLogout: () => v
       setMessage(null);
       try {
         const res = await fetch(
-          `/api/edit/content?section=${encodeURIComponent(sectionSlug)}&topic=${encodeURIComponent(topicSlug)}`
+          apiPath(`/api/edit/content?section=${encodeURIComponent(sectionSlug)}&topic=${encodeURIComponent(topicSlug)}`)
         );
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error ?? "内容の読み込みに失敗しました");
         if (!cancelled) setContentText(data.content ?? "");
       } catch (err) {
