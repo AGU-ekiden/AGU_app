@@ -63,7 +63,7 @@ export function AppShell({
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-[var(--border)] bg-[var(--surface)]/90 px-4 py-3 backdrop-blur md:px-8 print:hidden">
           <a
             href="/"
-            className="hidden sm:inline-flex items-center rounded-md bg-[#3e8a88] px-2 py-1 text-xs font-bold text-white hover:bg-[#2c6462]"
+            className="inline-flex shrink-0 items-center rounded-md bg-[#3e8a88] px-2 py-1 text-xs font-bold text-white hover:bg-[#2c6462]"
           >
             ← ポータル
           </a>
