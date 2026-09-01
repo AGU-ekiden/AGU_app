@@ -34,5 +34,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // The two migrate-legacy routes are excluded: they're one-time admin
+  // endpoints with their own Bearer-token check (EDIT_PASSWORD /
+  // STRETCH_AUDIO_TOKEN), and that Authorization header would otherwise
+  // collide with this Basic-auth check, which only understands "Basic ...".
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/stretch-audio/migrate-legacy|api/edit/migrate-legacy-images).*)"],
 };

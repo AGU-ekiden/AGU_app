@@ -38,25 +38,7 @@ function requireAudioToken(request: Request): boolean {
 
 export async function POST(request: Request) {
   if (!requireAudioToken(request)) {
-    // TEMPORARY diagnostic — reveals lengths only, never the actual secret
-    // values, to help figure out why a value that "looks right" doesn't
-    // match. Revert this once the mismatch is found.
-    const expected = process.env.STRETCH_AUDIO_TOKEN?.trim();
-    const header = request.headers.get("authorization") ?? "";
-    const provided = header.startsWith("Bearer ") ? header.slice("Bearer ".length) : "";
-    return NextResponse.json(
-      {
-        error: "認証が必要です",
-        debug: {
-          envConfigured: !!expected,
-          expectedLength: expected?.length ?? 0,
-          providedLength: provided.length,
-          headerReceived: header.length > 0,
-          headerStartsWithBearer: header.startsWith("Bearer "),
-        },
-      },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
   }
 
   const manifestRes = await fetch(`${LEGACY_BASE_URL}/manifest.json`, { cache: "no-store" }).catch(() => null);
