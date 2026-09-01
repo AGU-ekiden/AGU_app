@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import { checkPassword } from "@/lib/editAuth";
-import { uploadRawAtFilename } from "@/lib/ftpImages";
+import { uploadRawFilesBatch, type BatchRawUploadItem } from "@/lib/ftpImages";
+
+// Fetching+uploading files one-at-a-time (reconnecting over FTP each time)
+// was slow enough to hit the function's time limit with 100+ files. Fetches
+// now run concurrently; uploads still go over one shared FTP connection
+// (uploadRawFilesBatch), since FTP itself doesn't parallelize safely over a
+// single connection.
+const FETCH_CONCURRENCY = 8;
+
+export const maxDuration = 60;
 
 // One-time migration: copies every photo/PDF still referenced from
 // notion_sync/content that lives on the old Xserver host (acc-pg.com) over
@@ -150,24 +159,46 @@ function requireEditToken(request: Request): boolean {
   return checkPassword(provided);
 }
 
+async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let next = 0;
+  async function worker() {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await fn(items[i]);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}
+
 export async function POST(request: Request) {
   if (!requireEditToken(request)) {
     return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
   }
 
-  const migrated: string[] = [];
-  const failed: { filename: string; error: string }[] = [];
-
-  for (const filename of LEGACY_FILENAMES) {
+  const fetchResults = await mapWithConcurrency(LEGACY_FILENAMES, FETCH_CONCURRENCY, async (filename) => {
     try {
       const fileRes = await fetch(`${LEGACY_BASE_URL}/${filename}`, { cache: "no-store" });
       if (!fileRes.ok) throw new Error(`ファイル取得失敗(status: ${fileRes.status})`);
       const buffer = Buffer.from(await fileRes.arrayBuffer());
-      await uploadRawAtFilename(buffer, filename);
-      migrated.push(filename);
+      return { filename, buffer, error: null as string | null };
     } catch (err) {
-      failed.push({ filename, error: err instanceof Error ? err.message : String(err) });
+      return { filename, buffer: null, error: err instanceof Error ? err.message : String(err) };
     }
+  });
+
+  const failed: { filename: string; error: string }[] = [];
+  const toUpload: BatchRawUploadItem[] = [];
+  for (const r of fetchResults) {
+    if (r.error || !r.buffer) failed.push({ filename: r.filename, error: r.error ?? "unknown fetch error" });
+    else toUpload.push({ filename: r.filename, buffer: r.buffer });
+  }
+
+  const uploadResults = toUpload.length > 0 ? await uploadRawFilesBatch(toUpload) : [];
+  const migrated = uploadResults.filter((r) => r.ok).map((r) => r.filename);
+  for (const r of uploadResults) {
+    if (!r.ok) failed.push({ filename: r.filename, error: r.error ?? "unknown upload error" });
   }
 
   return NextResponse.json({

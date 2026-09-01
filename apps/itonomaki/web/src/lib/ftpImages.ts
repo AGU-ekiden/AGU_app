@@ -107,6 +107,46 @@ export async function uploadRawAtFilename(buffer: Buffer, filename: string): Pro
   return `${PUBLIC_BASE_URL}/${filename}`;
 }
 
+export interface BatchRawUploadItem {
+  filename: string;
+  buffer: Buffer;
+}
+
+export interface BatchRawUploadResult {
+  filename: string;
+  ok: boolean;
+  url?: string;
+  error?: string;
+}
+
+/** Same behavior as calling uploadRawAtFilename() once per item, but over a
+ *  single FTP connection — used by the legacy-host migration, where
+ *  reconnecting per item (100+ times) was slow enough to hit the serverless
+ *  function's time limit. */
+export async function uploadRawFilesBatch(items: BatchRawUploadItem[]): Promise<BatchRawUploadResult[]> {
+  const host = envOrThrow("FTP_HOST");
+  const user = envOrThrow("FTP_USER");
+  const password = envOrThrow("FTP_PASSWORD");
+
+  const client = new Client(15_000);
+  const results: BatchRawUploadResult[] = [];
+  try {
+    await client.access({ host, user, password, secure: true });
+    await ensureLibraryDir(client);
+    for (const item of items) {
+      try {
+        await client.uploadFrom(Readable.from(item.buffer), item.filename);
+        results.push({ filename: item.filename, ok: true, url: `${PUBLIC_BASE_URL}/${item.filename}` });
+      } catch (err) {
+        results.push({ filename: item.filename, ok: false, error: err instanceof Error ? err.message : String(err) });
+      }
+    }
+  } finally {
+    client.close();
+  }
+  return results;
+}
+
 /** Uploads a PDF as-is (no conversion) and returns its public URL. Lands in
  *  the same library-images/ folder as photos — it's just a directory on the
  *  FTP account, not actually restricted to images. */

@@ -184,6 +184,63 @@ export async function uploadSharedRecording(buffer: Buffer, category: string, se
   });
 }
 
+export interface BatchUploadItem {
+  buffer: Buffer;
+  category: string;
+  setName: string;
+  text: string;
+  mimeType: string;
+}
+
+export interface BatchUploadResult {
+  key: string;
+  ok: boolean;
+  url?: string;
+  error?: string;
+}
+
+/** Same behavior as calling uploadSharedRecording() once per item, but over
+ *  a single FTP connection and a single manifest read/write — used by the
+ *  legacy-host migration, where reconnecting per item (dozens of times)
+ *  was slow enough to hit the serverless function's time limit. */
+export async function uploadSharedRecordingsBatch(items: BatchUploadItem[]): Promise<BatchUploadResult[]> {
+  return withClient(async (client) => {
+    await ensureAudioDir(client);
+    const manifest = await readManifest(client);
+    const results: BatchUploadResult[] = [];
+
+    for (const item of items) {
+      const key = `${item.category}/${item.setName}/${item.text}`;
+      try {
+        const filename = `${hashKey(item.category, item.setName, item.text)}.${extensionForMimeType(item.mimeType)}`;
+        const existingIdx = manifest.findIndex((e) => e.category === item.category && e.setName === item.setName && e.text === item.text);
+        if (existingIdx >= 0 && manifest[existingIdx].filename !== filename) {
+          await client.remove(manifest[existingIdx].filename).catch(() => {});
+        }
+
+        await client.uploadFrom(Readable.from(item.buffer), filename);
+        await client.sendIgnoringError(`SITE CHMOD 644 ${filename}`);
+
+        const remoteSize = await client.size(filename);
+        if (remoteSize !== item.buffer.length) {
+          throw new Error(`アップロード後の確認に失敗しました(サーバー上のサイズ ${remoteSize} バイト、期待値 ${item.buffer.length} バイト)`);
+        }
+
+        const entry = { category: item.category, setName: item.setName, text: item.text, filename };
+        if (existingIdx >= 0) manifest[existingIdx] = entry;
+        else manifest.push(entry);
+
+        results.push({ key, ok: true, url: `${PUBLIC_BASE_URL}/${filename}` });
+      } catch (err) {
+        results.push({ key, ok: false, error: err instanceof Error ? err.message : String(err) });
+      }
+    }
+
+    await writeManifest(client, manifest);
+    return results;
+  });
+}
+
 /** Deletes whatever recording matches the given (category, set, cue text)
  *  triple. */
 export async function deleteSharedRecording(category: string, setName: string, text: string): Promise<void> {
