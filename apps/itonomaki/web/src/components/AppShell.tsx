@@ -61,12 +61,6 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-[var(--border)] bg-[var(--surface)]/90 px-4 py-3 backdrop-blur md:px-8 print:hidden">
-          <a
-            href="/"
-            className="inline-flex shrink-0 items-center rounded-md bg-[#3e8a88] px-2 py-1 text-xs font-bold text-white hover:bg-[#2c6462]"
-          >
-            ← ポータル
-          </a>
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
@@ -77,8 +71,7 @@ export function AppShell({
               <path strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-[var(--fg-strong)]">
-            <span className="text-lg">💪</span>
+          <Link href="/" className="flex items-center font-semibold tracking-tight text-[var(--fg-strong)]">
             <span className="truncate">青トレ(基礎知識)</span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
@@ -96,6 +89,12 @@ export function AppShell({
               </svg>
             </Link>
             <ThemeToggle />
+            <a
+              href="/"
+              className="inline-flex h-9 shrink-0 items-center rounded-[10px] bg-[#3e8a88] px-2.5 text-xs font-bold text-white hover:bg-[#2c6462]"
+            >
+              ← ポータル
+            </a>
           </div>
         </header>
         <main className="flex-1">{children}</main>
