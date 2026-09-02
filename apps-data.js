@@ -131,4 +131,14 @@ window.APPS = [
     liveUrl: '/keihi-seisan/',
     stack: 'Next.js + GAS(各自のスプレッドシート)',
   },
+  {
+    id: 'training-result',
+    name: '練習結果ビューア',
+    description: 'Dropboxに保存された練習結果(合格/不合格などのPDF)を一覧・検索・詳細閲覧できるアプリ。',
+    category: 'measure',
+    icon: '📄',
+    repoUrl: `${REPO_TREE}/apps/training-result`,
+    liveUrl: null,
+    stack: 'Next.js + Dropbox API',
+  },
 ];
