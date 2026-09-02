@@ -141,4 +141,14 @@ window.APPS = [
     liveUrl: '/training-result/',
     stack: 'Next.js + Dropbox API',
   },
+  {
+    id: 'training-log',
+    name: '練習日誌',
+    description: 'Garmin/COROS→Strava経由の走行データ(距離・タイム・ペース・心拍)を自動取得し、RPE・違和感部位・睡眠・所感などの主観データと合わせてNotionに記録する練習日誌アプリ。',
+    category: 'measure',
+    icon: '📝',
+    repoUrl: `${REPO_TREE}/apps/training-log`,
+    liveUrl: null,
+    stack: 'Next.js + Strava API + Supabase + Notion API',
+  },
 ];

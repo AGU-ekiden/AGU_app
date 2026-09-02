@@ -32,6 +32,7 @@ window.FEATURES = {
   injury_report: { name: '故障者報告確認', icon: '🚑', target: null, note: '未構築(今後追加予定)' },
   keihi: { name: '経費精算', icon: '💳', target: 'keihi-seisan', note: null },
   training_result: { name: '練習結果', icon: '📄', target: 'training-result', note: null },
+  training_log: { name: '練習日誌', icon: '📝', target: 'training-log', note: null },
 };
 
 window.ROLES = [
@@ -39,7 +40,7 @@ window.ROLES = [
     id: 'athlete',
     name: '選手',
     icon: '🏃',
-    features: ['tabata', 'reinforce', 'stretch', 'pace', 'aotore', 'blood', 'race_result', 'training_result'],
+    features: ['training_log', 'tabata', 'reinforce', 'stretch', 'pace', 'aotore', 'blood', 'race_result', 'training_result'],
   },
   {
     id: 'manager',
@@ -48,7 +49,7 @@ window.ROLES = [
     features: [
       'stopwatch_main', 'tabata', 'rollcall', 'reinforce', 'stretch', 'crossing',
       'pace', 'aotore', 'ryouhi', 'injury_report', 'blood', 'race_result',
-      'training_result', 'label', 'racing_watch',
+      'training_result', 'training_log', 'label', 'racing_watch',
     ],
   },
   {
@@ -59,7 +60,7 @@ window.ROLES = [
       'reinforce', 'stopwatch_main', 'rollcall', 'tabata', 'stretch',
       'physical_karte_view', 'medical_karte_view', 'crossing', 'pace', 'aotore',
       'ryouhi', 'task_manage', 'injury_report', 'blood', 'race_result',
-      'training_result', 'label', 'racing_watch', 'meal_count', 'keihi',
+      'training_result', 'training_log', 'label', 'racing_watch', 'meal_count', 'keihi',
     ],
   },
   {

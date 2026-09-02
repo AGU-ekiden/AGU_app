@@ -14,10 +14,11 @@
 | 8 | tiryou-karte | `agu-tiryou-karte` | `apps/tiryou-karte` | Next.js 16 | `/tiryou-karte/` |
 | 9 | spm-medical-record | `agu-spm-medical-record` | `apps/spm-medical-record` | Next.js 16 | `/spm-medical-record/` |
 | 10 | itonomaki | `agu-itonomaki` | `apps/itonomaki/web` | Next.js 16 | `/itonomaki/` |
+| 11 | training-log | `agu-training-log` | `apps/training-log` | Next.js 16 | `/training-log/`(未デプロイ) |
 
 - 静的アプリ(2〜5): Framework Preset = **Other**、Build Command は空、Output Directory はルート
 - Viteアプリ(6〜7): Framework Preset = **Vite**、Build = `npm run build`、Output = `dist`
-- Next.jsアプリ(8〜10): Framework Preset = **Next.js**(既存の設定・自動検出でOK)
+- Next.jsアプリ(8〜11): Framework Preset = **Next.js**(既存の設定・自動検出でOK)
 
 セットアップの実体は `setup_vercel.py` / `vercel-apps.json` の1組だけです(Cloudflare向けだった `setup_cloudflare.py` / `cloudflare-apps.json` は移行に伴い廃止しました)。
 
@@ -62,6 +63,7 @@ python3 scripts/setup_vercel.py --only ryouhi,label_create
 
 ### 注意点
 
+- **Ignored Build Step を設定すること(1日のデプロイ回数上限に引っかかりやすい問題への対処)** — このリポジトリはモノレポで、全プロジェクトが同じGitHubリポジトリを見ています。何も設定しないと、リポジトリのどこか1箇所に1回pushしただけで**全プロジェクトのビルドが同時に走り**、Vercel Hobbyプランの1日のデプロイ回数上限にすぐ到達します。`scripts/vercel-apps.json` の各アプリに `ignoreBuildStepCommand`(例: `git diff --quiet HEAD^ HEAD -- apps/training-log`)を指定して `setup_vercel.py` を実行すると、そのプロジェクトのRoot Directory配下に変更が無いpushではビルドをスキップするようになります(Vercelダッシュボードなら Settings → Git → Ignored Build Step から手動設定も可能)。現状 `training-log` にのみ設定済みです。他のプロジェクトにも順次設定することを推奨します。
 - **Production Branch は `main` に設定すること**(`main` が存在しない状態でプロジェクトを作ってしまうと、「プロジェクトはできているのにデプロイが1回も走らない」状態になる事故が過去にあった)
 - 各プロジェクトの **Node.js Versionは22.x**(Next.js 16のため)
 - スクリプトが期待通り動かない場合、無理に直そうとせず**Vercelダッシュボードから手動で作成する**方が早いこともあります。その場合は上表のRoot Directory / Framework Preset / Build設定をそのまま使ってください
@@ -144,6 +146,21 @@ BLOB_READ_WRITE_TOKEN              (写真アップロード用。Vercelダッ�
 ```
 
 Notion関連の値は tiryou-karte と spm-medical-record で共通で問題ないことを確認済みです。
+
+### training-log(すべて必須。未デプロイ)
+
+```
+NOTION_TOKEN
+NOTION_TRAINING_LOG_DATABASE_ID
+NOTION_MEMBERS_DATABASE_ID         (任意。tiryou-karteと同じ値。設定すると「部員」relationを紐付ける)
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+STRAVA_CLIENT_ID
+STRAVA_CLIENT_SECRET
+STRAVA_REDIRECT_URI                 https://<ポータルのドメイン>/training-log/api/strava/callback
+```
+
+Strava側の管理画面(https://www.strava.com/settings/api )で「Authorization Callback Domain」にポータルのドメインを登録する必要があります。詳細は `apps/training-log/README.md` 参照。
 
 ### itonomaki(すべて任意。未設定でも閲覧はできる)
 

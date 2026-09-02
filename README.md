@@ -23,7 +23,9 @@ AGU_app/
     ├── itonomaki/
     │   ├── web/           ← デプロイ対象はこちら(Next.js)
     │   └── notion_sync/   Notion同期用スクリプト(Python、非デプロイ)
-    └── spm-medical-record/ Next.js + Notion API
+    ├── spm-medical-record/ Next.js + Notion API
+    ├── training-result/   Next.js + Dropbox API
+    └── training-log/      Next.js + Strava API + Supabase + Notion API
 ```
 
 ## デプロイ先: Vercel
@@ -94,6 +96,7 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 | メディカルカルテ (tiryou-karte) | メディカル | `/tiryou-karte/` |
 | トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | `/itonomaki/` |
 | フィジカルカルテ(SPM) (spm-medical-record) | メディカル | `/spm-medical-record/` |
+| 練習日誌 (training-log) | 計測・トレーニング | 未デプロイ(`apps/training-log/README.md` 参照) |
 
 「故障者報告確認」はまだどのアプリにも実装されていない機能のため、メニュー上は「準備中」と表示されます。実装後に `roles-data.js` の `injury_report.target` を設定してください。
 
