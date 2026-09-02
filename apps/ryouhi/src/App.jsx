@@ -88,7 +88,7 @@ function AppShell() {
             <div className="flex items-center gap-2.5">
               <a
                 href="/"
-                className="hidden sm:inline-flex items-center rounded-md bg-[#3e8a88] px-2 py-1 text-xs font-bold text-white hover:bg-[#2c6462]"
+                className="inline-flex h-9 shrink-0 items-center rounded-[10px] bg-[#3e8a88] px-2.5 text-xs font-bold text-white hover:bg-[#2c6462]"
               >
                 ← ポータル
               </a>
