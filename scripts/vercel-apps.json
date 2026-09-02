@@ -6,6 +6,7 @@
       "projectName": "agu-portal",
       "rootDirectory": null,
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)apps'",
       "envVars": []
     },
     {
@@ -13,6 +14,7 @@
       "projectName": "agu-tokei",
       "rootDirectory": "apps/tokei",
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/tokei",
       "envVars": []
     },
     {
@@ -20,6 +22,7 @@
       "projectName": "agu-stopwatch",
       "rootDirectory": "apps/stopwatch",
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/stopwatch",
       "envVars": []
     },
     {
@@ -27,6 +30,7 @@
       "projectName": "agu-taskkyoyu",
       "rootDirectory": "apps/taskkyoyu",
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/taskkyoyu",
       "envVars": []
     },
     {
@@ -34,6 +38,7 @@
       "projectName": "agu-ryouhi",
       "rootDirectory": "apps/ryouhi",
       "framework": "vite",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/ryouhi",
       "envVars": [
         { "key": "VITE_GAS_API_URL", "required": false, "note": "未設定でもダミーデータで動作" },
         { "key": "VITE_USE_DUMMY_DATA", "required": false, "note": "true/false" }
@@ -44,6 +49,7 @@
       "projectName": "agu-meal-traker",
       "rootDirectory": "apps/meal_traker",
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/meal_traker",
       "envVars": []
     },
     {
@@ -51,6 +57,7 @@
       "projectName": "agu-label-create",
       "rootDirectory": "apps/label_create",
       "framework": "vite",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/label_create",
       "envVars": []
     },
     {
@@ -58,6 +65,7 @@
       "projectName": "agu-tiryou-karte",
       "rootDirectory": "apps/tiryou-karte",
       "framework": "nextjs",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/tiryou-karte",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "Notionインテグレーションのシークレットトークン" },
         { "key": "NOTION_MEMBERS_DATABASE_ID", "required": true, "note": "" },
@@ -84,13 +92,14 @@
         { "key": "FTP_PASSWORD", "required": false, "note": "" },
         { "key": "STRETCH_AUDIO_TOKEN", "required": false, "note": "stopwatchアプリの音声共有機能から呼ばれるAPIの認証トークン" }
       ],
-      "note": "旧Vercelプロジェクト 'itonomaki-55ve' は使わず、新規に 'agu-itonomaki' として作成する(別アカウント/新体制のため)。"
+      "note": "旧Vercelプロジェクト 'itonomaki-55ve' は使わず、新規に 'agu-itonomaki' として作成する(別アカウント/新体制のため)。注意: 2026-09時点でVERCEL_TEAM_ID=team_ccjHey89X0swE4O9a3kkELIF配下からは 'agu-itonomaki' が見つからず(setup_vercel.pyが新規プロジェクト作成を試みてしまう)、本番稼働中の実プロジェクトが別チーム/アカウント配下にある可能性がある。実際のプロジェクト名・所属チームを確認し、ignoreBuildStepCommandを追加する前にRoot Directory等が意図通りか確かめること。確認できるまでsetup_vercel.pyは --only でitonomaki以外を指定して実行し、このアプリは対象から除外すること。"
     },
     {
       "id": "spm-medical-record",
       "projectName": "agu-spm-medical-record",
       "rootDirectory": "apps/spm-medical-record",
       "framework": "nextjs",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/spm-medical-record",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "" },
         { "key": "NOTION_DATABASE_ID", "required": false, "note": "" },
