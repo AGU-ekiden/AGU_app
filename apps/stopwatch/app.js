@@ -2801,11 +2801,51 @@ let tabataIndex = -1; // -1 = not started, TABATA_PHASES.length = finished
 let tabataRunning = false;
 let tabataPhaseStartEpoch = 0;
 
+// カウントダウン音: 各フェーズの残り3・2・1秒で短いビープ(ぴ、ぴ、ぴ)、
+// フェーズが切り替わる瞬間(0秒)で長めのビープ(ぴー)を鳴らす。
+// 音声ファイルは使わずWeb Audio APIでその場でトーンを生成する。
+let tabataAudioCtx = null;
+let tabataLastBeepedSecond = null;
+
+function ensureTabataAudioCtx() {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  if (!tabataAudioCtx) tabataAudioCtx = new Ctx();
+  if (tabataAudioCtx.state === 'suspended') tabataAudioCtx.resume();
+  return tabataAudioCtx;
+}
+
+function playTabataBeep({ frequency, durationMs }) {
+  const ctx = ensureTabataAudioCtx();
+  if (!ctx) return;
+  const oscillator = ctx.createOscillator();
+  const gain = ctx.createGain();
+  oscillator.type = 'sine';
+  oscillator.frequency.value = frequency;
+  const now = ctx.currentTime;
+  const durationSec = durationMs / 1000;
+  // 立ち上がり/立ち下がりを短いランプにして、オン/オフ時の「プツッ」という
+  // クリックノイズを防ぐ。
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.35, now + 0.01);
+  gain.gain.setValueAtTime(0.35, Math.max(now + 0.01, now + durationSec - 0.03));
+  gain.gain.linearRampToValueAtTime(0, now + durationSec);
+  oscillator.connect(gain);
+  gain.connect(ctx.destination);
+  oscillator.start(now);
+  oscillator.stop(now + durationSec);
+}
+
 function updateTabataTimerDisplay() {
   const phase = TABATA_PHASES[tabataIndex];
   const elapsedMs = Date.now() - tabataPhaseStartEpoch;
   const remainingSec = Math.max(0, phase.duration - Math.floor(elapsedMs / 1000));
   el.tabataTimer.textContent = String(remainingSec);
+
+  if (remainingSec <= 3 && remainingSec >= 1 && remainingSec !== tabataLastBeepedSecond) {
+    tabataLastBeepedSecond = remainingSec;
+    playTabataBeep({ frequency: 880, durationMs: 120 });
+  }
 }
 
 function renderTabataUI() {
@@ -2828,6 +2868,8 @@ function renderTabataUI() {
 }
 
 function advanceTabataPhase() {
+  // 直前のフェーズがちょうど0秒に達した瞬間なので、長めのビープを鳴らす。
+  playTabataBeep({ frequency: 988, durationMs: 450 });
   tabataIndex += 1;
   if (tabataIndex >= TABATA_PHASES.length) {
     tabataRunning = false;
@@ -2836,6 +2878,7 @@ function advanceTabataPhase() {
     return;
   }
   tabataPhaseStartEpoch = Date.now();
+  tabataLastBeepedSecond = null;
   renderTabataUI();
   if ('vibrate' in navigator) {
     navigator.vibrate(TABATA_PHASES[tabataIndex].type === 'train' ? [300] : [150, 100, 150]);
@@ -2847,6 +2890,8 @@ function startTabata() {
   tabataIndex = 0;
   tabataRunning = true;
   tabataPhaseStartEpoch = Date.now();
+  tabataLastBeepedSecond = null;
+  ensureTabataAudioCtx(); // ユーザー操作(クリック)の中で作成/再開しておく
   renderTabataUI();
   if ('vibrate' in navigator) navigator.vibrate([300]);
 }
