@@ -138,7 +138,7 @@ window.APPS = [
     category: 'measure',
     icon: '📄',
     repoUrl: `${REPO_TREE}/apps/training-result`,
-    liveUrl: null,
+    liveUrl: '/training-result/',
     stack: 'Next.js + Dropbox API',
   },
 ];

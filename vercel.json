@@ -42,6 +42,9 @@
     { "source": "/itonomaki/(.*)", "destination": "https://agu-itonomaki.vercel.app/itonomaki/$1" },
 
     { "source": "/keihi-seisan/", "destination": "https://agu-keihi-seisan.vercel.app/keihi-seisan/" },
-    { "source": "/keihi-seisan/(.*)", "destination": "https://agu-keihi-seisan.vercel.app/keihi-seisan/$1" }
+    { "source": "/keihi-seisan/(.*)", "destination": "https://agu-keihi-seisan.vercel.app/keihi-seisan/$1" },
+
+    { "source": "/training-result/", "destination": "https://traininng-result-three.vercel.app/training-result/" },
+    { "source": "/training-result/(.*)", "destination": "https://traininng-result-three.vercel.app/training-result/$1" }
   ]
 }
