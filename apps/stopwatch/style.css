@@ -71,11 +71,11 @@ html, body {
 }
 
 /* One parent stopwatch plus any children duplicated from it while running —
-   siblings sit next to the parent as swipeable pages, not stacked below it. */
+   stacked vertically, children below their parent. */
 .family-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 .family-group + .family-group {
   margin-top: 12px;
@@ -83,54 +83,10 @@ html, body {
   border-top: 1px solid var(--border);
 }
 
-.family-track {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.family-track::-webkit-scrollbar {
-  display: none;
-}
-.family-track > .stopwatch-card {
-  flex: 0 0 100%;
-  min-width: 100%;
-  scroll-snap-align: start;
-}
-
-/* Page dots — one per card in the family, shown only when there's more
-   than a lone parent to swipe between. */
-.family-dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-}
-.family-dots:empty {
-  display: none;
-}
-.family-dot {
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  border: none;
-  border-radius: 999px;
-  background: var(--border);
-  cursor: pointer;
-}
-.family-dot.is-active {
-  background: var(--accent);
-}
-
 .stopwatch-card {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  /* Track children scroll horizontally in whole-card steps; a hairline of
-     breathing room between adjacent cards keeps the swipe edge legible. */
-  padding: 0 2px;
-  box-sizing: border-box;
 }
 
 /* Children get their own blue palette (scoped via custom property

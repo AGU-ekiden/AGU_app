@@ -113,20 +113,21 @@ function selectTab(tabName) {
   // ブラウザのタブ名でも見分けられるようにタブごとに document.title を変える。
   document.title = label ? `${label} | ストップウォッチ` : 'ストップウォッチ';
 
-  // 点呼タブは連続してボタンをタップする操作なので、誤タップ防止の
-  // 「固定」ボタンは不要かつ邪魔になるため非表示にする。ロック中に
-  // このタブへ切り替えた場合は、ボタンごと消えて解除できなくなって
-  // しまわないよう自動でロックを解除しておく。
-  const isRollcallTab = tabName === 'rollcall';
-  el.lockToggleBtn.hidden = isRollcallTab;
-  if (isRollcallTab && !el.lockOverlay.hidden) {
+  // 誤タップ防止の「固定」ボタンは計測タブのみで使う(それ以外のタブは
+  // 連続してボタンをタップする操作だったり、そもそも長時間画面を
+  // 見ながら操作するものではないため不要)。ロック中に他のタブへ
+  // 切り替えた場合は、ボタンごと消えて解除できなくなってしまわないよう
+  // 自動でロックを解除しておく。
+  const showLockToggle = tabName === 'timer';
+  el.lockToggleBtn.hidden = !showLockToggle;
+  if (!showLockToggle && !el.lockOverlay.hidden) {
     el.lockOverlay.hidden = true;
     el.lockToggleBtn.classList.remove('is-locked');
     el.lockToggleBtn.textContent = '固定';
   }
-  // 「固定」ボタンが無い点呼タブでは、そのボタン用に空けていた上部余白も
-  // 詰める(他のタブはボタンとの重なり防止のため余白を残す)。
-  document.querySelector('.app').classList.toggle('no-lock-padding', isRollcallTab);
+  // 「固定」ボタンが無いタブでは、そのボタン用に空けていた上部余白も
+  // 詰める(計測タブのみボタンとの重なり防止のため余白を残す)。
+  document.querySelector('.app').classList.toggle('no-lock-padding', !showLockToggle);
   return true;
 }
 
@@ -319,36 +320,6 @@ let nextStopwatchNumber = 1;
 let nextParentNumber = 1; // letter naming counted only among parents, so children in between never skip a letter
 let firstStopwatchId = null; // only this stopwatch shows the "新規複製" button
 
-// Rebuilds a family's page dots to match its current card count (none for a
-// lone parent), and wires each dot to swipe its card into view on tap.
-function updateFamilyDots(group) {
-  const track = group.querySelector('.family-track');
-  const dotsContainer = group.querySelector('.family-dots');
-  const cards = Array.from(track.children);
-  dotsContainer.innerHTML = '';
-  if (cards.length <= 1) return;
-  cards.forEach((card, i) => {
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.className = 'family-dot';
-    dot.setAttribute('aria-label', `${i + 1} / ${cards.length}`);
-    dot.addEventListener('click', () => {
-      card.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-    });
-    dotsContainer.appendChild(dot);
-  });
-  syncFamilyDots(group);
-}
-
-// Highlights whichever dot matches the card currently snapped into view.
-function syncFamilyDots(group) {
-  const track = group.querySelector('.family-track');
-  const dots = group.querySelector('.family-dots').children;
-  if (dots.length === 0 || track.clientWidth === 0) return;
-  const index = Math.round(track.scrollLeft / track.clientWidth);
-  Array.from(dots).forEach((dot, i) => dot.classList.toggle('is-active', i === index));
-}
-
 // 1 -> A, 2 -> B, ..., 26 -> Z, 27 -> AA, 28 -> AB, ... (spreadsheet-style).
 function defaultLabelFor(number) {
   let n = number;
@@ -467,18 +438,10 @@ function createStopwatch(seed) {
   if (!group) {
     group = document.createElement('div');
     group.className = 'family-group';
-    const track = document.createElement('div');
-    track.className = 'family-track';
-    const dots = document.createElement('div');
-    dots.className = 'family-dots';
-    track.addEventListener('scroll', () => syncFamilyDots(group));
-    group.appendChild(track);
-    group.appendChild(dots);
     el.stopwatchList.appendChild(group);
     familyGroups.set(rootId, group);
   }
-  group.querySelector('.family-track').appendChild(node);
-  updateFamilyDots(group);
+  group.appendChild(node);
 
   stopwatches.set(id, sw);
   renderRecords(sw);
@@ -532,15 +495,9 @@ function removeStopwatch(sw) {
   }
   sw.dom.root.remove();
   stopwatches.delete(sw.id);
-  if (group) {
-    const track = group.querySelector('.family-track');
-    if (track.children.length === 0) {
-      group.remove();
-      familyGroups.delete(rootId);
-    } else {
-      track.scrollTo({ left: 0 });
-      updateFamilyDots(group);
-    }
+  if (group && group.children.length === 0) {
+    group.remove();
+    familyGroups.delete(rootId);
   }
   updateRemoveButtons();
 }
