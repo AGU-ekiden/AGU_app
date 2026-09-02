@@ -6,6 +6,7 @@
       "projectName": "agu-portal",
       "rootDirectory": null,
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)apps'",
       "envVars": []
     },
     {
@@ -13,6 +14,7 @@
       "projectName": "agu-tokei",
       "rootDirectory": "apps/tokei",
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/tokei",
       "envVars": []
     },
     {
@@ -20,6 +22,7 @@
       "projectName": "agu-stopwatch",
       "rootDirectory": "apps/stopwatch",
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/stopwatch",
       "envVars": []
     },
     {
@@ -27,6 +30,7 @@
       "projectName": "agu-taskkyoyu",
       "rootDirectory": "apps/taskkyoyu",
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/taskkyoyu",
       "envVars": []
     },
     {
@@ -34,6 +38,7 @@
       "projectName": "agu-ryouhi",
       "rootDirectory": "apps/ryouhi",
       "framework": "vite",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/ryouhi",
       "envVars": [
         { "key": "VITE_GAS_API_URL", "required": false, "note": "未設定でもダミーデータで動作" },
         { "key": "VITE_USE_DUMMY_DATA", "required": false, "note": "true/false" }
@@ -44,6 +49,7 @@
       "projectName": "agu-meal-traker",
       "rootDirectory": "apps/meal_traker",
       "framework": null,
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/meal_traker",
       "envVars": []
     },
     {
@@ -51,6 +57,7 @@
       "projectName": "agu-label-create",
       "rootDirectory": "apps/label_create",
       "framework": "vite",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/label_create",
       "envVars": []
     },
     {
@@ -58,6 +65,7 @@
       "projectName": "agu-tiryou-karte",
       "rootDirectory": "apps/tiryou-karte",
       "framework": "nextjs",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/tiryou-karte",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "Notionインテグレーションのシークレットトークン" },
         { "key": "NOTION_MEMBERS_DATABASE_ID", "required": true, "note": "" },
@@ -74,6 +82,7 @@
       "projectName": "agu-itonomaki",
       "rootDirectory": "apps/itonomaki/web",
       "framework": "nextjs",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/itonomaki/web",
       "envVars": [
         { "key": "SITE_USER", "required": false, "note": "閲覧用Basic認証。未設定なら誰でも閲覧可" },
         { "key": "SITE_PASSWORD", "required": false, "note": "" },
@@ -91,6 +100,7 @@
       "projectName": "agu-spm-medical-record",
       "rootDirectory": "apps/spm-medical-record",
       "framework": "nextjs",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/spm-medical-record",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "" },
         { "key": "NOTION_DATABASE_ID", "required": false, "note": "" },
