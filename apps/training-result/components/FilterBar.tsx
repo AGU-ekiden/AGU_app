@@ -17,7 +17,7 @@ interface FilterBarProps {
 }
 
 const selectClassName =
-  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-700 focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200";
+  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-700 focus:border-[var(--primary)] focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200";
 
 const buttonClassName =
   "inline-flex items-center gap-1.5 rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800";
@@ -43,7 +43,7 @@ export default function FilterBar({
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
           placeholder="ファイル名で検索"
-          className="w-full rounded-md border border-zinc-300 bg-white py-2 pl-9 pr-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className="w-full rounded-md border border-zinc-300 bg-white py-2 pl-9 pr-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--primary)] focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
         />
       </div>
 

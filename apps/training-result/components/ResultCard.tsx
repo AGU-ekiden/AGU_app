@@ -9,7 +9,7 @@ export default function ResultCard({ result }: { result: PracticeResult }) {
   return (
     <Link
       href={`/results/${result.id}`}
-      className="group flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+      className="group flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-4 transition hover:border-[var(--primary)] hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-[var(--primary)]"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2 text-zinc-900 dark:text-zinc-50">
