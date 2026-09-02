@@ -7,7 +7,7 @@ export default function Icon() {
   return new ImageResponse(
     (
       <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <rect width="32" height="32" rx="6" fill="#7c3aed" />
+        <rect width="32" height="32" rx="6" fill="#3e8a88" />
 
         {/* receipt body with torn bottom edge */}
         <path
@@ -15,7 +15,7 @@ export default function Icon() {
           fill="#ffffff"
         />
 
-        <rect x="12" y="9" width="8" height="2" rx="1" fill="#7c3aed" />
+        <rect x="12" y="9" width="8" height="2" rx="1" fill="#3e8a88" />
         <rect x="10" y="14" width="12" height="1.6" rx="0.8" fill="#94a3b8" />
         <rect x="10" y="18" width="9" height="1.6" rx="0.8" fill="#94a3b8" />
       </svg>

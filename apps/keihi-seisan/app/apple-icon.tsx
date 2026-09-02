@@ -7,7 +7,7 @@ export default function AppleIcon() {
   return new ImageResponse(
     (
       <svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-        <rect width="180" height="180" fill="#7c3aed" />
+        <rect width="180" height="180" fill="#3e8a88" />
 
         {/* receipt body with torn bottom edge */}
         <path
@@ -16,7 +16,7 @@ export default function AppleIcon() {
         />
 
         {/* store name */}
-        <rect x="66" y="42" width="48" height="9" rx="4.5" fill="#7c3aed" />
+        <rect x="66" y="42" width="48" height="9" rx="4.5" fill="#3e8a88" />
 
         {/* item rows: name + price */}
         <rect x="54" y="64" width="40" height="6" rx="3" fill="#94a3b8" />
@@ -32,8 +32,8 @@ export default function AppleIcon() {
         <rect x="54" y="112" width="72" height="2" fill="#e2e8f0" />
 
         {/* total row */}
-        <rect x="54" y="122" width="26" height="9" rx="4.5" fill="#7c3aed" />
-        <rect x="96" y="122" width="30" height="9" rx="4.5" fill="#7c3aed" />
+        <rect x="54" y="122" width="26" height="9" rx="4.5" fill="#3e8a88" />
+        <rect x="96" y="122" width="30" height="9" rx="4.5" fill="#3e8a88" />
       </svg>
     ),
     { ...size }
