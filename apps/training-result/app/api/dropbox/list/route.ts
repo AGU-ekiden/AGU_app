@@ -1,58 +1,35 @@
-import { NextRequest, NextResponse } from "next/server";
-import { listPracticeResults } from "@/lib/practice-results";
-import type {
-  PracticeStatus,
-  PracticeTeam,
-  SortField,
-  SortOrder,
-} from "@/lib/types";
+import { iteratePracticeResultBatches } from "@/lib/practice-results";
+import type { PracticeResult } from "@/lib/types";
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const q = searchParams.get("q")?.trim().toLowerCase() ?? "";
-  const statusParam = searchParams.get("status");
-  const teamParam = searchParams.get("team");
-  const sort: SortField = searchParams.get("sort") === "name" ? "name" : "date";
-  const order: SortOrder = searchParams.get("order") === "asc" ? "asc" : "desc";
+// Dropbox上のPDF一覧はNDJSON(1行1 JSON)でストリーミング配信する。
+// フォルダの再帰一覧は複数ページに渡ることがあり、全ページが揃うまで
+// 待たずに、届いたページから順にクライアントへ送って先に表示できる
+// ようにするため。検索・絞り込み・並び替えはクライアント側で行う。
+export async function GET() {
+  const encoder = new TextEncoder();
 
-  try {
-    let results = await listPracticeResults();
-
-    if (q) {
-      results = results.filter(
-        (result) =>
-          result.name.toLowerCase().includes(q) ||
-          result.title.toLowerCase().includes(q)
-      );
-    }
-
-    if (statusParam && statusParam !== "all") {
-      const status = statusParam as PracticeStatus;
-      results = results.filter((result) => result.status === status);
-    }
-
-    if (teamParam && teamParam !== "all") {
-      const team = teamParam as PracticeTeam;
-      results = results.filter((result) => result.team === team);
-    }
-
-    const dir = order === "asc" ? 1 : -1;
-    results = [...results].sort((a, b) => {
-      if (sort === "name") {
-        return a.name.localeCompare(b.name, "ja") * dir;
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      try {
+        for await (const batch of iteratePracticeResultBatches()) {
+          const line: { batch: PracticeResult[] } = { batch };
+          controller.enqueue(encoder.encode(JSON.stringify(line) + "\n"));
+        }
+      } catch (error) {
+        console.error("Failed to list Dropbox practice results:", error);
+        const message =
+          error instanceof Error ? error.message : "練習結果の取得に失敗しました";
+        controller.enqueue(encoder.encode(JSON.stringify({ error: message }) + "\n"));
+      } finally {
+        controller.close();
       }
-      return (
-        (new Date(a.practiceDate).getTime() -
-          new Date(b.practiceDate).getTime()) *
-        dir
-      );
-    });
+    },
+  });
 
-    return NextResponse.json({ results });
-  } catch (error) {
-    console.error("Failed to list Dropbox practice results:", error);
-    const message =
-      error instanceof Error ? error.message : "練習結果の取得に失敗しました";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "application/x-ndjson; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+  });
 }

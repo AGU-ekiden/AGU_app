@@ -22,7 +22,9 @@ function formatMonthLabel(monthKey: string): string {
 }
 
 export default function ResultsList() {
-  const [results, setResults] = useState<PracticeResult[] | null>(null);
+  // Dropboxから届いた生データ(フィルタ・並び替え前)。ストリーミングで
+  // ページが届くたびに追記され、届いた分から順に画面に反映される。
+  const [allResults, setAllResults] = useState<PracticeResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,38 +36,102 @@ export default function ResultsList() {
   const [jumpMonth, setJumpMonth] = useState("");
   const pendingScrollMonthRef = useRef<string | null>(null);
 
-  const fetchResults = useCallback(async () => {
+  // 二重読み込み(更新ボタン連打など)で古いストリームの結果が後から
+  // 反映されないようにするためのリクエストID
+  const requestIdRef = useRef(0);
+
+  const loadAllResults = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setIsLoading(true);
     setError(null);
-    try {
-      const params = new URLSearchParams({ sort, order });
-      if (query) params.set("q", query);
-      if (team !== "all") params.set("team", team);
+    setAllResults([]);
 
-      const res = await fetch(apiPath(`/api/dropbox/list?${params.toString()}`), {
+    let streamError: string | null = null;
+    try {
+      const res = await fetch(apiPath("/api/dropbox/list"), {
         cache: "no-store",
       });
-      const data = await res.json();
-
-      if (!res.ok) {
+      if (!res.ok || !res.body) {
+        const data = await res.json().catch(() => ({}));
         throw new Error(data.error ?? "練習結果の取得に失敗しました");
       }
 
-      setResults(data.results as PracticeResult[]);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (requestId !== requestIdRef.current) {
+          await reader.cancel().catch(() => {});
+          return;
+        }
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const parsed = JSON.parse(line) as
+            | { batch: PracticeResult[] }
+            | { error: string };
+          if ("error" in parsed) {
+            streamError = parsed.error;
+            continue;
+          }
+          setAllResults((prev) => [...(prev ?? []), ...parsed.batch]);
+        }
+      }
+
+      if (streamError) throw new Error(streamError);
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       setError(
         err instanceof Error ? err.message : "練習結果の取得に失敗しました"
       );
-      setResults(null);
+      setAllResults(null);
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) setIsLoading(false);
     }
-  }, [query, team, sort, order]);
+  }, []);
 
   useEffect(() => {
-    const timer = setTimeout(fetchResults, 250);
-    return () => clearTimeout(timer);
-  }, [fetchResults]);
+    loadAllResults();
+  }, [loadAllResults]);
+
+  // 検索・絞り込み・並び替えはすでに取得済みのデータに対してクライアント側で
+  // 行う(変更のたびにDropboxへ再取得しに行くと、フィルタを1回変えるだけで
+  // 毎回フォルダ全体の再取得が走ってしまい遅くなるため)。
+  const results = useMemo(() => {
+    if (!allResults) return null;
+    const q = query.trim().toLowerCase();
+
+    let filtered = allResults;
+    if (q) {
+      filtered = filtered.filter(
+        (result) =>
+          result.name.toLowerCase().includes(q) ||
+          result.title.toLowerCase().includes(q)
+      );
+    }
+    if (team !== "all") {
+      filtered = filtered.filter((result) => result.team === team);
+    }
+
+    const dir = order === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      if (sort === "name") {
+        return a.name.localeCompare(b.name, "ja") * dir;
+      }
+      return (
+        (new Date(a.practiceDate).getTime() -
+          new Date(b.practiceDate).getTime()) *
+        dir
+      );
+    });
+  }, [allResults, query, team, sort, order]);
 
   // 練習日順（sort === "date"）のときだけ、月ごとにグループ化して見出しを表示する。
   const monthGroups = useMemo(() => {
@@ -125,7 +191,7 @@ export default function ResultsList() {
           onSortChange={setSort}
           order={order}
           onOrderToggle={() => setOrder((o) => (o === "asc" ? "desc" : "asc"))}
-          onRefresh={fetchResults}
+          onRefresh={loadAllResults}
           isLoading={isLoading}
         />
 
@@ -151,14 +217,14 @@ export default function ResultsList() {
         </div>
       )}
 
-      {!error && isLoading && !results && (
+      {!error && isLoading && (!results || results.length === 0) && (
         <div className="flex items-center justify-center gap-2 py-16 text-zinc-400">
           <Loader2 className="h-5 w-5 animate-spin" />
           読み込み中...
         </div>
       )}
 
-      {!error && results && results.length === 0 && (
+      {!error && !isLoading && results && results.length === 0 && (
         <div className="flex flex-col items-center gap-2 py-16 text-zinc-400">
           <Inbox className="h-8 w-8" />
           <p className="text-sm">該当する練習結果が見つかりませんでした。</p>
@@ -191,6 +257,13 @@ export default function ResultsList() {
           {results.map((result) => (
             <ResultCard key={result.id} result={result} />
           ))}
+        </div>
+      )}
+
+      {!error && isLoading && results && results.length > 0 && (
+        <div className="flex items-center justify-center gap-2 py-4 text-xs text-zinc-400">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          残りの練習結果を読み込み中...
         </div>
       )}
     </div>

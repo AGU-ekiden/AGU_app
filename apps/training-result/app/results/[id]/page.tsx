@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { listPracticeResults, resolveResultPath } from "@/lib/practice-results";
+import { getPracticeResultByPath, resolveResultPath } from "@/lib/practice-results";
 import { formatDateTime, formatFileSize } from "@/lib/format";
 import StatusBadge from "@/components/StatusBadge";
 import TeamBadge from "@/components/TeamBadge";
@@ -15,9 +15,8 @@ export default async function ResultDetailPage(
   const path = await resolveResultPath(id);
   if (!path) notFound();
 
-  const results = await listPracticeResults();
-  const result = results.find((item) => item.id === id);
-  if (!result) notFound();
+  const result = await getPracticeResultByPath(path);
+  if (!result || result.id !== id) notFound();
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6">
