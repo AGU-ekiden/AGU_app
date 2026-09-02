@@ -82,7 +82,6 @@
       "projectName": "agu-itonomaki",
       "rootDirectory": "apps/itonomaki/web",
       "framework": "nextjs",
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/itonomaki/web",
       "envVars": [
         { "key": "SITE_USER", "required": false, "note": "閲覧用Basic認証。未設定なら誰でも閲覧可" },
         { "key": "SITE_PASSWORD", "required": false, "note": "" },
@@ -93,7 +92,7 @@
         { "key": "FTP_PASSWORD", "required": false, "note": "" },
         { "key": "STRETCH_AUDIO_TOKEN", "required": false, "note": "stopwatchアプリの音声共有機能から呼ばれるAPIの認証トークン" }
       ],
-      "note": "旧Vercelプロジェクト 'itonomaki-55ve' は使わず、新規に 'agu-itonomaki' として作成する(別アカウント/新体制のため)。"
+      "note": "旧Vercelプロジェクト 'itonomaki-55ve' は使わず、新規に 'agu-itonomaki' として作成する(別アカウント/新体制のため)。注意: 2026-09時点でVERCEL_TEAM_ID=team_ccjHey89X0swE4O9a3kkELIF配下からは 'agu-itonomaki' が見つからず(setup_vercel.pyが新規プロジェクト作成を試みてしまう)、本番稼働中の実プロジェクトが別チーム/アカウント配下にある可能性がある。実際のプロジェクト名・所属チームを確認し、ignoreBuildStepCommandを追加する前にRoot Directory等が意図通りか確かめること。確認できるまでsetup_vercel.pyは --only でitonomaki以外を指定して実行し、このアプリは対象から除外すること。"
     },
     {
       "id": "spm-medical-record",

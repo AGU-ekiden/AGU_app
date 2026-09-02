@@ -63,7 +63,9 @@ python3 scripts/setup_vercel.py --only ryouhi,label_create
 
 ### 注意点
 
-- **Ignored Build Step を設定すること(1日のデプロイ回数上限に引っかかりやすい問題への対処)** — このリポジトリはモノレポで、全プロジェクトが同じGitHubリポジトリを見ています。何も設定しないと、リポジトリのどこか1箇所に1回pushしただけで**全プロジェクトのビルドが同時に走り**、Vercel Hobbyプランの1日のデプロイ回数上限にすぐ到達します。`scripts/vercel-apps.json` の各アプリに `ignoreBuildStepCommand`(例: `git diff --quiet HEAD^ HEAD -- apps/training-log`)を指定して `setup_vercel.py` を実行すると、そのプロジェクトのRoot Directory配下に変更が無いpushではビルドをスキップするようになります(Vercelダッシュボードなら Settings → Git → Ignored Build Step から手動設定も可能)。現状 `training-log` にのみ設定済みです。他のプロジェクトにも順次設定することを推奨します。
+- **Ignored Build Step を設定すること(1日のデプロイ回数上限に引っかかりやすい問題への対処)** — このリポジトリはモノレポで、全プロジェクトが同じGitHubリポジトリを見ています。何も設定しないと、リポジトリのどこか1箇所に1回pushしただけで**全プロジェクトのビルドが同時に走り**、Vercel Hobbyプランの1日のデプロイ回数上限にすぐ到達します。`scripts/vercel-apps.json` の各アプリに `ignoreBuildStepCommand`(例: `git diff --quiet HEAD^ HEAD -- apps/training-log`)を指定して `setup_vercel.py` を実行すると、そのプロジェクトのRoot Directory配下に変更が無いpushではビルドをスキップするようになります(Vercelダッシュボードなら Settings → Git → Ignored Build Step から手動設定も可能)。`portal`・`tokei`・`stopwatch`・`taskkyoyu`・`ryouhi`・`meal_traker`・`label_create`・`tiryou-karte`・`spm-medical-record`・`training-log` の10プロジェクトには設定済みです。**`itonomaki` のみ未設定**です(後述の注意点を参照)。
+  - `ignoreBuildStepCommand` をPowerShellから編集する場合、`Get-Content`/`Set-Content` はUTF-8 BOM付与や日本語の文字化けを起こしやすいので使わないこと。JSONの読み書きは必ずPythonの `json` モジュール(`open(path, encoding="utf-8")` / `json.dump(..., ensure_ascii=False)`)経由で行う。
+  - **`itonomaki` は要注意** — `scripts/vercel-apps.json` の `agu-itonomaki` は、2026-09時点で少なくとも1つのVercelチーム(`team_ccjHey89X0swE4O9a3kkELIF`)からは見つからず、`setup_vercel.py` を素で実行すると**同名の空プロジェクトを新規作成しようとする**(実際に本番稼働中のプロジェクトとは別物になり、何の解決にもならない)。本番のitonomakiが実際にどのチーム/アカウント配下にあるか確認できるまでは、`--only` で明示的に対象から除外して運用すること。
 - **Production Branch は `main` に設定すること**(`main` が存在しない状態でプロジェクトを作ってしまうと、「プロジェクトはできているのにデプロイが1回も走らない」状態になる事故が過去にあった)
 - 各プロジェクトの **Node.js Versionは22.x**(Next.js 16のため)
 - スクリプトが期待通り動かない場合、無理に直そうとせず**Vercelダッシュボードから手動で作成する**方が早いこともあります。その場合は上表のRoot Directory / Framework Preset / Build設定をそのまま使ってください
