@@ -101,6 +101,23 @@
         { "key": "NOTION_PLAYER_PROFILE_DATABASE_ID", "required": false, "note": "" },
         { "key": "BLOB_READ_WRITE_TOKEN", "required": false, "note": "写真アップロード(@vercel/blob)用。Vercelダッシュボードで Blob ストアを作成しプロジェクトに接続すると自動で設定されることが多い" }
       ]
+    },
+    {
+      "id": "training-log",
+      "projectName": "agu-training-log",
+      "rootDirectory": "apps/training-log",
+      "framework": "nextjs",
+      "envVars": [
+        { "key": "NOTION_TOKEN", "required": true, "note": "" },
+        { "key": "NOTION_TRAINING_LOG_DATABASE_ID", "required": true, "note": "" },
+        { "key": "NOTION_MEMBERS_DATABASE_ID", "required": false, "note": "設定すると日誌に「部員」relationを紐付ける(tiryou-karteと同じ値)" },
+        { "key": "SUPABASE_URL", "required": true, "note": "" },
+        { "key": "SUPABASE_SERVICE_ROLE_KEY", "required": true, "note": "service_role キー。APIルートのみで使用" },
+        { "key": "STRAVA_CLIENT_ID", "required": true, "note": "" },
+        { "key": "STRAVA_CLIENT_SECRET", "required": true, "note": "" },
+        { "key": "STRAVA_REDIRECT_URI", "required": true, "note": "1オリジン化後は https://<ポータルのドメイン>/training-log/api/strava/callback。Strava側のAuthorization Callback Domainにも登録すること" }
+      ],
+      "note": "未デプロイ。詳細は apps/training-log/README.md 参照。"
     }
   ]
 }

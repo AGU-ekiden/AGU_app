@@ -14,10 +14,11 @@
 | 8 | tiryou-karte | `agu-tiryou-karte` | `apps/tiryou-karte` | Next.js 16 | `/tiryou-karte/` |
 | 9 | spm-medical-record | `agu-spm-medical-record` | `apps/spm-medical-record` | Next.js 16 | `/spm-medical-record/` |
 | 10 | itonomaki | `agu-itonomaki` | `apps/itonomaki/web` | Next.js 16 | `/itonomaki/` |
+| 11 | training-log | `agu-training-log` | `apps/training-log` | Next.js 16 | `/training-log/`(未デプロイ) |
 
 - 静的アプリ(2〜5): Framework Preset = **Other**、Build Command は空、Output Directory はルート
 - Viteアプリ(6〜7): Framework Preset = **Vite**、Build = `npm run build`、Output = `dist`
-- Next.jsアプリ(8〜10): Framework Preset = **Next.js**(既存の設定・自動検出でOK)
+- Next.jsアプリ(8〜11): Framework Preset = **Next.js**(既存の設定・自動検出でOK)
 
 セットアップの実体は `setup_vercel.py` / `vercel-apps.json` の1組だけです(Cloudflare向けだった `setup_cloudflare.py` / `cloudflare-apps.json` は移行に伴い廃止しました)。
 
@@ -144,6 +145,21 @@ BLOB_READ_WRITE_TOKEN              (写真アップロード用。Vercelダッ�
 ```
 
 Notion関連の値は tiryou-karte と spm-medical-record で共通で問題ないことを確認済みです。
+
+### training-log(すべて必須。未デプロイ)
+
+```
+NOTION_TOKEN
+NOTION_TRAINING_LOG_DATABASE_ID
+NOTION_MEMBERS_DATABASE_ID         (任意。tiryou-karteと同じ値。設定すると「部員」relationを紐付ける)
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+STRAVA_CLIENT_ID
+STRAVA_CLIENT_SECRET
+STRAVA_REDIRECT_URI                 https://<ポータルのドメイン>/training-log/api/strava/callback
+```
+
+Strava側の管理画面(https://www.strava.com/settings/api )で「Authorization Callback Domain」にポータルのドメインを登録する必要があります。詳細は `apps/training-log/README.md` 参照。
 
 ### itonomaki(すべて任意。未設定でも閲覧はできる)
 
