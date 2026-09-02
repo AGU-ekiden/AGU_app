@@ -5,6 +5,12 @@
 GitHub連携済みのVercelプロジェクトを1つずつ作成し、Root Directoryを設定し、
 .env.vercel.local に書いた値を環境変数として登録する。
 
+vercel-apps.json の各アプリに "ignoreBuildStepCommand" を指定すると、Ignored
+Build Step(Vercelの「そのプロジェクトに関係する変更が無ければビルドをスキップ
+する」設定)も一緒に登録する。モノレポの全プロジェクトが同じGitHubリポジトリを
+見ているため、これを設定しないと1回のpushで全プロジェクトのビルドが走り、
+Hobbyプランの1日のデプロイ回数上限にすぐ達してしまう。
+
 前提:
   - pip install 不要(標準ライブラリのみ)。Python 3.8+ で動作。
   - 環境変数 VERCEL_TOKEN が必須(Vercelダッシュボード > Settings > Tokens で発行)。
@@ -125,6 +131,15 @@ class VercelClient:
         if status != 200:
             raise RuntimeError(f"Root Directory設定失敗 ({status}): {resp}")
 
+    def set_ignore_build_step(self, project_id: str, command: str):
+        body = {"commandForIgnoringBuildStep": command}
+        if self.dry_run:
+            print(f"  [dry-run] PATCH /v9/projects/{project_id} {body}")
+            return
+        status, resp = self.request("PATCH", f"/v9/projects/{project_id}", body)
+        if status != 200:
+            raise RuntimeError(f"Ignored Build Step設定失敗 ({status}): {resp}")
+
     def list_env_keys(self, project_id: str) -> set[str]:
         if project_id.startswith("dry-run-"):
             return set()
@@ -197,6 +212,10 @@ def main():
         if app["rootDirectory"]:
             print(f"  Root Directory -> {app['rootDirectory']}")
             client.set_root_directory(project_id, app["rootDirectory"])
+
+        if app.get("ignoreBuildStepCommand"):
+            print(f"  Ignored Build Step -> {app['ignoreBuildStepCommand']}")
+            client.set_ignore_build_step(project_id, app["ignoreBuildStepCommand"])
 
         existing_keys = client.list_env_keys(project_id)
         for env in app.get("envVars", []):

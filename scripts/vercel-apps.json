@@ -107,6 +107,7 @@
       "projectName": "agu-training-log",
       "rootDirectory": "apps/training-log",
       "framework": "nextjs",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/training-log",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "" },
         { "key": "NOTION_TRAINING_LOG_DATABASE_ID", "required": true, "note": "" },

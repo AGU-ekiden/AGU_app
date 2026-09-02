@@ -63,6 +63,7 @@ python3 scripts/setup_vercel.py --only ryouhi,label_create
 
 ### 注意点
 
+- **Ignored Build Step を設定すること(1日のデプロイ回数上限に引っかかりやすい問題への対処)** — このリポジトリはモノレポで、全プロジェクトが同じGitHubリポジトリを見ています。何も設定しないと、リポジトリのどこか1箇所に1回pushしただけで**全プロジェクトのビルドが同時に走り**、Vercel Hobbyプランの1日のデプロイ回数上限にすぐ到達します。`scripts/vercel-apps.json` の各アプリに `ignoreBuildStepCommand`(例: `git diff --quiet HEAD^ HEAD -- apps/training-log`)を指定して `setup_vercel.py` を実行すると、そのプロジェクトのRoot Directory配下に変更が無いpushではビルドをスキップするようになります(Vercelダッシュボードなら Settings → Git → Ignored Build Step から手動設定も可能)。現状 `training-log` にのみ設定済みです。他のプロジェクトにも順次設定することを推奨します。
 - **Production Branch は `main` に設定すること**(`main` が存在しない状態でプロジェクトを作ってしまうと、「プロジェクトはできているのにデプロイが1回も走らない」状態になる事故が過去にあった)
 - 各プロジェクトの **Node.js Versionは22.x**(Next.js 16のため)
 - スクリプトが期待通り動かない場合、無理に直そうとせず**Vercelダッシュボードから手動で作成する**方が早いこともあります。その場合は上表のRoot Directory / Framework Preset / Build設定をそのまま使ってください
