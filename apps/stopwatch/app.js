@@ -441,7 +441,19 @@ function createStopwatch(seed) {
     el.stopwatchList.appendChild(group);
     familyGroups.set(rootId, group);
   }
-  group.appendChild(node);
+  if (sw.parentId) {
+    // 子は親と見た目で区別できるよう、専用のコンテナにまとめて左に
+    // インデント+縦線を引く(CSS側で表現)。
+    let children = group.querySelector('.family-children');
+    if (!children) {
+      children = document.createElement('div');
+      children.className = 'family-children';
+      group.appendChild(children);
+    }
+    children.appendChild(node);
+  } else {
+    group.insertBefore(node, group.firstChild);
+  }
 
   stopwatches.set(id, sw);
   renderRecords(sw);
@@ -495,9 +507,13 @@ function removeStopwatch(sw) {
   }
   sw.dom.root.remove();
   stopwatches.delete(sw.id);
-  if (group && group.children.length === 0) {
-    group.remove();
-    familyGroups.delete(rootId);
+  if (group) {
+    const children = group.querySelector('.family-children');
+    if (children && children.children.length === 0) children.remove();
+    if (group.querySelectorAll('.stopwatch-card').length === 0) {
+      group.remove();
+      familyGroups.delete(rootId);
+    }
   }
   updateRemoveButtons();
 }

@@ -83,6 +83,38 @@ html, body {
   border-top: 1px solid var(--border);
 }
 
+/* 子(複製)は親と区別できるよう、少し幅を狭めて左にインデントし、
+   親から縦線を引く(枝分かれしているように見せる)。 */
+.family-children {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-left: 22px;
+  padding-left: 16px;
+}
+.family-children::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--child-accent);
+}
+.family-children .stopwatch-card {
+  position: relative;
+}
+.family-children .stopwatch-card::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 28px;
+  width: 16px;
+  height: 2px;
+  background: var(--child-accent);
+}
+
 .stopwatch-card {
   display: flex;
   flex-direction: column;
