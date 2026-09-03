@@ -749,7 +749,6 @@ export default function MealLogsScreen({ dorm, guestCategories = GUEST_CATEGORIE
         days={days}
         memberRows={memberRowsForMatrix}
         guestRows={guestRowsForMatrix}
-        guestCategories={guestCategories}
         onToggleMember={toggleMemberCell}
         onToggleGuest={toggleGuestCell}
         onAddGuest={addGuestRow}
