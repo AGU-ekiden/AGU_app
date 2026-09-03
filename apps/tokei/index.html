@@ -9131,6 +9131,12 @@
     setGamepadConnected(false);
     el.gamepadStatusText.textContent = 'Gamepad API 非対応';
   }
+
+  // ポータルなど外部からの直リンク用: URLの #racingwatch でレーシング
+  // ウォッチ(カメラ同期・ダーク配色)を開いた状態にする。
+  if (location.hash.replace(/^#/, '') === 'racingwatch') {
+    switchApp('racingwatch');
+  }
 })();
 </script>
 
