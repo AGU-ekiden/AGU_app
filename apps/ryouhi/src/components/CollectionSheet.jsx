@@ -32,7 +32,7 @@ export default function CollectionSheet({ group, rows, year, month, periodLabel 
   }
 
   // 列が多い月でも収まるよう、内容量に応じて自動幅にする
-  const totalCols = 5 + dynamicCols.length + 4 // No/氏名/ランク/部費/食費 + 動的列 + 治療費/治療費補助/モチベーション費補助/配達代 + 合計/領収(概算)
+  const totalCols = 5 + dynamicCols.length + 4 // No/氏名/ランク/部費/食費 + 動的列 + 治療費/治療費補助/SPM費補助/配達代 + 合計/領収(概算)
 
   return (
     <div
@@ -88,7 +88,7 @@ export default function CollectionSheet({ group, rows, year, month, periodLabel 
             ))}
             <Th align="right">治療費</Th>
             <Th align="right">治療費補助</Th>
-            <Th align="right">モチベーション費補助</Th>
+            <Th align="right">SPM費補助</Th>
             <Th align="right">配達代</Th>
             <Th align="right">合計</Th>
             <Th align="center">領収</Th>

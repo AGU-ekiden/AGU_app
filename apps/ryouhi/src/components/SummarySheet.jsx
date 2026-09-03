@@ -38,7 +38,7 @@ const FIXED_COLS_TAIL = [
   },
   {
     key: 'motivation',
-    label: 'モチベーション費補助',
+    label: 'SPM費補助',
     align: 'right',
     money: true,
     sum: true,
@@ -224,7 +224,7 @@ function Page({ items, cols, fontSize, pageIndex, pageCount, year, month, config
       {pageIndex === pageCount - 1 && (
         <div style={{ marginTop: 10, fontSize: 8.5, color: '#94a3b8' }}>
           ※
-          大会・合宿・その他費用は今月実際に使われた項目名がそのまま列になっています。「○○補助」はチームが負担した補助額（マイナス表示）です。治療費補助・モチベーション費補助も同様にマイナス表示です。
+          大会・合宿・その他費用は今月実際に使われた項目名がそのまま列になっています。「○○補助」はチームが負担した補助額（マイナス表示）です。治療費補助・SPM費補助も同様にマイナス表示です。
         </div>
       )}
     </div>

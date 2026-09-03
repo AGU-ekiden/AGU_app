@@ -100,7 +100,7 @@ export const EXPENSE_LABELS = {
   tournament: '大会費',
   camp: '合宿費',
   medical: '治療費',
-  motivation: 'モチベーション費補助',
+  motivation: 'SPM費補助',
   sagawa: '配達代',
 }
 

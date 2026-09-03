@@ -500,7 +500,7 @@ export default function ExpensesScreen() {
                   <th className="px-3 py-2.5 text-right">合宿費</th>
                   <th className="px-2 py-2.5 text-right">治療費実費</th>
                   <th className="px-2 py-2.5 text-right">治療費補助</th>
-                  <th className="px-2 py-2.5 text-right">モチベーション費補助</th>
+                  <th className="px-2 py-2.5 text-right">SPM費補助</th>
                   <th className="px-2 py-2.5 text-right text-primary">治療費差額</th>
                   <th className="px-2 py-2.5 text-right">配達代</th>
                   <th className="px-3 py-2.5 text-right">その他費用</th>
@@ -604,7 +604,7 @@ export default function ExpensesScreen() {
                             }
                           />
                         </td>
-                        {/* モチベーション費補助（回数 × 単価770円） */}
+                        {/* SPM費補助（回数 × 単価770円） */}
                         <td className="px-1 py-1.5">
                           <NumCell
                             value={r.motivation_count}

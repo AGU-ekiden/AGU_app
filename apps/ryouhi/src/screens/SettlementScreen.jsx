@@ -442,7 +442,7 @@ export default function SettlementScreen() {
                   ))}
                   <th className="px-3 py-2.5 text-right">治療費</th>
                   <th className="px-3 py-2.5 text-right">治療費補助</th>
-                  <th className="px-3 py-2.5 text-right">モチベーション費補助</th>
+                  <th className="px-3 py-2.5 text-right">SPM費補助</th>
                   <th className="px-3 py-2.5 text-right">配達代</th>
                   <th className="px-3 py-2.5 text-right font-semibold text-slate-700">
                     合計請求額
@@ -563,7 +563,7 @@ export default function SettlementScreen() {
 
       <p className="text-xs text-muted-foreground">
         合計請求額 = 部費 + 大会費(各: 参加費−補助) + 合宿費(各: 単価×泊数) +
-        (治療費実費−補助金) − モチベーション費補助(回数×
+        (治療費実費−補助金) − SPM費補助(回数×
         {formatYen(MOTIVATION_FEE_PER_UNIT)}) + 配達代 +
         その他費用(各項目の合計) +
         食費(実際に食べた寮ごとに 朝食数×朝食単価 + 夕食数×夕食単価。

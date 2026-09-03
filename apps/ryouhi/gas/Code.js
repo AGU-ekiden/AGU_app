@@ -997,7 +997,7 @@ function saveExpenses(yearMonth, expenses, tournamentItems, campItems, otherItem
   campItems = campItems || [];
   otherItems = otherItems || [];
 
-  // --- monthly_expenses（治療/配達代/ウエア/モチベーション費補助）を UPSERT ---
+  // --- monthly_expenses（治療/配達代/ウエア/SPM費補助）を UPSERT ---
   var sheet = getSheet_(SHEETS.monthly_expenses.name);
   var headers = SHEETS.monthly_expenses.headers;
   var values = getBody_(sheet);

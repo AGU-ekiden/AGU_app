@@ -10,7 +10,7 @@ import { MEAL_TRACKING_DORMS, MOTIVATION_FEE_PER_UNIT } from './constants.js'
 //   + 大会費合計   … 各大会（参加費 − 補助）の合計 ※0円未満は0円
 //   + 合宿費合計   … 各合宿（1泊単価 × 泊数）の合計
 //   + (治療費実費 − 治療費補助金)
-//   − モチベーション費補助 … 補助回数 × 単価(770円)
+//   − SPM費補助 … 補助回数 × 単価(770円)
 //   + 配達代
 //   + その他費用合計 … 自由に名前を付けて追加できる項目（教材費・保険料など、
 //     各項目 金額−補助 の合計。0円未満は0円）
@@ -54,7 +54,7 @@ export function medicalNet(expense) {
   return Math.max(0, num(expense.medical_actual) - num(expense.medical_subsidy))
 }
 
-// モチベーション費補助額（補助回数 × 単価770円）
+// SPM費補助額（補助回数 × 単価770円）
 export function motivationSubsidyAmount(expense) {
   return num(expense?.motivation_count) * MOTIVATION_FEE_PER_UNIT
 }
@@ -163,7 +163,7 @@ export function computeSettlement({
     medical,
     medicalActual: num(expense?.medical_actual),
     medicalSubsidy: num(expense?.medical_subsidy),
-    // モチベーション費補助
+    // SPM費補助
     motivationCount,
     motivation,
     // その他（自由記名の追加項目）
