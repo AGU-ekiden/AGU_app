@@ -100,6 +100,26 @@ export function AppProvider({ children, onAuthError }) {
     }
   }, [year, month, yearMonth, checkAuthError, applyData])
 
+  // 現在表示中の年月とは別の、任意の年月のデータを取得する（画面の表示中の
+  // 状態には一切触れない）。複数月をまとめて精算するときに使う。
+  // 同じキャッシュ(cacheRef)を使うので、reload() で訪問済みの月は再取得しない。
+  const fetchMonthData = useCallback(
+    async (targetYear, targetMonth) => {
+      const targetYearMonth = toYearMonth(targetYear, targetMonth)
+      const cached = cacheRef.current[targetYearMonth]
+      if (cached) return cached
+      try {
+        const data = await api.getInitialData(targetYear, targetMonth, targetYearMonth)
+        cacheRef.current[targetYearMonth] = data
+        return data
+      } catch (e) {
+        checkAuthError(e)
+        throw e
+      }
+    },
+    [checkAuthError]
+  )
+
   useEffect(() => {
     reload()
   }, [reload])
@@ -578,6 +598,7 @@ export function AppProvider({ children, onAuthError }) {
     toast,
     showToast,
     reload,
+    fetchMonthData,
     saveMembers,
     saveConfig,
     saveMealLogs,

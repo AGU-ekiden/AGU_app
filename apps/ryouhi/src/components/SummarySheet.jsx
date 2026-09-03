@@ -98,7 +98,7 @@ function chunk(arr, size) {
   return out
 }
 
-export default function SummarySheet({ rows, groups, year, month, config }) {
+export default function SummarySheet({ rows, groups, year, month, config, periodLabel }) {
   const dynamicCols = buildItemColumns(rows)
   const cols = [...FIXED_COLS_HEAD, ...dynamicCols, ...FIXED_COLS_TAIL]
   const items = buildItems(rows, groups, cols)
@@ -120,6 +120,7 @@ export default function SummarySheet({ rows, groups, year, month, config }) {
             year={year}
             month={month}
             config={config}
+            periodLabel={periodLabel}
           />
         </div>
       ))}
@@ -127,7 +128,7 @@ export default function SummarySheet({ rows, groups, year, month, config }) {
   )
 }
 
-function Page({ items, cols, fontSize, pageIndex, pageCount, year, month, config }) {
+function Page({ items, cols, fontSize, pageIndex, pageCount, year, month, config, periodLabel }) {
   return (
     <div
       style={{
@@ -157,7 +158,7 @@ function Page({ items, cols, fontSize, pageIndex, pageCount, year, month, config
             全選手 清算一覧
           </span>
           <span style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>
-            {formatYearMonthJa(year, month)}分
+            {periodLabel || formatYearMonthJa(year, month)}分
           </span>
         </div>
         <div style={{ fontSize: 10, color: '#64748b' }}>

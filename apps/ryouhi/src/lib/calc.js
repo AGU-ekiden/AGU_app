@@ -351,6 +351,88 @@ export function itemColumnValue(row, col) {
   return matches.reduce((a, it) => a + num(it[col.field]), 0)
 }
 
+// 複数月分の清算行（各月ごとに buildSettlementRows した結果）を、メンバー
+// ごとに合算して1つの清算行に統合する。7月分を精算し損ねて9月に7〜9月分
+// まとめて請求する、といったケース用。
+// monthlyRowSets: [{ label: '7月', rows: buildSettlementRowsの結果 }, ...]
+// 大会・合宿・その他費用の明細は、どの月の分か分かるよう項目名の先頭に
+// 月ラベルを付けて全月分を連結する。
+export function mergeSettlementRows(monthlyRowSets) {
+  const byMember = new Map()
+
+  for (const { label, rows } of monthlyRowSets) {
+    for (const r of rows) {
+      const key = String(r.memberId)
+      if (!byMember.has(key)) {
+        byMember.set(key, {
+          memberId: r.memberId,
+          name: r.name,
+          rank: r.rank,
+          group: r.group,
+          tournamentRows: [],
+          tournamentGross: 0,
+          tournamentSubsidy: 0,
+          tournament: 0,
+          campRows: [],
+          camp: 0,
+          medical: 0,
+          medicalActual: 0,
+          medicalSubsidy: 0,
+          motivationCount: 0,
+          motivation: 0,
+          otherRows: [],
+          otherGross: 0,
+          otherSubsidy: 0,
+          other: 0,
+          clubFee: 0,
+          sagawa: 0,
+          breakfastCount: 0,
+          dinnerCount: 0,
+          breakfastFee: 0,
+          dinnerFee: 0,
+          mealFee: 0,
+          total: 0,
+        })
+      }
+      const acc = byMember.get(key)
+      const prefix = (name) => `${label} ${name}`
+
+      acc.tournamentRows.push(...r.tournamentRows.map((t) => ({ ...t, name: prefix(t.name) })))
+      acc.tournamentGross += r.tournamentGross
+      acc.tournamentSubsidy += r.tournamentSubsidy
+      acc.tournament += r.tournament
+
+      acc.campRows.push(...r.campRows.map((c) => ({ ...c, name: prefix(c.name) })))
+      acc.camp += r.camp
+
+      acc.medical += r.medical
+      acc.medicalActual += r.medicalActual
+      acc.medicalSubsidy += r.medicalSubsidy
+
+      acc.motivationCount += r.motivationCount
+      acc.motivation += r.motivation
+
+      acc.otherRows.push(...r.otherRows.map((o) => ({ ...o, name: prefix(o.name) })))
+      acc.otherGross += r.otherGross
+      acc.otherSubsidy += r.otherSubsidy
+      acc.other += r.other
+
+      acc.clubFee += r.clubFee
+      acc.sagawa += r.sagawa
+
+      acc.breakfastCount += r.breakfastCount
+      acc.dinnerCount += r.dinnerCount
+      acc.breakfastFee += r.breakfastFee
+      acc.dinnerFee += r.dinnerFee
+      acc.mealFee += r.mealFee
+
+      acc.total += r.total
+    }
+  }
+
+  return Array.from(byMember.values()).sort(compareMembersByGradeKana)
+}
+
 // グループごとに清算行をまとめる（PDF改ページ用）
 export function groupSettlementRows(rows, groups) {
   return groups

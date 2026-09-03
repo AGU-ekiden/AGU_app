@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import {
   FileDown,
   FileSpreadsheet,
@@ -11,6 +11,8 @@ import {
   Trophy,
   Tent,
   Tag,
+  CalendarRange,
+  X,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext.jsx'
 import { GROUPS, MEAL_TRACKING_DORMS, MOTIVATION_FEE_PER_UNIT } from '../lib/constants.js'
@@ -20,11 +22,13 @@ import {
   CardContent,
   Select,
   Badge,
+  Checkbox,
   Skeleton,
 } from '../components/ui/index.jsx'
-import { formatYen, formatYearMonthJa, cn } from '../lib/utils.js'
+import { formatYen, formatYearMonthJa, formatYearMonthRangeJa, toYearMonth, cn } from '../lib/utils.js'
 import {
   buildSettlementRows,
+  mergeSettlementRows,
   groupSettlementRows,
   sumTotals,
   mealPriceFor,
@@ -34,6 +38,22 @@ import {
 import { generateGroupPdf, generateSummaryPdf } from '../lib/pdf.js'
 import CollectionSheet from '../components/CollectionSheet.jsx'
 import SummarySheet from '../components/SummarySheet.jsx'
+
+// 「対象月を追加」で選べる候補（現在選択中の月より前の6ヶ月分）
+function precedingMonths(year, month, count) {
+  const list = []
+  let y = year
+  let m = month
+  for (let i = 0; i < count; i++) {
+    m -= 1
+    if (m === 0) {
+      m = 12
+      y -= 1
+    }
+    list.push({ year: y, month: m })
+  }
+  return list
+}
 
 // 画面D：清算一覧・集金用PDF出力
 export default function SettlementScreen() {
@@ -50,6 +70,7 @@ export default function SettlementScreen() {
     yearMonth,
     loading,
     showToast,
+    fetchMonthData,
   } = useApp()
   const [filterGroup, setFilterGroup] = useState('all')
   const [generating, setGenerating] = useState(false)
@@ -58,19 +79,70 @@ export default function SettlementScreen() {
   const sheetsRef = useRef(null)
   const summaryRef = useRef(null)
 
-  const rows = useMemo(
-    () =>
-      buildSettlementRows({
-        members,
-        expenses,
-        tournamentItems,
-        campItems,
-        otherItems,
-        mealLogs,
-        config,
-        yearMonth,
-      }),
-    [
+  // 「7月精算し損ねて9月に7〜9月まとめて請求」のような複数月合算用。
+  // 現在選択中の月(グローバルの年月セレクタ)は常に含み、それ以外に
+  // 追加でまとめたい月をここでチェックする。
+  const [extraMonths, setExtraMonths] = useState([])
+  const [extraData, setExtraData] = useState({})
+  const [loadingExtra, setLoadingExtra] = useState(false)
+  const [showMonthPicker, setShowMonthPicker] = useState(false)
+
+  const monthCandidates = useMemo(() => precedingMonths(year, month, 6), [year, month])
+
+  // 選択中の月が変わったら、追加の月選択はリセットする
+  useEffect(() => {
+    setExtraMonths([])
+    setExtraData({})
+    setShowMonthPicker(false)
+  }, [yearMonth])
+
+  const toggleExtraMonth = (ym) => {
+    setExtraMonths((prev) => {
+      const exists = prev.some((m) => m.year === ym.year && m.month === ym.month)
+      return exists
+        ? prev.filter((m) => !(m.year === ym.year && m.month === ym.month))
+        : [...prev, ym]
+    })
+  }
+
+  useEffect(() => {
+    if (extraMonths.length === 0) {
+      setExtraData({})
+      return
+    }
+    let cancelled = false
+    setLoadingExtra(true)
+    Promise.all(extraMonths.map((m) => fetchMonthData(m.year, m.month)))
+      .then((results) => {
+        if (cancelled) return
+        const next = {}
+        extraMonths.forEach((m, i) => {
+          next[toYearMonth(m.year, m.month)] = results[i]
+        })
+        setExtraData(next)
+      })
+      .catch((e) => {
+        console.error(e)
+        if (!cancelled) showToast('他の月のデータ取得に失敗しました', 'error')
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingExtra(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [extraMonths, fetchMonthData, showToast])
+
+  // 現在の月 + 追加で選んだ月を、年月順に並べたもの
+  const combinedMonths = useMemo(() => {
+    const list = [{ year, month }, ...extraMonths]
+    return list.slice().sort((a, b) => a.year - b.year || a.month - b.month)
+  }, [year, month, extraMonths])
+  const isCombined = combinedMonths.length > 1
+  const periodLabel = isCombined ? formatYearMonthRangeJa(combinedMonths) : null
+
+  const rows = useMemo(() => {
+    const currentRows = buildSettlementRows({
       members,
       expenses,
       tournamentItems,
@@ -79,8 +151,44 @@ export default function SettlementScreen() {
       mealLogs,
       config,
       yearMonth,
-    ]
-  )
+    })
+    if (!isCombined) return currentRows
+
+    const monthlyRowSets = combinedMonths.map((m) => {
+      const ym = toYearMonth(m.year, m.month)
+      if (ym === yearMonth) {
+        return { label: `${m.month}月`, rows: currentRows }
+      }
+      const data = extraData[ym]
+      if (!data) return { label: `${m.month}月`, rows: [] }
+      return {
+        label: `${m.month}月`,
+        rows: buildSettlementRows({
+          members,
+          expenses: data.expenses || [],
+          tournamentItems: data.tournamentItems || [],
+          campItems: data.campItems || [],
+          otherItems: data.otherItems || [],
+          mealLogs: data.mealLogs || [],
+          config: data.config || config,
+          yearMonth: ym,
+        }),
+      }
+    })
+    return mergeSettlementRows(monthlyRowSets)
+  }, [
+    isCombined,
+    combinedMonths,
+    members,
+    expenses,
+    tournamentItems,
+    campItems,
+    otherItems,
+    mealLogs,
+    config,
+    yearMonth,
+    extraData,
+  ])
 
   const toggleExpand = (id) => {
     setExpanded((prev) => {
@@ -124,7 +232,7 @@ export default function SettlementScreen() {
       }
       await generateGroupPdf(
         pages,
-        `集金一覧_${formatYearMonthJa(year, month)}.pdf`
+        `集金一覧_${periodLabel || formatYearMonthJa(year, month)}.pdf`
       )
       showToast('PDFをダウンロードしました')
     } catch (e) {
@@ -148,7 +256,7 @@ export default function SettlementScreen() {
       }
       await generateSummaryPdf(
         pages,
-        `全選手一覧_${formatYearMonthJa(year, month)}.pdf`
+        `全選手一覧_${periodLabel || formatYearMonthJa(year, month)}.pdf`
       )
       showToast('全選手一覧PDFをダウンロードしました')
     } catch (e) {
@@ -185,6 +293,74 @@ export default function SettlementScreen() {
         />
       </div>
 
+      {/* 複数月まとめて精算 */}
+      <div className="relative">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant={isCombined ? 'default' : 'secondary'}
+            size="sm"
+            onClick={() => setShowMonthPicker((v) => !v)}
+          >
+            <CalendarRange className="h-4 w-4" />
+            {isCombined ? `対象月: ${periodLabel}` : '対象月を追加してまとめて精算'}
+          </Button>
+          {loadingExtra && (
+            <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              他の月のデータを取得中...
+            </span>
+          )}
+          {isCombined && !loadingExtra && (
+            <button
+              onClick={() => setExtraMonths([])}
+              className="text-xs text-slate-400 underline hover:text-slate-600"
+            >
+              選択を解除
+            </button>
+          )}
+        </div>
+
+        {showMonthPicker && (
+          <div className="absolute z-10 mt-2 w-72 rounded-lg border border-slate-200 bg-white p-3 shadow-lg">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">
+                {formatYearMonthJa(year, month)}に加えて、まとめて請求する月を選択
+              </span>
+              <button
+                onClick={() => setShowMonthPicker(false)}
+                className="text-slate-400 hover:text-slate-600"
+                aria-label="閉じる"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-1">
+              {monthCandidates.map((m) => {
+                const checked = extraMonths.some(
+                  (e) => e.year === m.year && e.month === m.month
+                )
+                return (
+                  <button
+                    key={`${m.year}-${m.month}`}
+                    onClick={() => toggleExtraMonth(m)}
+                    className={cn(
+                      'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
+                      checked ? 'bg-primary/5' : 'hover:bg-slate-50'
+                    )}
+                  >
+                    <Checkbox checked={checked} onChange={() => toggleExtraMonth(m)} />
+                    {formatYearMonthJa(m.year, m.month)}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="mt-2 text-[11px] text-slate-400">
+              選んだ月の食費・経費・部費をこの月の分と合算して、1つのPDFにまとめます。
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* ツールバー */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -206,7 +382,7 @@ export default function SettlementScreen() {
           <Button
             variant="secondary"
             onClick={handleDownloadSummaryPdf}
-            disabled={generatingSummary || rows.length === 0}
+            disabled={generatingSummary || rows.length === 0 || loadingExtra}
           >
             {generatingSummary ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -217,7 +393,7 @@ export default function SettlementScreen() {
           </Button>
           <Button
             onClick={handleDownloadPdf}
-            disabled={generating || rows.length === 0}
+            disabled={generating || rows.length === 0 || loadingExtra}
           >
             {generating ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -412,6 +588,7 @@ export default function SettlementScreen() {
               year={year}
               month={month}
               config={config}
+              periodLabel={periodLabel}
             />
           </div>
         ))}
@@ -425,6 +602,7 @@ export default function SettlementScreen() {
           year={year}
           month={month}
           config={config}
+          periodLabel={periodLabel}
         />
       </div>
     </div>

@@ -53,6 +53,26 @@ export function formatYearMonthJa(year, month) {
   return `${year}年${month}月`
 }
 
+// 複数月をまとめて精算するときの期間表示。
+// [{year,month}, ...] (年月順)を「2026年7月・8月・9月」のように連結する。
+// 年をまたぐ場合は年が変わった箇所だけ年を出す（例:「2025年12月・2026年1月」）。
+export function formatYearMonthRangeJa(months) {
+  if (!months || months.length === 0) return ''
+  if (months.length === 1) return formatYearMonthJa(months[0].year, months[0].month)
+  let out = ''
+  let lastYear = null
+  months.forEach((m, i) => {
+    if (i > 0) out += '・'
+    if (m.year !== lastYear) {
+      out += `${m.year}年${m.month}月`
+      lastYear = m.year
+    } else {
+      out += `${m.month}月`
+    }
+  })
+  return out
+}
+
 // 指定年月の日数を取得
 export function daysInMonth(year, month) {
   return new Date(year, month, 0).getDate()

@@ -19,7 +19,7 @@ import { buildItemColumns, itemColumnValue } from '../lib/calc.js'
 const PAGE_WIDTH = 794 // A4 幅 (96dpi)
 const BORDER = '1px solid #000000'
 
-export default function CollectionSheet({ group, rows, year, month }) {
+export default function CollectionSheet({ group, rows, year, month, periodLabel }) {
   const totalSum = rows.reduce((a, r) => a + r.total, 0)
 
   // 大会・合宿・その他費用はその月に実際に使われた項目名がそのまま列見出しになる
@@ -60,7 +60,7 @@ export default function CollectionSheet({ group, rows, year, month }) {
       >
         <div style={{ fontSize: 26, fontWeight: 700 }}>{group}</div>
         <div style={{ fontSize: 18, fontWeight: 700 }}>
-          {formatYearMonthJa(year, month)}分
+          {periodLabel || formatYearMonthJa(year, month)}分
         </div>
       </div>
 
