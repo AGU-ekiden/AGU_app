@@ -139,23 +139,30 @@ export default function MonthlyMealMatrix({
                     </td>
                   </tr>
                 )}
-                {guestRows.map((row, idx) => (
+                {guestRows.map((row, idx) => {
+                  // 見学高校生の区別が無い寮(2寮など)では、寮外生/寮管の
+                  // 種別を毎回選ばせるほどの意味が無いため、種別プルダウンは
+                  // 出さず名前(・備考)だけ入力できるようにする
+                  const showCategoryPicker = guestCategories.includes('見学高校生')
+                  return (
                   <tr key={row.uid} className="bg-[#eaf5f4]/30 hover:bg-[#eaf5f4]/60">
                     <td className="sticky left-0 z-10 w-[220px] overflow-hidden border-r border-slate-200 bg-[#eaf5f4]/40 px-2 py-1">
                       <div className="flex items-center gap-1.5">
                         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                           <div className="flex items-center gap-1">
-                            <Select
-                              value={row.category}
-                              onChange={(e) => onUpdateGuestField(row.uid, 'category', e.target.value)}
-                              className="h-5 w-16 shrink-0 px-1 text-[9px]"
-                            >
-                              {guestCategories.map((c) => (
-                                <option key={c} value={c}>
-                                  {c}
-                                </option>
-                              ))}
-                            </Select>
+                            {showCategoryPicker && (
+                              <Select
+                                value={row.category}
+                                onChange={(e) => onUpdateGuestField(row.uid, 'category', e.target.value)}
+                                className="h-5 w-16 shrink-0 px-1 text-[9px]"
+                              >
+                                {guestCategories.map((c) => (
+                                  <option key={c} value={c}>
+                                    {c}
+                                  </option>
+                                ))}
+                              </Select>
+                            )}
                             <Input
                               value={row.school}
                               placeholder={row.category === '見学高校生' ? '〇〇高校' : '備考（任意）'}
@@ -191,7 +198,8 @@ export default function MonthlyMealMatrix({
                     ))}
                     <TotalCell row={row} idx={idx} />
                   </tr>
-                ))}
+                  )
+                })}
 
                 {rows.length === 0 && (
                   <tr>
