@@ -20,6 +20,9 @@ export default function MonthlyMealMatrix({
   onRemoveGuest,
 }) {
   const rows = [...memberRows, ...guestRows]
+  // 表示順: この寮の在籍者 → 寮生以外 → 寮間移動(otherDorm所属)の順にする
+  const ownRows = memberRows.filter((r) => !r.isCrossDorm)
+  const crossDormRows = memberRows.filter((r) => r.isCrossDorm)
 
   const columnTotals = days.map((d, idx) => {
     let breakfast = 0
@@ -94,38 +97,15 @@ export default function MonthlyMealMatrix({
                     pinTop
                   />
                 )}
-                {memberRows.map((row, idx) => (
-                  <tr
+                {ownRows.map((row, idx) => (
+                  <MemberRow
                     key={row.memberId}
-                    className={cn(
-                      'hover:bg-slate-50/60',
-                      row.isCrossDorm ? 'bg-amber-50/40' : idx % 2 === 1 && 'bg-slate-50/30'
-                    )}
-                  >
-                    <td
-                      className={cn(
-                        'sticky left-0 z-10 w-[220px] overflow-hidden border-r border-slate-200 px-3 py-1.5 font-medium text-slate-800',
-                        row.isCrossDorm ? 'bg-amber-50' : idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'
-                      )}
-                    >
-                      <div className="truncate">{row.name}</div>
-                      {row.isCrossDorm && (
-                        <div className="text-[10px] font-normal text-amber-600">
-                          {otherDorm}所属
-                        </div>
-                      )}
-                    </td>
-                    {row.cells.map((cell) => (
-                      <MealCell
-                        key={cell.date}
-                        cell={cell}
-                        year={year}
-                        month={month}
-                        onToggle={(field) => onToggleMember(row.memberId, cell.date, field)}
-                      />
-                    ))}
-                    <TotalCell row={row} idx={idx} tint={row.isCrossDorm ? 'bg-amber-50' : undefined} />
-                  </tr>
+                    row={row}
+                    idx={idx}
+                    year={year}
+                    month={month}
+                    onToggleMember={onToggleMember}
+                  />
                 ))}
 
                 {guestRows.length > 0 && (
@@ -179,6 +159,27 @@ export default function MonthlyMealMatrix({
                   </tr>
                 ))}
 
+                {crossDormRows.length > 0 && (
+                  <tr>
+                    <td
+                      colSpan={days.length + 2}
+                      className="sticky left-0 border-b border-t border-slate-200 bg-amber-50/60 px-3 py-1 text-[11px] font-semibold text-amber-700"
+                    >
+                      寮間移動（{otherDorm}所属）
+                    </td>
+                  </tr>
+                )}
+                {crossDormRows.map((row, idx) => (
+                  <MemberRow
+                    key={row.memberId}
+                    row={row}
+                    idx={idx}
+                    year={year}
+                    month={month}
+                    onToggleMember={onToggleMember}
+                  />
+                ))}
+
                 {rows.length === 0 && (
                   <tr>
                     <td
@@ -214,6 +215,37 @@ export default function MonthlyMealMatrix({
         <span>セルをクリックすると◯/×を切り替えられます</span>
       </div>
     </div>
+  )
+}
+
+// 寮生1名分の行（この寮の在籍者・寮間移動者のどちらにも使う）
+function MemberRow({ row, idx, year, month, onToggleMember }) {
+  return (
+    <tr
+      className={cn(
+        'hover:bg-slate-50/60',
+        row.isCrossDorm ? 'bg-amber-50/40' : idx % 2 === 1 && 'bg-slate-50/30'
+      )}
+    >
+      <td
+        className={cn(
+          'sticky left-0 z-10 w-[220px] overflow-hidden border-r border-slate-200 px-3 py-1.5 font-medium text-slate-800',
+          row.isCrossDorm ? 'bg-amber-50' : idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'
+        )}
+      >
+        <div className="truncate">{row.name}</div>
+      </td>
+      {row.cells.map((cell) => (
+        <MealCell
+          key={cell.date}
+          cell={cell}
+          year={year}
+          month={month}
+          onToggle={(field) => onToggleMember(row.memberId, cell.date, field)}
+        />
+      ))}
+      <TotalCell row={row} idx={idx} tint={row.isCrossDorm ? 'bg-amber-50' : undefined} />
+    </tr>
   )
 }
 
