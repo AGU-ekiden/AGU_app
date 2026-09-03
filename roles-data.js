@@ -17,7 +17,7 @@ window.FEATURES = {
   pace: { name: 'ペース計算', icon: '📏', target: 'stopwatch', hash: 'pace', note: '「距離」タブ' },
   crossing: { name: '山試走', icon: '⛰️', target: 'stopwatch', hash: 'crossing', note: '「山試走」タブ' },
   rollcall: { name: '点呼', icon: '🙋', target: 'stopwatch', hash: 'rollcall', note: '「点呼」タブ' },
-  racing_watch: { name: 'レーシングウォッチ', icon: '📷', target: 'tokei', hash: 'racingwatch', note: 'カメラ同期ストップウォッチ' },
+  racing_watch: { name: 'レーシングウォッチ', icon: '📷', target: 'tokei', note: 'カメラ同期ストップウォッチ' },
   aotore: { name: '青トレデータフォルダ', icon: '📚', target: 'itonomaki', note: null },
   blood: { name: '血液検査確認', icon: '🩸', target: 'tiryou-karte', note: null },
   race_result: { name: '試合結果確認', icon: '🏁', target: 'tiryou-karte', note: null },
