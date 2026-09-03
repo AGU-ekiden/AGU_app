@@ -451,7 +451,7 @@ export default function MealLogsScreen({ dorm, guestCategories = GUEST_CATEGORIE
           if (v.dinner) totalDinner += 1
           return { day: d, date, breakfast: v.breakfast, dinner: v.dinner }
         })
-        return { uid: g.uid, category: g.category, name: g.name, cells, totalBreakfast, totalDinner }
+        return { uid: g.uid, category: g.category, school: g.school, name: g.name, cells, totalBreakfast, totalDinner }
       }),
     [guestRowsDraft, days, year, month]
   )

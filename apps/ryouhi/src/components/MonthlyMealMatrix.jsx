@@ -57,7 +57,7 @@ export default function MonthlyMealMatrix({
             <table className="border-collapse text-xs">
               <thead>
                 <tr>
-                  <th className="sticky left-0 top-0 z-20 w-[190px] overflow-hidden border-b border-r border-slate-200 bg-slate-50 px-3 py-2 text-left font-medium text-slate-500">
+                  <th className="sticky left-0 top-0 z-20 w-[220px] overflow-hidden border-b border-r border-slate-200 bg-slate-50 px-3 py-2 text-left font-medium text-slate-500">
                     氏名
                   </th>
                   {days.map((d) => {
@@ -87,7 +87,13 @@ export default function MonthlyMealMatrix({
               </thead>
               <tbody>
                 {rows.length > 0 && (
-                  <TotalsRow label="日別合計" columnTotals={columnTotals} grandBreakfast={grandBreakfast} grandDinner={grandDinner} />
+                  <TotalsRow
+                    label="日別合計"
+                    columnTotals={columnTotals}
+                    grandBreakfast={grandBreakfast}
+                    grandDinner={grandDinner}
+                    pinTop
+                  />
                 )}
                 {memberRows.map((row, idx) => (
                   <tr
@@ -99,7 +105,7 @@ export default function MonthlyMealMatrix({
                   >
                     <td
                       className={cn(
-                        'sticky left-0 z-10 w-[190px] overflow-hidden border-r border-slate-200 px-3 py-1.5 font-medium text-slate-800',
+                        'sticky left-0 z-10 w-[220px] overflow-hidden border-r border-slate-200 px-3 py-1.5 font-medium text-slate-800',
                         row.isCrossDorm ? 'bg-amber-50' : idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'
                       )}
                     >
@@ -135,32 +141,40 @@ export default function MonthlyMealMatrix({
                 )}
                 {guestRows.map((row, idx) => (
                   <tr key={row.uid} className="bg-[#eaf5f4]/30 hover:bg-[#eaf5f4]/60">
-                    <td className="sticky left-0 z-10 w-[190px] overflow-hidden border-r border-slate-200 bg-[#eaf5f4]/40 px-2 py-1.5">
-                      <div className="flex items-center gap-1">
-                        <Select
-                          value={row.category}
-                          onChange={(e) => onUpdateGuestField(row.uid, 'category', e.target.value)}
-                          className="h-6 w-16 shrink-0 px-1 text-[10px]"
-                        >
-                          {guestCategories.map((c) => (
-                            <option key={c} value={c}>
-                              {c}
-                            </option>
-                          ))}
-                        </Select>
+                    <td className="sticky left-0 z-10 w-[220px] overflow-hidden border-r border-slate-200 bg-[#eaf5f4]/40 px-2 py-1">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-1">
+                          <Select
+                            value={row.category}
+                            onChange={(e) => onUpdateGuestField(row.uid, 'category', e.target.value)}
+                            className="h-5 w-16 shrink-0 px-1 text-[9px]"
+                          >
+                            {guestCategories.map((c) => (
+                              <option key={c} value={c}>
+                                {c}
+                              </option>
+                            ))}
+                          </Select>
+                          <Input
+                            value={row.school}
+                            placeholder={row.category === '見学高校生' ? '〇〇高校' : '備考（任意）'}
+                            onChange={(e) => onUpdateGuestField(row.uid, 'school', e.target.value)}
+                            className="h-5 min-w-0 flex-1 px-1 text-[9px]"
+                          />
+                          <button
+                            onClick={() => onRemoveGuest(row.uid)}
+                            className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-slate-300 hover:bg-red-50 hover:text-destructive"
+                            aria-label="削除"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
                         <Input
                           value={row.name}
                           placeholder="氏名"
                           onChange={(e) => onUpdateGuestField(row.uid, 'name', e.target.value)}
-                          className="h-6 min-w-0 flex-1 px-1.5 text-[10px]"
+                          className="h-5 px-1 text-[9px]"
                         />
-                        <button
-                          onClick={() => onRemoveGuest(row.uid)}
-                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-slate-300 hover:bg-red-50 hover:text-destructive"
-                          aria-label="削除"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
                       </div>
                     </td>
                     {row.cells.map((cell) => (
@@ -259,21 +273,25 @@ function TotalCell({ row, idx, tint }) {
   )
 }
 
-function TotalsRow({ label, columnTotals, grandBreakfast, grandDinner, footer }) {
+// 日別合計行。pinTop を渡すと、ヘッダー行のすぐ下に貼り付いたまま
+// 縦スクロールしても常に見える状態にする（日付ヘッダーと同じ考え方で、
+// 行全体のセルに sticky top-<ヘッダー高さ> を付ける）。
+function TotalsRow({ label, columnTotals, grandBreakfast, grandDinner, footer, pinTop }) {
+  const topClass = pinTop ? 'sticky top-[45px] z-10' : ''
   return (
     <tr className={cn('bg-slate-100 font-semibold', footer ? 'border-t' : 'border-b', 'border-slate-200')}>
-      <td className="sticky left-0 z-10 border-r border-slate-200 bg-slate-100 px-3 py-1.5 text-slate-700">
+      <td className={cn('sticky left-0 z-20 border-r border-slate-200 bg-slate-100 px-3 py-1.5 text-slate-700', topClass)}>
         {label}
       </td>
       {columnTotals.map((c) => (
-        <td key={c.day} className="px-0.5 py-1 text-center">
+        <td key={c.day} className={cn('bg-slate-100 px-0.5 py-1 text-center', topClass)}>
           <div className="mx-auto flex w-fit flex-col items-center gap-0.5 text-[9px] leading-tight">
             <span className="text-[#2c6462]">{c.breakfast}</span>
             <span className="text-emerald-600">{c.dinner}</span>
           </div>
         </td>
       ))}
-      <td className="sticky right-0 z-10 border-l border-slate-200 bg-slate-100 px-2 py-1.5 text-right">
+      <td className={cn('sticky right-0 z-20 border-l border-slate-200 bg-slate-100 px-2 py-1.5 text-right', topClass)}>
         <span className="text-[#2c6462]">{grandBreakfast}</span>
         <span className="text-slate-300">/</span>
         <span className="text-emerald-600">{grandDinner}</span>
