@@ -205,6 +205,83 @@ export function AppProvider({ children, onAuthError }) {
     [yearMonth, mealLogs, guestMeals, showToast, checkAuthError]
   )
 
+  // 月間一覧表（編集画面）専用の一括保存。
+  // memberLogs: メンバー食数（複数日付分をまとめてUPSERT）
+  // guestsByDate: { [date]: 寮生以外の当日分（そのdorm×dateの内容を総入れ替え）配列 }
+  // 寮生以外は「対象日付ごとの総入れ替え」というAPI仕様のため、日付が複数
+  // あればAPI呼び出し自体は日付ごとに順番に行うが、saveMealLogs を複数回
+  // 呼ぶと「呼び出しのたびに古い guestMeals を元に差し替える」ため後の
+  // 呼び出しが前の呼び出しの反映分を消してしまう。そのためローカル状態
+  // （mealLogs/guestMeals）への反映は、全リクエストが完了した後に一度だけ
+  // まとめて行う。
+  const saveMonthlyMealData = useCallback(
+    async (dorm, memberLogs, guestsByDate = {}, options = {}) => {
+      try {
+        if (memberLogs.length > 0) {
+          await api.saveMealLogs(yearMonth, memberLogs, [], null, dorm)
+        }
+        for (const [date, guests] of Object.entries(guestsByDate)) {
+          await api.saveMealLogs(yearMonth, [], guests, date, dorm)
+        }
+      } catch (e) {
+        checkAuthError(e)
+        throw e
+      }
+
+      // メンバー食数を UPSERT 更新（key: date+member+dorm）
+      const key = (l) => `${l.date}__${l.member_id}__${l.dorm || ''}`
+      const map = new Map(mealLogs.map((l) => [key(l), l]))
+      for (const l of memberLogs) {
+        if (l.breakfast || l.dinner) map.set(key(l), l)
+        else map.delete(key(l))
+      }
+      const nextMealLogs = Array.from(map.values())
+      setMealLogs(nextMealLogs)
+
+      // 寮生以外: 変更のあった日付をまとめて総入れ替え
+      let nextGuestMeals = guestMeals
+      const touchedDates = Object.keys(guestsByDate)
+      if (touchedDates.length > 0) {
+        const touched = new Set(touchedDates)
+        const validByDate = []
+        for (const [date, guests] of Object.entries(guestsByDate)) {
+          for (const g of guests) {
+            if ((g.name || '').trim() === '' && (g.school || '').trim() === '')
+              continue
+            validByDate.push({
+              date,
+              dorm,
+              category: g.category || '見学高校生',
+              school: (g.school || '').trim(),
+              name: (g.name || '').trim(),
+              breakfast: !!g.breakfast,
+              dinner: !!g.dinner,
+            })
+          }
+        }
+        nextGuestMeals = [
+          ...guestMeals.filter((g) => !(touched.has(g.date) && (g.dorm || '') === dorm)),
+          ...validByDate,
+        ]
+        setGuestMeals(nextGuestMeals)
+      }
+
+      const entry = cacheRef.current[yearMonth]
+      if (entry) {
+        cacheRef.current[yearMonth] = {
+          ...entry,
+          mealLogs: nextMealLogs,
+          guestMeals: nextGuestMeals,
+        }
+      }
+
+      if (!options.silent) {
+        showToast(options.toastMessage || '食数データを保存しました')
+      }
+    },
+    [yearMonth, mealLogs, guestMeals, showToast, checkAuthError]
+  )
+
   // payload: { expenses, tournamentItems, campItems, otherItems }
   const saveExpenses = useCallback(
     async (payload) => {
@@ -504,6 +581,7 @@ export function AppProvider({ children, onAuthError }) {
     saveMembers,
     saveConfig,
     saveMealLogs,
+    saveMonthlyMealData,
     saveExpenses,
     registerDormTransfer,
     undoDormTransfer,

@@ -76,7 +76,7 @@ export function buildMonthlyMealMatrix({
 
   // 寮生以外（見学高校生・寮外生・寮管）も一覧の末尾に追加する。
   // 寮生と違い固定の名簿が無いため、種別＋氏名（学校名込み）を単位に集計する。
-  const guestRows = buildGuestRows(guestMeals, dorm, year, month, days)
+  const guestRows = buildGuestMonthlyRows({ guestMeals, dorm, year, month, days })
   const allRows = [...rows, ...guestRows]
 
   const columnTotals = days.map((d, idx) => {
@@ -95,9 +95,70 @@ export function buildMonthlyMealMatrix({
   return { days, rows: allRows, columnTotals, grandBreakfast, grandDinner }
 }
 
+// 編集画面用: この寮の在籍メンバーに加えて、もう一方の食数管理対象寮
+// （otherDorm）の在籍メンバーも常に全員行として含める。読み取り専用の
+// buildMonthlyMealMatrix と違い「まだ一度も記録の無い寮間移動者」も
+// その場でチェックできるようにするため、eaterIds によるフィルタは行わない。
+export function buildMemberMonthlyRows({
+  members,
+  mealLogs,
+  dorm,
+  otherDorm,
+  year,
+  month,
+}) {
+  const totalDays = daysInMonth(year, month)
+  const days = Array.from({ length: totalDays }, (_, i) => i + 1)
+
+  const activeMembers = members.filter((m) => m.active)
+  const population = activeMembers.filter(
+    (m) => mealDormOf(m) === dorm || (otherDorm && mealDormOf(m) === otherDorm)
+  )
+
+  const lookup = new Map()
+  for (const log of mealLogs) {
+    if ((log.dorm || '') !== dorm) continue
+    const key = String(log.member_id)
+    if (!lookup.has(key)) lookup.set(key, new Map())
+    lookup.get(key).set(log.date, {
+      breakfast: !!log.breakfast,
+      dinner: !!log.dinner,
+    })
+  }
+
+  const rows = population
+    .slice()
+    .sort(compareMembersByGradeKana)
+    .map((m) => {
+      const dayMap = lookup.get(String(m.id)) || new Map()
+      let totalBreakfast = 0
+      let totalDinner = 0
+      const cells = days.map((d) => {
+        const date = toDateStr(year, month, d)
+        const v = dayMap.get(date) || { breakfast: false, dinner: false }
+        if (v.breakfast) totalBreakfast += 1
+        if (v.dinner) totalDinner += 1
+        return { day: d, date, breakfast: v.breakfast, dinner: v.dinner }
+      })
+      return {
+        memberId: m.id,
+        name: m.name,
+        group: m.group,
+        rank: m.rank,
+        isCrossDorm: mealDormOf(m) !== dorm,
+        cells,
+        totalBreakfast,
+        totalDinner,
+      }
+    })
+    .sort((a, b) => Number(a.isCrossDorm) - Number(b.isCrossDorm))
+
+  return { days, rows }
+}
+
 // 寮生以外（見学高校生・寮外生・寮管）の月間行を組み立てる
 // （種別＋表示名を同一人物とみなして日ごとのセルに集計する）
-function buildGuestRows(guestMeals, dorm, year, month, days) {
+export function buildGuestMonthlyRows({ guestMeals, dorm, year, month, days }) {
   const map = new Map()
   for (const g of guestMeals) {
     if ((g.dorm || '') !== dorm) continue
