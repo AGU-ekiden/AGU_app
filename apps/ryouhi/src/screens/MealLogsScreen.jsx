@@ -59,6 +59,7 @@ export default function MealLogsScreen({ dorm, guestCategories = GUEST_CATEGORIE
     dismissDormTransfer,
     removeDormTransferMember,
     showToast,
+    setUnsaved,
   } = useApp()
 
   const today = new Date()
@@ -315,6 +316,17 @@ export default function MealLogsScreen({ dorm, guestCategories = GUEST_CATEGORIE
   // ものを読めるようにするため）
   const dirtyRef = useRef(false)
   dirtyRef.current = dirty
+
+  // タブ切り替え・月変更・ログアウト前に確認ダイアログを出せるよう、
+  // 未保存の変更の有無をAppContextへ同期する。
+  // このタブ内には自動保存もあるが、保存前の状態のまま画面を切り替えた
+  // 場合（未入力セルしかない寮外生行など）に、切り替え先へ移ってから
+  // 気づいて操作を続けてしまい、結果的にドラフトが失われることがある。
+  // ここで一度確認を挟むことで、その場で「一括保存」を押し直す機会を作る。
+  useEffect(() => {
+    setUnsaved(dirty)
+    return () => setUnsaved(false)
+  }, [dirty, setUnsaved])
 
   const buildSavePayload = () => {
     const memberLogs = []
@@ -738,7 +750,7 @@ export default function MealLogsScreen({ dorm, guestCategories = GUEST_CATEGORIE
       )}
 
       <p className="text-xs text-muted-foreground">
-        表の朝食・夕食セルをクリックしてチェックを切り替え、「一括保存」で保存してください（別の月へ移動する・画面を離れる際は自動保存されます）。
+        表の朝食・夕食セルをクリックしてチェックを切り替え、「一括保存」で保存してください（保存前に別の月へ移動する・画面を離れようとすると確認が表示されます）。
       </p>
 
       <MonthlyMealMatrix
