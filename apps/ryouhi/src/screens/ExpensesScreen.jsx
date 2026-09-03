@@ -500,8 +500,8 @@ export default function ExpensesScreen() {
                   <th className="px-3 py-2.5 text-right">合宿費</th>
                   <th className="px-2 py-2.5 text-right">治療費実費</th>
                   <th className="px-2 py-2.5 text-right">治療費補助</th>
-                  <th className="px-2 py-2.5 text-right">SPM費補助</th>
                   <th className="px-2 py-2.5 text-right text-primary">治療費差額</th>
+                  <th className="px-2 py-2.5 text-right">SPM費補助</th>
                   <th className="px-2 py-2.5 text-right">配達代</th>
                   <th className="px-3 py-2.5 text-right">その他費用</th>
                 </tr>
@@ -604,18 +604,6 @@ export default function ExpensesScreen() {
                             }
                           />
                         </td>
-                        {/* SPM費補助（回数 × 単価770円） */}
-                        <td className="px-1 py-1.5">
-                          <NumCell
-                            value={r.motivation_count}
-                            onChange={(v) =>
-                              updateField(m.id, 'motivation_count', v)
-                            }
-                          />
-                          <div className="mt-0.5 text-center text-[10px] text-slate-400">
-                            {formatYen(motivationSubsidyAmount(r))}
-                          </div>
-                        </td>
                         {/* 治療費差額 */}
                         <td className="px-2 py-1.5 text-right">
                           <span
@@ -628,6 +616,18 @@ export default function ExpensesScreen() {
                           >
                             {formatYen(net)}
                           </span>
+                        </td>
+                        {/* SPM費補助（回数 × 単価770円） */}
+                        <td className="px-1 py-1.5">
+                          <NumCell
+                            value={r.motivation_count}
+                            onChange={(v) =>
+                              updateField(m.id, 'motivation_count', v)
+                            }
+                          />
+                          <div className="mt-0.5 text-center text-[10px] text-slate-400">
+                            {formatYen(motivationSubsidyAmount(r))}
+                          </div>
                         </td>
                         {/* 配達代 */}
                         <td className="px-1 py-1.5">
