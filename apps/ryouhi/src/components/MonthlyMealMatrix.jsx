@@ -142,39 +142,42 @@ export default function MonthlyMealMatrix({
                 {guestRows.map((row, idx) => (
                   <tr key={row.uid} className="bg-[#eaf5f4]/30 hover:bg-[#eaf5f4]/60">
                     <td className="sticky left-0 z-10 w-[220px] overflow-hidden border-r border-slate-200 bg-[#eaf5f4]/40 px-2 py-1">
-                      <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-1">
-                          <Select
-                            value={row.category}
-                            onChange={(e) => onUpdateGuestField(row.uid, 'category', e.target.value)}
-                            className="h-5 w-16 shrink-0 px-1 text-[9px]"
-                          >
-                            {guestCategories.map((c) => (
-                              <option key={c} value={c}>
-                                {c}
-                              </option>
-                            ))}
-                          </Select>
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                          <div className="flex items-center gap-1">
+                            <Select
+                              value={row.category}
+                              onChange={(e) => onUpdateGuestField(row.uid, 'category', e.target.value)}
+                              className="h-5 w-16 shrink-0 px-1 text-[9px]"
+                            >
+                              {guestCategories.map((c) => (
+                                <option key={c} value={c}>
+                                  {c}
+                                </option>
+                              ))}
+                            </Select>
+                            <Input
+                              value={row.school}
+                              placeholder={row.category === '見学高校生' ? '〇〇高校' : '備考（任意）'}
+                              onChange={(e) => onUpdateGuestField(row.uid, 'school', e.target.value)}
+                              className="h-5 min-w-0 flex-1 px-1 text-[9px]"
+                            />
+                          </div>
                           <Input
-                            value={row.school}
-                            placeholder={row.category === '見学高校生' ? '〇〇高校' : '備考（任意）'}
-                            onChange={(e) => onUpdateGuestField(row.uid, 'school', e.target.value)}
-                            className="h-5 min-w-0 flex-1 px-1 text-[9px]"
+                            value={row.name}
+                            placeholder="氏名"
+                            onChange={(e) => onUpdateGuestField(row.uid, 'name', e.target.value)}
+                            className="h-5 px-1 text-[9px]"
                           />
-                          <button
-                            onClick={() => onRemoveGuest(row.uid)}
-                            className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-slate-300 hover:bg-red-50 hover:text-destructive"
-                            aria-label="削除"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
                         </div>
-                        <Input
-                          value={row.name}
-                          placeholder="氏名"
-                          onChange={(e) => onUpdateGuestField(row.uid, 'name', e.target.value)}
-                          className="h-5 px-1 text-[9px]"
-                        />
+                        <button
+                          onClick={() => onRemoveGuest(row.uid)}
+                          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-rose-200 bg-white text-rose-500 hover:bg-rose-50 hover:text-rose-700"
+                          aria-label={`${row.name || row.school || '寮外生等'}を削除`}
+                          title="この行を削除"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     </td>
                     {row.cells.map((cell) => (
