@@ -103,7 +103,7 @@
       <section class="auth">
         <div class="auth-card">
           <h1 class="auth-title">ログイン</h1>
-          <p class="auth-sub">氏名と暗証番号を入力してください。<br>初めての方は暗証番号に【000000】を入力してください。</p>
+          <p class="auth-sub">氏名と暗証番号を入力してください。</p>
           <form id="loginForm" class="auth-form">
             <label class="field">
               <span>氏名</span>

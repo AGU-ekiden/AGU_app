@@ -346,22 +346,6 @@ body {
 .feature-status.repo { background: var(--surface-2); color: var(--text-sub); }
 .feature-status.pending { background: var(--surface-2); color: var(--text-hint); }
 
-/* Footer */
-.footer {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1.25rem 2.5rem;
-  color: var(--text-hint);
-  font-size: 0.78rem;
-  line-height: 1.6;
-}
-
-.footer code {
-  background: var(--surface-2);
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-}
-
 /* ==========================================================
    Desktop layout
    モバイル(縦一列)をそのまま引き伸ばすのではなく、
@@ -370,8 +354,7 @@ body {
 @media (min-width: 900px) {
   .header-inner,
   .header-nav,
-  .main,
-  .footer {
+  .main {
     max-width: 1180px;
   }
 
@@ -386,10 +369,6 @@ body {
 
   .main {
     padding: 3rem 2.5rem 4.5rem;
-  }
-
-  .footer {
-    padding: 0 2.5rem 3rem;
   }
 
   .brand-mark { font-size: 1.7rem; }
@@ -427,15 +406,12 @@ body {
   }
 
   .feature-name { font-size: 1rem; }
-
-  .footer p { max-width: 78ch; }
 }
 
 @media (min-width: 1400px) {
   .header-inner,
   .header-nav,
-  .main,
-  .footer {
+  .main {
     max-width: 1320px;
   }
 
