@@ -18,7 +18,7 @@ import { mealPriceFor } from '../lib/calc.js'
 // 誤って書き換えてしまわないよう、通常は読み取り専用で表示し、
 // 「編集」ボタンを押したときだけ入力できるようにする。
 export default function SettingsScreen() {
-  const { config, loading, saveConfig } = useApp()
+  const { config, loading, saveConfig, setUnsaved } = useApp()
   const [form, setForm] = useState(() => buildForm(config))
   const [saving, setSaving] = useState(false)
   const [dirty, setDirty] = useState(false)
@@ -28,6 +28,13 @@ export default function SettingsScreen() {
     setForm(buildForm(config))
     setDirty(false)
   }, [config])
+
+  // タブ切り替え・年月変更・ログアウト前に確認できるよう、保存されていない
+  // 変更の有無をAppContextへ同期する（画面を離れるときは必ず解除する）
+  useEffect(() => {
+    setUnsaved(dirty)
+    return () => setUnsaved(false)
+  }, [dirty, setUnsaved])
 
   const updatePrice = (dorm, meal, value) => {
     setForm((prev) => ({

@@ -74,10 +74,21 @@ export default function App() {
 
 function AppShell() {
   const [active, setActive] = useState('members')
-  const { year, month, usingDummy, error } = useApp()
+  const { year, month, usingDummy, error, confirmDiscardUnsaved } = useApp()
   const { user, logout } = useAuth()
   const activeTab = TABS.find((t) => t.id === active)
   const ActiveComponent = activeTab.Component
+
+  // 保存されていない変更があるタブから離れようとしたら確認する
+  const handleTabClick = (tabId) => {
+    if (tabId === active) return
+    if (!confirmDiscardUnsaved()) return
+    setActive(tabId)
+  }
+  const handleLogout = () => {
+    if (!confirmDiscardUnsaved()) return
+    logout()
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -115,7 +126,7 @@ function AppShell() {
                 <span className="hidden text-sm text-slate-600 sm:inline">
                   {user?.name}
                 </span>
-                <Button variant="ghost" size="sm" onClick={logout}>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
                   <LogOut className="h-3.5 w-3.5" />
                   ログアウト
                 </Button>
@@ -132,7 +143,7 @@ function AppShell() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActive(tab.id)}
+                  onClick={() => handleTabClick(tab.id)}
                   className={cn(
                     'flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors',
                     isActive

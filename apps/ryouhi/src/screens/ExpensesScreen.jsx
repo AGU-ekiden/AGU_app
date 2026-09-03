@@ -54,6 +54,7 @@ export default function ExpensesScreen() {
     yearMonth,
     loading,
     saveExpenses,
+    setUnsaved,
   } = useApp()
   const [rows, setRows] = useState({}) // member_id -> { ...expense, tournaments, camps, others }
   const [expanded, setExpanded] = useState(() => new Set())
@@ -61,6 +62,13 @@ export default function ExpensesScreen() {
   const [dirty, setDirty] = useState(false)
   const [filterGroup, setFilterGroup] = useState('all')
   const [bulkType, setBulkType] = useState(null) // 'tournament' | 'camp' | 'other' | null
+
+  // タブ切り替え・年月変更・ログアウト前に確認できるよう、保存されていない
+  // 変更の有無をAppContextへ同期する（画面を離れるときは必ず解除する）
+  useEffect(() => {
+    setUnsaved(dirty)
+    return () => setUnsaved(false)
+  }, [dirty, setUnsaved])
 
   const activeMembers = useMemo(
     () => members.filter((m) => m.active),

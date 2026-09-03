@@ -46,6 +46,34 @@ export function AppProvider({ children, onAuthError }) {
   // 裏で最新データを取得して静かに差し替える（stale-while-revalidate）。
   const cacheRef = useRef({})
 
+  // 「保存されていない変更」フラグ。タブ切り替え・年月変更・ログアウト・
+  // ブラウザを閉じる操作の直前にチェックし、確認ダイアログを出すために使う。
+  // 画面の再レンダーを起こす必要は無いのでrefで持つ（各画面が dirty state を
+  // 変えるたびに setUnsaved を呼んで同期する）。
+  const unsavedRef = useRef(false)
+  const setUnsaved = useCallback((flag) => {
+    unsavedRef.current = flag
+  }, [])
+  const hasUnsavedChanges = useCallback(() => unsavedRef.current, [])
+  // タブ切り替え等の前に呼び、保存されていない変更があれば確認ダイアログを出す。
+  // true = 続行してよい（変更なし、またはユーザーが「移動する」を選択）
+  const confirmDiscardUnsaved = useCallback(() => {
+    if (!unsavedRef.current) return true
+    return window.confirm(
+      '保存されていない変更があります。保存せずに移動すると変更内容は失われます。移動しますか？'
+    )
+  }, [])
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (!unsavedRef.current) return
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [])
+
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type, id: Date.now() })
     setTimeout(() => setToast(null), 3000)
@@ -599,6 +627,9 @@ export function AppProvider({ children, onAuthError }) {
     showToast,
     reload,
     fetchMonthData,
+    setUnsaved,
+    hasUnsavedChanges,
+    confirmDiscardUnsaved,
     saveMembers,
     saveConfig,
     saveMealLogs,

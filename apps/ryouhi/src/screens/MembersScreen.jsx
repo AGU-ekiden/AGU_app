@@ -15,7 +15,7 @@ import { cn, compareMembersByGradeKana } from '../lib/utils.js'
 
 // 画面A：寮生マスター管理
 export default function MembersScreen() {
-  const { members, loading, saveMembers } = useApp()
+  const { members, loading, saveMembers, setUnsaved } = useApp()
   const [rows, setRows] = useState([])
   const [saving, setSaving] = useState(false)
   const [dirty, setDirty] = useState(false)
@@ -26,6 +26,13 @@ export default function MembersScreen() {
     setRows(members.map((m) => ({ ...m })))
     setDirty(false)
   }, [members])
+
+  // タブ切り替え・年月変更・ログアウト前に確認できるよう、保存されていない
+  // 変更の有無をAppContextへ同期する（画面を離れるときは必ず解除する）
+  useEffect(() => {
+    setUnsaved(dirty)
+    return () => setUnsaved(false)
+  }, [dirty, setUnsaved])
 
   const update = (id, field, value) => {
     setRows((prev) =>

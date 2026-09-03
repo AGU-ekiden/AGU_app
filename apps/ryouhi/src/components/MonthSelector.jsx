@@ -5,7 +5,7 @@ import { Button, Select } from './ui/index.jsx'
 
 // 画面上部のグローバル年月セレクタ
 export default function MonthSelector() {
-  const { year, month, setYear, setMonth } = useApp()
+  const { year, month, setYear, setMonth, confirmDiscardUnsaved } = useApp()
 
   const now = new Date()
   const years = []
@@ -14,6 +14,7 @@ export default function MonthSelector() {
   }
 
   const prev = () => {
+    if (!confirmDiscardUnsaved()) return
     if (month === 1) {
       setYear(year - 1)
       setMonth(12)
@@ -22,12 +23,21 @@ export default function MonthSelector() {
     }
   }
   const next = () => {
+    if (!confirmDiscardUnsaved()) return
     if (month === 12) {
       setYear(year + 1)
       setMonth(1)
     } else {
       setMonth(month + 1)
     }
+  }
+  const changeYear = (v) => {
+    if (!confirmDiscardUnsaved()) return
+    setYear(v)
+  }
+  const changeMonth = (v) => {
+    if (!confirmDiscardUnsaved()) return
+    setMonth(v)
   }
 
   return (
@@ -39,7 +49,7 @@ export default function MonthSelector() {
       <div className="flex items-center gap-1.5">
         <Select
           value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
+          onChange={(e) => changeYear(Number(e.target.value))}
           className="w-24"
         >
           {years.map((y) => (
@@ -50,7 +60,7 @@ export default function MonthSelector() {
         </Select>
         <Select
           value={month}
-          onChange={(e) => setMonth(Number(e.target.value))}
+          onChange={(e) => changeMonth(Number(e.target.value))}
           className="w-20"
         >
           {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
