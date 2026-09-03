@@ -76,7 +76,8 @@ export function AppProvider({ children, onAuthError }) {
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type, id: Date.now() })
-    setTimeout(() => setToast(null), 3000)
+    // エラーは原因の文言まで表示するため、通常より長めに出しておく
+    setTimeout(() => setToast(null), type === 'error' ? 8000 : 3000)
   }, [])
 
   // セッション切れを検知したら、呼び出し元にログイン画面へ戻すよう通知する

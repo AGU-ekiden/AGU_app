@@ -81,8 +81,10 @@ export default function SettingsScreen() {
     } catch (e) {
       // ここで捕まえないと保存失敗が画面上どこにも表示されず、
       // 「保存したはずなのに変わっていない」ように見えてしまう
+      // 原因調査のため、エラー内容もトーストに表示する
       console.error(e)
-      showToast('規定の保存に失敗しました。もう一度お試しください', 'error')
+      const detail = e && e.message ? `: ${e.message}` : ''
+      showToast(`規定の保存に失敗しました${detail}`, 'error')
     } finally {
       setSaving(false)
     }
