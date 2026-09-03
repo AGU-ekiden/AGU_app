@@ -18,7 +18,7 @@ import { mealPriceFor } from '../lib/calc.js'
 // 誤って書き換えてしまわないよう、通常は読み取り専用で表示し、
 // 「編集」ボタンを押したときだけ入力できるようにする。
 export default function SettingsScreen() {
-  const { config, loading, saveConfig, setUnsaved } = useApp()
+  const { config, loading, saveConfig, setUnsaved, showToast } = useApp()
   const [form, setForm] = useState(() => buildForm(config))
   const [saving, setSaving] = useState(false)
   const [dirty, setDirty] = useState(false)
@@ -78,6 +78,11 @@ export default function SettingsScreen() {
       await saveConfig(payload)
       setDirty(false)
       setEditing(false)
+    } catch (e) {
+      // ここで捕まえないと保存失敗が画面上どこにも表示されず、
+      // 「保存したはずなのに変わっていない」ように見えてしまう
+      console.error(e)
+      showToast('規定の保存に失敗しました。もう一度お試しください', 'error')
     } finally {
       setSaving(false)
     }
