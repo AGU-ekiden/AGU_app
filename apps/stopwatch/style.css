@@ -460,21 +460,25 @@ html, body {
 .lap-group {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
+  margin: 0 -8px;
 }
 
 .btn.btn-lap {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 104px;
-  padding: 12px 6px;
-  font-size: 14px;
+  min-height: 136px;
+  padding: 12px 4px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.02em;
-  background: var(--lcd-bg);
-  border-color: var(--lcd-bg);
-  color: var(--lcd-ink);
+  /* lcd-bg was too close to the surrounding panel color to read as a
+     button (see: user report of near-misses tapping the wrong one).
+     panel-2 + a solid accent border gives it clear edges instead. */
+  background: var(--panel-2);
+  border: 2px solid var(--accent);
+  color: var(--text);
 }
 
 /* Reset / CSV / spreadsheet always share a single row. */
