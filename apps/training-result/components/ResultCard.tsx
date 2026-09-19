@@ -81,6 +81,13 @@ export default function ResultCard({ result }: { result: PracticeResult }) {
           // 隠れてしまうため、長押し中は抑止する
           if (isLongPressRef.current) event.preventDefault();
         }}
+        // iOS Safariはリンクの長押しを検知すると、こちらのpointer/click
+        // イベントより先に自前のリンクプレビュー(遷移先ページのプレビュー
+        // カード+共有メニュー)を割り込ませてしまい、下のポップアップが
+        // 隠れてしまう。-webkit-touch-callout: noneでそのOS標準プレビューを
+        // 無効化し、代わりにこのコンポーネント自身のプレビューだけが
+        // 表示されるようにする。
+        style={{ WebkitTouchCallout: "none" }}
         className="group flex select-none flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-4 transition hover:border-[var(--primary)] hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-[var(--primary)]"
       >
         <div className="flex items-start justify-between gap-3">
