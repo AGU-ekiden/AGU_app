@@ -31,9 +31,11 @@ app/
   api/dropbox/file/route.ts  指定したPDFをDropboxからプロキシ配信するAPI
 components/
   ResultsList.tsx   一覧のデータ取得・状態管理
-  FilterBar.tsx     検索・ステータス絞り込み・並び替えUI
+  FilterBar.tsx     検索・タグ/ステータス絞り込み・並び替えUI
   ResultCard.tsx    一覧の1件分のカード
   StatusBadge.tsx   ステータス（合格/不合格/未分類）バッジ
+  TeamBadge.tsx     所属（男子/女子/合宿）バッジ
+  TagBadge.tsx      タグ（練習/試合・TT）バッジ
   PdfViewer.tsx     詳細画面のPDF埋め込み表示
 lib/
   dropbox.ts            Dropboxクライアントの生成（サーバー専用）
@@ -41,6 +43,15 @@ lib/
   types.ts               共有の型定義
   format.ts               日時・ファイルサイズの表示用フォーマッタ
 ```
+
+## タグについて
+
+一覧の各PDFには、どのDropboxフォルダから取得したかを示す「タグ」が付きます。
+
+- `DROPBOX_FOLDER_PATH`（練習結果フォルダ）配下のPDF → タグ「練習」
+- `DROPBOX_MATCH_FOLDER_PATH`（試合結果フォルダ、任意設定）配下のPDF → タグ「試合・TT」
+
+試合結果フォルダのタグはファイル名に関わらず固定で付与されます。`DROPBOX_MATCH_FOLDER_PATH` が未設定の場合、このフォルダの読み込み自体を行いません。
 
 ## ステータス・練習日の判定について
 
@@ -55,4 +66,4 @@ Dropbox上のファイル名から以下のように情報を抽出します（�
 
 - Dropboxのアクセストークン・認証情報はすべて環境変数（`.env.local`）で管理し、クライアントには一切送信していません。
 - PDFの実体は `app/api/dropbox/file/route.ts` がサーバー側でDropboxからダウンロードし、そのままプロキシ配信します。
-- 配信対象のパスは `DROPBOX_FOLDER_PATH` 配下のPDFファイルのみに制限しています（パストラバーサル対策）。
+- 配信対象のパスは `DROPBOX_FOLDER_PATH` / `DROPBOX_MATCH_FOLDER_PATH` 配下のPDFファイルのみに制限しています（パストラバーサル対策）。

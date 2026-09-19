@@ -5,6 +5,7 @@ import { getPracticeResultByPath, resolveResultPath } from "@/lib/practice-resul
 import { formatDateTime, formatFileSize } from "@/lib/format";
 import StatusBadge from "@/components/StatusBadge";
 import TeamBadge from "@/components/TeamBadge";
+import TagBadge from "@/components/TagBadge";
 import PdfViewer from "@/components/PdfViewerLoader";
 
 export default async function ResultDetailPage(
@@ -33,6 +34,7 @@ export default async function ResultDetailPage(
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
             {result.title}
           </h1>
+          <TagBadge tag={result.tag} />
           <TeamBadge team={result.team} />
           <StatusBadge status={result.status} />
         </div>

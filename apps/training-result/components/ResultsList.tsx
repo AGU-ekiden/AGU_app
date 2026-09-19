@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, CalendarDays, Inbox, Loader2 } from "lucide-react";
 import type {
   PracticeResult,
+  PracticeTag,
   PracticeTeam,
   SortField,
   SortOrder,
@@ -30,6 +31,7 @@ export default function ResultsList() {
 
   const [query, setQuery] = useState("");
   const [team, setTeam] = useState<PracticeTeam | "all">("all");
+  const [tag, setTag] = useState<PracticeTag | "all">("all");
   const [sort, setSort] = useState<SortField>("date");
   const [order, setOrder] = useState<SortOrder>("desc");
 
@@ -119,6 +121,9 @@ export default function ResultsList() {
     if (team !== "all") {
       filtered = filtered.filter((result) => result.team === team);
     }
+    if (tag !== "all") {
+      filtered = filtered.filter((result) => result.tag === tag);
+    }
 
     const dir = order === "asc" ? 1 : -1;
     return [...filtered].sort((a, b) => {
@@ -131,7 +136,7 @@ export default function ResultsList() {
         dir
       );
     });
-  }, [allResults, query, team, sort, order]);
+  }, [allResults, query, team, tag, sort, order]);
 
   // 練習日順（sort === "date"）のときだけ、月ごとにグループ化して見出しを表示する。
   const monthGroups = useMemo(() => {
@@ -187,6 +192,8 @@ export default function ResultsList() {
           onQueryChange={setQuery}
           team={team}
           onTeamChange={setTeam}
+          tag={tag}
+          onTagChange={setTag}
           sort={sort}
           onSortChange={setSort}
           order={order}

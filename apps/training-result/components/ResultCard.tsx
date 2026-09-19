@@ -4,6 +4,7 @@ import type { PracticeResult } from "@/lib/types";
 import { formatDateTime, formatFileSize } from "@/lib/format";
 import StatusBadge from "@/components/StatusBadge";
 import TeamBadge from "@/components/TeamBadge";
+import TagBadge from "@/components/TagBadge";
 
 export default function ResultCard({ result }: { result: PracticeResult }) {
   return (
@@ -17,6 +18,7 @@ export default function ResultCard({ result }: { result: PracticeResult }) {
           <span className="truncate font-medium">{result.title}</span>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <TagBadge tag={result.tag} />
           <TeamBadge team={result.team} />
           <StatusBadge status={result.status} />
         </div>

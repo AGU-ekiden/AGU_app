@@ -1,13 +1,15 @@
 "use client";
 
 import { ArrowUpDown, RefreshCw, Search } from "lucide-react";
-import type { PracticeTeam, SortField, SortOrder } from "@/lib/types";
+import type { PracticeTag, PracticeTeam, SortField, SortOrder } from "@/lib/types";
 
 interface FilterBarProps {
   query: string;
   onQueryChange: (value: string) => void;
   team: PracticeTeam | "all";
   onTeamChange: (value: PracticeTeam | "all") => void;
+  tag: PracticeTag | "all";
+  onTagChange: (value: PracticeTag | "all") => void;
   sort: SortField;
   onSortChange: (value: SortField) => void;
   order: SortOrder;
@@ -27,6 +29,8 @@ export default function FilterBar({
   onQueryChange,
   team,
   onTeamChange,
+  tag,
+  onTagChange,
   sort,
   onSortChange,
   order,
@@ -48,6 +52,18 @@ export default function FilterBar({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
+        <select
+          value={tag}
+          onChange={(event) =>
+            onTagChange(event.target.value as PracticeTag | "all")
+          }
+          className={selectClassName}
+        >
+          <option value="all">すべてのタグ</option>
+          <option value="practice">練習</option>
+          <option value="match_tt">試合・TT</option>
+        </select>
+
         <select
           value={team}
           onChange={(event) =>

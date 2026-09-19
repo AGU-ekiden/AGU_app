@@ -1,7 +1,13 @@
 export type PracticeStatus = "pass" | "fail" | "unclassified";
 
-/** Dropbox上のフォルダ名（男子練習結果/女子練習結果/合宿）から判定する所属区分 */
-export type PracticeTeam = "male" | "female" | "camp";
+/** Dropbox上のフォルダ名（男子練習結果/女子練習結果/合宿）から判定する所属区分。
+ *  いずれにも一致しない場合は "other"（バッジ非表示）になる。 */
+export type PracticeTeam = "male" | "female" | "camp" | "other";
+
+/** どのDropboxフォルダから取得したデータかを表す区分。
+ *  練習結果フォルダ（DROPBOX_FOLDER_PATH）は "practice"、
+ *  試合結果フォルダ（DROPBOX_MATCH_FOLDER_PATH）は "match_tt" 固定。 */
+export type PracticeTag = "practice" | "match_tt";
 
 export interface PracticeResult {
   /** Dropboxのファイルパスをbase64urlエンコードした識別子 */
@@ -20,6 +26,7 @@ export interface PracticeResult {
   practiceDate: string;
   status: PracticeStatus;
   team: PracticeTeam;
+  tag: PracticeTag;
 }
 
 export type SortField = "date" | "name";

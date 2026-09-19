@@ -1,6 +1,15 @@
 import "server-only";
-import { getDropboxClient, getResultsFolderPath } from "@/lib/dropbox";
-import type { PracticeResult, PracticeStatus, PracticeTeam } from "@/lib/types";
+import {
+  getDropboxClient,
+  getMatchResultsFolderPath,
+  getResultsFolderPath,
+} from "@/lib/dropbox";
+import type {
+  PracticeResult,
+  PracticeStatus,
+  PracticeTag,
+  PracticeTeam,
+} from "@/lib/types";
 
 // ファイル名中のトークンとステータスの対応表。
 // 例: "2026-09-01_合格_柔道乱取り.pdf" -> 日付・ステータス・タイトルを抽出
@@ -18,11 +27,13 @@ const STATUS_KEYWORDS: Record<string, PracticeStatus> = {
 
 const DATE_TOKEN = /^\d{4}-\d{2}-\d{2}$/;
 
-/** パス中の「男子」「女子」フォルダ名から所属を判定する。それ以外は合宿フォルダとして扱う */
+/** パス中の「男子」「女子」「合宿」フォルダ名から所属を判定する。
+ *  いずれにも一致しなければ "other"（バッジ非表示）とする。 */
 function inferTeam(path: string): PracticeTeam {
   if (path.includes("男子")) return "male";
   if (path.includes("女子")) return "female";
-  return "camp";
+  if (path.includes("合宿")) return "camp";
+  return "other";
 }
 
 function encodeResultId(path: string): string {
@@ -81,7 +92,10 @@ interface DropboxFileEntry {
   server_modified: string;
 }
 
-function toPracticeResult(entry: DropboxFileEntry): PracticeResult | null {
+function toPracticeResult(
+  entry: DropboxFileEntry,
+  tag: PracticeTag
+): PracticeResult | null {
   if (entry[".tag"] !== "file") return null;
   if (!entry.name.toLowerCase().endsWith(".pdf")) return null;
   // ZIP展開時にmacOSが作る "._foo.pdf" のようなリソースフォークファイルは除外
@@ -101,20 +115,25 @@ function toPracticeResult(entry: DropboxFileEntry): PracticeResult | null {
     practiceDate: meta.practiceDate ?? modifiedAt.slice(0, 10),
     status: meta.status,
     team: inferTeam(path),
+    tag,
   };
 }
 
-/**
- * Dropbox内の対象フォルダにあるPDFファイルを、Dropbox APIのページ単位で
- * 逐次yieldする。一覧取得は複数ページ(filesListFolderContinue)に渡ることが
- * あり、全ページを待たずに先に届いた分から画面表示できるようにするための
- * ストリーミング版。
- */
-export async function* iteratePracticeResultBatches(): AsyncGenerator<
-  PracticeResult[]
-> {
+/** 指定パスが試合結果フォルダ配下かどうかで、付与すべきタグを判定する */
+function tagForPath(path: string): PracticeTag {
+  const matchFolder = getMatchResultsFolderPath();
+  if (matchFolder && path.toLowerCase().startsWith(matchFolder.toLowerCase())) {
+    return "match_tt";
+  }
+  return "practice";
+}
+
+/** 指定フォルダ配下のPDFファイルを、Dropbox APIのページ単位で逐次yieldする */
+async function* iterateFolderBatches(
+  folderPath: string,
+  tag: PracticeTag
+): AsyncGenerator<PracticeResult[]> {
   const dbx = getDropboxClient();
-  const folderPath = getResultsFolderPath();
 
   let response = await dbx.filesListFolder({
     path: folderPath,
@@ -123,7 +142,7 @@ export async function* iteratePracticeResultBatches(): AsyncGenerator<
 
   for (;;) {
     const batch = response.result.entries
-      .map((entry) => toPracticeResult(entry as DropboxFileEntry))
+      .map((entry) => toPracticeResult(entry as DropboxFileEntry, tag))
       .filter((r): r is PracticeResult => r !== null);
     if (batch.length > 0) yield batch;
 
@@ -131,6 +150,25 @@ export async function* iteratePracticeResultBatches(): AsyncGenerator<
     response = await dbx.filesListFolderContinue({
       cursor: response.result.cursor,
     });
+  }
+}
+
+/**
+ * 練習結果フォルダ（タグ: 練習）に加え、試合結果フォルダ
+ * （DROPBOX_MATCH_FOLDER_PATH設定時のみ、タグ: 試合・TT固定）にある
+ * PDFファイルも、Dropbox APIのページ単位で逐次yieldする。
+ * 一覧取得は複数ページ(filesListFolderContinue)に渡ることがあり、
+ * 全ページを待たずに先に届いた分から画面表示できるようにするための
+ * ストリーミング版。
+ */
+export async function* iteratePracticeResultBatches(): AsyncGenerator<
+  PracticeResult[]
+> {
+  yield* iterateFolderBatches(getResultsFolderPath(), "practice");
+
+  const matchFolder = getMatchResultsFolderPath();
+  if (matchFolder !== null) {
+    yield* iterateFolderBatches(matchFolder, "match_tt");
   }
 }
 
@@ -153,7 +191,7 @@ export async function getPracticeResultByPath(
   const dbx = getDropboxClient();
   try {
     const response = await dbx.filesGetMetadata({ path });
-    return toPracticeResult(response.result as DropboxFileEntry);
+    return toPracticeResult(response.result as DropboxFileEntry, tagForPath(path));
   } catch {
     return null;
   }
@@ -161,15 +199,21 @@ export async function getPracticeResultByPath(
 
 /**
  * idから安全なDropboxパスを復元する。
- * 対象フォルダ配下のPDFでなければnullを返す（パストラバーサル対策）。
+ * 対象フォルダ（練習結果 or 試合結果）配下のPDFでなければnullを返す
+ * （パストラバーサル対策）。
  */
 export async function resolveResultPath(id: string): Promise<string | null> {
   const path = decodeResultId(id);
   if (!path) return null;
   if (!path.toLowerCase().endsWith(".pdf")) return null;
 
-  const folderPath = getResultsFolderPath().toLowerCase();
-  if (folderPath && !path.toLowerCase().startsWith(folderPath)) return null;
+  const lowerPath = path.toLowerCase();
+  const practiceFolder = getResultsFolderPath().toLowerCase();
+  const matchFolder = getMatchResultsFolderPath()?.toLowerCase() ?? null;
+
+  const underPractice = !practiceFolder || lowerPath.startsWith(practiceFolder);
+  const underMatch = matchFolder !== null && lowerPath.startsWith(matchFolder);
+  if (!underPractice && !underMatch) return null;
 
   return path;
 }
