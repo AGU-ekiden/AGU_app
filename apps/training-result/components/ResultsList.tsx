@@ -22,6 +22,42 @@ function formatMonthLabel(monthKey: string): string {
   return `${year}年${Number(month)}月`;
 }
 
+// 絞り込み・並び替え・スクロール位置を一覧離脱後も保持するための
+// セッションストレージのキー。詳細画面から「一覧に戻る」で戻ってきたときに、
+// 最初の状態からではなく直前の閲覧状態から再開できるようにするため。
+const SESSION_STATE_KEY = "training-result:list-state";
+
+interface SavedListState {
+  query: string;
+  team: PracticeTeam | "all";
+  tag: PracticeTag | "all";
+  sort: SortField;
+  order: SortOrder;
+  scrollY: number;
+}
+
+function readSavedState(): SavedListState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(SESSION_STATE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as SavedListState;
+  } catch {
+    return null;
+  }
+}
+
+function writeSavedState(partial: Partial<SavedListState>) {
+  if (typeof window === "undefined") return;
+  try {
+    const current = readSavedState();
+    const next = { ...current, ...partial } as SavedListState;
+    window.sessionStorage.setItem(SESSION_STATE_KEY, JSON.stringify(next));
+  } catch {
+    // sessionStorageが使えない環境では単に保持しないだけにする
+  }
+}
+
 export default function ResultsList() {
   // Dropboxから届いた生データ(フィルタ・並び替え前)。ストリーミングで
   // ページが届くたびに追記され、届いた分から順に画面に反映される。
@@ -37,6 +73,8 @@ export default function ResultsList() {
 
   const [jumpMonth, setJumpMonth] = useState("");
   const pendingScrollMonthRef = useRef<string | null>(null);
+  // 詳細画面から戻ってきた直後、最初の1回だけスクロール位置を復元するためのフラグ
+  const pendingScrollRestoreRef = useRef(true);
 
   // 二重読み込み(更新ボタン連打など)で古いストリームの結果が後から
   // 反映されないようにするためのリクエストID
@@ -103,6 +141,56 @@ export default function ResultsList() {
     loadAllResults();
   }, [loadAllResults]);
 
+  // 保存済みの絞り込み・並び替え状態をマウント後に復元する。useStateの
+  // 初期値でsessionStorageを直接読むと、サーバー側の初回レンダリング
+  // (常にデフォルト値)とクライアント側の初回レンダリングがズレて
+  // hydrationエラーになるため、マウント後のeffect内でのみ行う。
+  useEffect(() => {
+    const saved = readSavedState();
+    if (!saved) return;
+    // マウント直後の1回だけ、外部(sessionStorage)から状態を同期する
+    // (hydration安全のためuseStateの初期値では読めないので、ここが唯一の入口)
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setQuery(saved.query);
+    setTeam(saved.team);
+    setTag(saved.tag);
+    setSort(saved.sort);
+    setOrder(saved.order);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+
+  // 絞り込み・並び替え条件が変わるたびに保存しておく（詳細画面から
+  // 「一覧に戻る」で戻ってきたときに、変更のたびに毎回保存しておく
+  // ことで最新の状態を復元できるようにするため）。上の復元effectが
+  // マウント直後にデフォルト値のまま走ってしまい、直後に来る復元前の
+  // 状態でsessionStorageを上書きしないよう、初回のこの effect 実行はスキップする。
+  const skipNextPersistRef = useRef(true);
+  useEffect(() => {
+    if (skipNextPersistRef.current) {
+      skipNextPersistRef.current = false;
+      return;
+    }
+    writeSavedState({ query, team, tag, sort, order });
+  }, [query, team, tag, sort, order]);
+
+  // スクロール位置も同様に、変更のたびに保存しておく（クリックした
+  // 瞬間だけを捕まえるより、常時追従させたほうが取りこぼしがない）。
+  useEffect(() => {
+    let frame: number | null = null;
+    const handleScroll = () => {
+      if (frame !== null) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = null;
+        writeSavedState({ scrollY: window.scrollY });
+      });
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (frame !== null) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
   // 検索・絞り込み・並び替えはすでに取得済みのデータに対してクライアント側で
   // 行う(変更のたびにDropboxへ再取得しに行くと、フィルタを1回変えるだけで
   // 毎回フォルダ全体の再取得が走ってしまい遅くなるため)。
@@ -137,6 +225,21 @@ export default function ResultsList() {
       );
     });
   }, [allResults, query, team, tag, sort, order]);
+
+  // データの初回読み込みが完了したタイミングで、一度だけ保存済みの
+  // スクロール位置へ復元する（詳細画面から戻ってきた直後の初期表示のみ。
+  // 「更新」ボタンでの再読み込み時は復元しない）。
+  useEffect(() => {
+    if (isLoading || !results) return;
+    if (!pendingScrollRestoreRef.current) return;
+    pendingScrollRestoreRef.current = false;
+
+    const savedScrollY = readSavedState()?.scrollY;
+    if (!savedScrollY) return;
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: savedScrollY });
+    });
+  }, [isLoading, results]);
 
   // 練習日順（sort === "date"）のときだけ、月ごとにグループ化して見出しを表示する。
   const monthGroups = useMemo(() => {
