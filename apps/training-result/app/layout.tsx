@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "練習結果ビューア",
-  description: "Dropboxに保存された練習結果PDFを閲覧するアプリ",
+  title: "試合・TT・練習結果ビューア",
+  description: "Dropboxに保存された試合・TT・練習結果PDFを閲覧するアプリ",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -30,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-3 sm:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Dumbbell className="h-5 w-5 text-[var(--primary)]" />
-              練習結果ビューア
+              試合・TT・練習結果ビューア
             </Link>
             <a
               href="/"

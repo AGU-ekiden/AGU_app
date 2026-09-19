@@ -133,8 +133,8 @@ window.APPS = [
   },
   {
     id: 'training-result',
-    name: '練習結果ビューア',
-    description: 'Dropboxに保存された練習結果(合格/不合格などのPDF)を一覧・検索・詳細閲覧できるアプリ。',
+    name: '試合・TT・練習結果ビューア',
+    description: 'Dropboxに保存された試合・TT・練習結果(合格/不合格などのPDF)を一覧・検索・詳細閲覧できるアプリ。',
     category: 'measure',
     icon: '📄',
     repoUrl: `${REPO_TREE}/apps/training-result`,
