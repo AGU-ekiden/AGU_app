@@ -91,9 +91,9 @@ export default function ResultCard({ result }: { result: PracticeResult }) {
         className="group flex select-none flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-4 transition hover:border-[var(--primary)] hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-[var(--primary)]"
       >
         <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-2 text-zinc-900 dark:text-zinc-50">
-            <FileText className="h-4 w-4 shrink-0 text-zinc-400" />
-            <span className="truncate font-medium">{result.title}</span>
+          <div className="flex min-w-0 items-start gap-2 text-zinc-900 dark:text-zinc-50">
+            <FileText className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
+            <span className="line-clamp-2 text-sm font-medium">{result.title}</span>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <TagBadge tag={result.tag} />

@@ -1,12 +1,11 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { getPracticeResultByPath, resolveResultPath } from "@/lib/practice-results";
 import { formatDateTime, formatFileSize } from "@/lib/format";
 import StatusBadge from "@/components/StatusBadge";
 import TeamBadge from "@/components/TeamBadge";
 import TagBadge from "@/components/TagBadge";
 import PdfViewer from "@/components/PdfViewerLoader";
+import BackToListLink from "@/components/BackToListLink";
 
 export default async function ResultDetailPage(
   props: PageProps<"/results/[id]">
@@ -21,13 +20,7 @@ export default async function ResultDetailPage(
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6">
-      <Link
-        href="/"
-        className="inline-flex w-fit items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        一覧に戻る
-      </Link>
+      <BackToListLink />
 
       <div className="flex flex-col gap-3 border-b border-zinc-200 pb-6 dark:border-zinc-800">
         <div className="flex flex-wrap items-center gap-3">

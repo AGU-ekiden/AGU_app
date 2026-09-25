@@ -154,22 +154,60 @@ async function* iterateFolderBatches(
 }
 
 /**
+ * 複数のAsyncGeneratorを並行して進め、届いた順にマージしてyieldする。
+ * 練習結果・試合結果の2フォルダを順番に(直列に)取得すると所要時間が
+ * 単純に合算されてタイムアウトしやすくなるため、両フォルダの取得を
+ * 並行に走らせて短縮する。
+ */
+async function* mergeAsyncGenerators<T>(
+  generators: AsyncGenerator<T>[]
+): AsyncGenerator<T> {
+  type Pending = { index: number; result: IteratorResult<T> };
+  const iterators = generators.map((g) => g[Symbol.asyncIterator]());
+  const pending = new Map<number, Promise<Pending>>();
+
+  iterators.forEach((it, index) => {
+    pending.set(
+      index,
+      it.next().then((result) => ({ index, result }))
+    );
+  });
+
+  while (pending.size > 0) {
+    const { index, result } = await Promise.race(pending.values());
+    if (result.done) {
+      pending.delete(index);
+      continue;
+    }
+    yield result.value;
+    pending.set(
+      index,
+      iterators[index].next().then((r) => ({ index, result: r }))
+    );
+  }
+}
+
+/**
  * 練習結果フォルダ（タグ: 練習）に加え、試合結果フォルダ
  * （DROPBOX_MATCH_FOLDER_PATH設定時のみ、タグ: 試合・TT固定）にある
  * PDFファイルも、Dropbox APIのページ単位で逐次yieldする。
  * 一覧取得は複数ページ(filesListFolderContinue)に渡ることがあり、
  * 全ページを待たずに先に届いた分から画面表示できるようにするための
- * ストリーミング版。
+ * ストリーミング版。2フォルダある場合は直列ではなく並行に取得する。
  */
 export async function* iteratePracticeResultBatches(): AsyncGenerator<
   PracticeResult[]
 > {
-  yield* iterateFolderBatches(getResultsFolderPath(), "practice");
+  const generators: AsyncGenerator<PracticeResult[]>[] = [
+    iterateFolderBatches(getResultsFolderPath(), "practice"),
+  ];
 
   const matchFolder = getMatchResultsFolderPath();
   if (matchFolder !== null) {
-    yield* iterateFolderBatches(matchFolder, "match_tt");
+    generators.push(iterateFolderBatches(matchFolder, "match_tt"));
   }
+
+  yield* mergeAsyncGenerators(generators);
 }
 
 /** Dropbox内の対象フォルダにあるPDFファイルを一覧取得する */
