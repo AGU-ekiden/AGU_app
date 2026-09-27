@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { getPracticeResultByPath, resolveResultPath } from "@/lib/practice-results";
 import { formatDateTime, formatFileSize } from "@/lib/format";
+import { apiPath } from "@/lib/api-path";
 import StatusBadge from "@/components/StatusBadge";
 import TeamBadge from "@/components/TeamBadge";
 import TagBadge from "@/components/TagBadge";
 import PdfViewer from "@/components/PdfViewerLoader";
-import BackToListLink from "@/components/BackToListLink";
 
 export default async function ResultDetailPage(
   props: PageProps<"/results/[id]">
@@ -20,7 +21,20 @@ export default async function ResultDetailPage(
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6">
-      <BackToListLink />
+      {/*
+        next/linkによるSPA遷移(basePath配下のクライアントサイドfetch)だと、
+        ポータル側のrewrite+trailingSlashのリダイレクトをうまく踏めずに
+        「一覧に戻る」が失敗するケースがあったため、あえて素のaタグで
+        フルページ遷移にしている。初回アクセスと同じ経路を通るので確実。
+        一覧側の絞り込み・スクロール位置はsessionStorageで別途復元される。
+      */}
+      <a
+        href={apiPath("/")}
+        className="inline-flex w-fit items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        一覧に戻る
+      </a>
 
       <div className="flex flex-col gap-3 border-b border-zinc-200 pb-6 dark:border-zinc-800">
         <div className="flex flex-wrap items-center gap-3">
