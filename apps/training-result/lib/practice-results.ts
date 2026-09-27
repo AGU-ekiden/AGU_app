@@ -219,6 +219,16 @@ export async function listPracticeResults(): Promise<PracticeResult[]> {
   return results;
 }
 
+// 短時間に同じ詳細ページへ連続アクセスされた場合の重複Dropbox呼び出しを
+// 吸収するための簡易キャッシュ(サーバーレス関数のウォームインスタンス内
+// でのみ有効)。in-flightのPromiseをそのまま共有するので、同時に複数
+// リクエストが来た場合もDropbox呼び出しは1回だけになる。
+const resultCache = new Map<
+  string,
+  { promise: Promise<PracticeResult | null>; expiresAt: number }
+>();
+const RESULT_CACHE_TTL_MS = 10_000;
+
 /**
  * 指定パス1件分のメタデータだけをDropboxから取得する。詳細画面用
  * (フォルダ全体を再帰一覧するより大幅に速い)。
@@ -226,13 +236,23 @@ export async function listPracticeResults(): Promise<PracticeResult[]> {
 export async function getPracticeResultByPath(
   path: string
 ): Promise<PracticeResult | null> {
-  const dbx = getDropboxClient();
-  try {
-    const response = await dbx.filesGetMetadata({ path });
-    return toPracticeResult(response.result as DropboxFileEntry, tagForPath(path));
-  } catch {
-    return null;
+  const cached = resultCache.get(path);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.promise;
   }
+
+  const promise = (async () => {
+    const dbx = getDropboxClient();
+    try {
+      const response = await dbx.filesGetMetadata({ path });
+      return toPracticeResult(response.result as DropboxFileEntry, tagForPath(path));
+    } catch {
+      return null;
+    }
+  })();
+
+  resultCache.set(path, { promise, expiresAt: Date.now() + RESULT_CACHE_TTL_MS });
+  return promise;
 }
 
 /**

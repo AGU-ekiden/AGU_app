@@ -10,6 +10,13 @@ export default function ResultCard({ result }: { result: PracticeResult }) {
   return (
     <Link
       href={`/results/${result.id}`}
+      // 一覧は件数が多く、スクロール中に多数のカードがビューポートへ
+      // 入ってはPrefetch対象になる。詳細画面はDropbox APIを呼ぶ動的
+      // ページなので、既定の自動prefetchのままだとリストを流し見する
+      // だけで同じ/複数のIDへ何度もリクエストが飛んでしまう
+      // (実際にログで同一ページへの短時間の連続アクセスを確認した)。
+      // クリック時にだけ取得すれば十分なため無効化する。
+      prefetch={false}
       className="group flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-4 transition hover:border-[var(--primary)] hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-[var(--primary)]"
     >
       <div className="flex items-start justify-between gap-3">
