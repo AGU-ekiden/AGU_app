@@ -36,6 +36,15 @@ interface SavedListState {
   scrollY: number;
 }
 
+const DEFAULT_SAVED_STATE: SavedListState = {
+  query: "",
+  team: "all",
+  tag: "all",
+  sort: "date",
+  order: "desc",
+  scrollY: 0,
+};
+
 function readSavedState(): SavedListState | null {
   if (typeof window === "undefined") return null;
   try {
@@ -51,7 +60,12 @@ function writeSavedState(partial: Partial<SavedListState>) {
   if (typeof window === "undefined") return;
   try {
     const current = readSavedState();
-    const next = { ...current, ...partial } as SavedListState;
+    // scrollYだけを保存するスクロール監視など、partialが一部のキーしか
+    // 持たないことがある。currentがnull(何も保存されていない)の場合に
+    // {...current, ...partial}だけだとquery/team/等が欠けたオブジェクトが
+    // 保存されてしまい、復元時にqueryがundefinedのままuseMemoでtrim()を
+    // 呼んでクラッシュする不具合があったため、必ずデフォルト値をベースにする。
+    const next = { ...DEFAULT_SAVED_STATE, ...current, ...partial };
     window.sessionStorage.setItem(SESSION_STATE_KEY, JSON.stringify(next));
   } catch {
     // sessionStorageが使えない環境では単に保持しないだけにする
@@ -149,13 +163,15 @@ export default function ResultsList() {
     const saved = readSavedState();
     if (!saved) return;
     // マウント直後の1回だけ、外部(sessionStorage)から状態を同期する
-    // (hydration安全のためuseStateの初期値では読めないので、ここが唯一の入口)
+    // (hydration安全のためuseStateの初期値では読めないので、ここが唯一の入口)。
+    // 保存内容が(古いバージョン由来などで)一部欠けていてもクラッシュしない
+    // よう、各フィールドはundefinedなら復元しない(現在の初期値のまま)。
     /* eslint-disable react-hooks/set-state-in-effect */
-    setQuery(saved.query);
-    setTeam(saved.team);
-    setTag(saved.tag);
-    setSort(saved.sort);
-    setOrder(saved.order);
+    if (saved.query !== undefined) setQuery(saved.query);
+    if (saved.team !== undefined) setTeam(saved.team);
+    if (saved.tag !== undefined) setTag(saved.tag);
+    if (saved.sort !== undefined) setSort(saved.sort);
+    if (saved.order !== undefined) setOrder(saved.order);
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
@@ -196,7 +212,7 @@ export default function ResultsList() {
   // 毎回フォルダ全体の再取得が走ってしまい遅くなるため)。
   const results = useMemo(() => {
     if (!allResults) return null;
-    const q = query.trim().toLowerCase();
+    const q = (query ?? "").trim().toLowerCase();
 
     let filtered = allResults;
     if (q) {
