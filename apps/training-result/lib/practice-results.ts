@@ -27,6 +27,29 @@ const STATUS_KEYWORDS: Record<string, PracticeStatus> = {
 
 const DATE_TOKEN = /^\d{4}-\d{2}-\d{2}$/;
 
+// ファイル名中の「20260912」のような8桁の日付(年月日)。前後が数字の
+// 場合(もっと長い数字列の一部)は日付とみなさない。
+// 「20260905-06」(期間表記)の場合は先頭の20260905を採用する。
+const COMPACT_DATE = /(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)/g;
+
+/** ファイル名から最初に見つかった8桁の日付をYYYY-MM-DD形式で返す */
+function findCompactDate(text: string): string | null {
+  for (const match of text.matchAll(COMPACT_DATE)) {
+    const [, y, m, d] = match;
+    const year = Number(y);
+    const month = Number(m);
+    const day = Number(d);
+    if (year < 2000 || year > 2100) continue;
+    if (month < 1 || month > 12) continue;
+    if (day < 1 || day > 31) continue;
+    // 2月30日のような実在しない日付を除外する
+    const date = new Date(Date.UTC(year, month - 1, day));
+    if (date.getUTCMonth() !== month - 1) continue;
+    return `${y}-${m}-${d}`;
+  }
+  return null;
+}
+
 /** パス中の「男子」「女子」「合宿」フォルダ名から所属を判定する。
  *  いずれにも一致しなければ "other"（バッジ非表示）とする。 */
 function inferTeam(path: string): PracticeTeam {
@@ -73,6 +96,12 @@ function parseNameMeta(filename: string): {
     titleTokens.push(token);
   }
 
+  // YYYY-MM-DD形式が無ければ、8桁の日付(例: 20260912)を探す。
+  // ファイル名の表示はそのまま残したいので、タイトルからは取り除かない。
+  if (!practiceDate) {
+    practiceDate = findCompactDate(base);
+  }
+
   return {
     practiceDate,
     status,
@@ -90,6 +119,14 @@ interface DropboxFileEntry {
   size: number;
   client_modified?: string;
   server_modified: string;
+}
+
+/** Dropboxの日時(UTCのISO文字列)を日本時間の日付(YYYY-MM-DD)にする */
+function toJstDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso.slice(0, 10);
+  const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  return jst.toISOString().slice(0, 10);
 }
 
 function toPracticeResult(
@@ -112,7 +149,7 @@ function toPracticeResult(
     path,
     size: entry.size,
     modifiedAt,
-    practiceDate: meta.practiceDate ?? modifiedAt.slice(0, 10),
+    practiceDate: meta.practiceDate ?? toJstDate(modifiedAt),
     status: meta.status,
     team: inferTeam(path),
     tag,

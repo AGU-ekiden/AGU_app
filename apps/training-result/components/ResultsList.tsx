@@ -61,7 +61,9 @@ function readSavedState(): SavedListState | null {
 // ときはDropboxへの再取得(数秒かかる)を待たずに即座に同じ一覧を表示する。
 // これにより、元のスクロール位置へすぐに戻れる。古くなりすぎないよう
 // 一定時間で失効させ、「更新」ボタンではいつでも取り直せる。
-const LIST_CACHE_KEY = "training-result:list-cache";
+// 一覧データの形式・日付の判定方法を変えたときは末尾の版数を上げ、
+// 各ブラウザに残っている古いキャッシュを使わないようにする
+const LIST_CACHE_KEY = "training-result:list-cache:v2";
 const LIST_CACHE_TTL_MS = 10 * 60 * 1000;
 
 function readListCache(): PracticeResult[] | null {
@@ -292,11 +294,13 @@ export default function ResultsList() {
       if (sort === "name") {
         return a.name.localeCompare(b.name, "ja") * dir;
       }
-      return (
-        (new Date(a.practiceDate).getTime() -
-          new Date(b.practiceDate).getTime()) *
-        dir
-      );
+      // 日付(ファイル名の8桁の日付、無ければ保存日)順。同じ日付の
+      // ファイル同士は保存日時、さらにファイル名で順序を固定する。
+      const byDate = a.practiceDate.localeCompare(b.practiceDate);
+      if (byDate !== 0) return byDate * dir;
+      const byModified = a.modifiedAt.localeCompare(b.modifiedAt);
+      if (byModified !== 0) return byModified * dir;
+      return a.name.localeCompare(b.name, "ja") * dir;
     });
   }, [allResults, query, team, tag, sort, order]);
 
