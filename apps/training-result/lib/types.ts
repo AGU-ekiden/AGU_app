@@ -29,5 +29,4 @@ export interface PracticeResult {
   tag: PracticeTag;
 }
 
-export type SortField = "date" | "name";
 export type SortOrder = "asc" | "desc";

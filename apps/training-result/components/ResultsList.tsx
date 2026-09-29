@@ -7,7 +7,6 @@ import type {
   PracticeResult,
   PracticeTag,
   PracticeTeam,
-  SortField,
   SortOrder,
 } from "@/lib/types";
 import FilterBar from "@/components/FilterBar";
@@ -32,7 +31,6 @@ interface SavedListState {
   query: string;
   team: PracticeTeam | "all";
   tag: PracticeTag | "all";
-  sort: SortField;
   order: SortOrder;
   scrollY: number;
 }
@@ -41,7 +39,6 @@ const DEFAULT_SAVED_STATE: SavedListState = {
   query: "",
   team: "all",
   tag: "all",
-  sort: "date",
   order: "desc",
   scrollY: 0,
 };
@@ -118,11 +115,9 @@ export default function ResultsList() {
   const [query, setQuery] = useState("");
   const [team, setTeam] = useState<PracticeTeam | "all">("all");
   const [tag, setTag] = useState<PracticeTag | "all">("all");
-  const [sort, setSort] = useState<SortField>("date");
   const [order, setOrder] = useState<SortOrder>("desc");
 
   const [jumpMonth, setJumpMonth] = useState("");
-  const pendingScrollMonthRef = useRef<string | null>(null);
   // 詳細画面から戻ってきた直後、最初の1回だけスクロール位置を復元するためのフラグ
   const pendingScrollRestoreRef = useRef(true);
   // 復元先のスクロール位置。マウント直後に一度だけ読み取って確保しておく
@@ -228,7 +223,6 @@ export default function ResultsList() {
     if (saved.query !== undefined) setQuery(saved.query);
     if (saved.team !== undefined) setTeam(saved.team);
     if (saved.tag !== undefined) setTag(saved.tag);
-    if (saved.sort !== undefined) setSort(saved.sort);
     if (saved.order !== undefined) setOrder(saved.order);
   }, [loadAllResults]);
 
@@ -243,8 +237,8 @@ export default function ResultsList() {
       skipNextPersistRef.current = false;
       return;
     }
-    writeSavedState({ query, team, tag, sort, order });
-  }, [query, team, tag, sort, order]);
+    writeSavedState({ query, team, tag, order });
+  }, [query, team, tag, order]);
 
   // スクロール位置も同様に、変更のたびに保存しておく。ただし、戻ってきた
   // 直後の復元が終わるまでと、詳細画面へ遷移した後は保存しない(どちらも
@@ -291,9 +285,6 @@ export default function ResultsList() {
 
     const dir = order === "asc" ? 1 : -1;
     return [...filtered].sort((a, b) => {
-      if (sort === "name") {
-        return a.name.localeCompare(b.name, "ja") * dir;
-      }
       // 日付(ファイル名の8桁の日付、無ければ保存日)順。同じ日付の
       // ファイル同士は保存日時、さらにファイル名で順序を固定する。
       const byDate = a.practiceDate.localeCompare(b.practiceDate);
@@ -302,7 +293,7 @@ export default function ResultsList() {
       if (byModified !== 0) return byModified * dir;
       return a.name.localeCompare(b.name, "ja") * dir;
     });
-  }, [allResults, query, team, tag, sort, order]);
+  }, [allResults, query, team, tag, order]);
 
   // データの初回読み込みが完了したタイミングで、一度だけ保存済みの
   // スクロール位置へ復元する（詳細画面から戻ってきた直後の初期表示のみ。
@@ -336,9 +327,9 @@ export default function ResultsList() {
     freezeScrollSaveRef.current = true;
   };
 
-  // 練習日順（sort === "date"）のときだけ、月ごとにグループ化して見出しを表示する。
+  // 月ごとにグループ化して見出しを表示する。
   const monthGroups = useMemo(() => {
-    if (!results || sort !== "date") return null;
+    if (!results) return null;
     const groups: { monthKey: string; items: PracticeResult[] }[] = [];
     const indexByMonth = new Map<string, number>();
 
@@ -354,32 +345,14 @@ export default function ResultsList() {
     }
 
     return groups;
-  }, [results, sort]);
-
-  // sortを切り替えた直後は再取得を待つ必要があるため、
-  // 移動先の月はrefに保持しておき、resultsが更新されたタイミングでスクロールする。
-  useEffect(() => {
-    const month = pendingScrollMonthRef.current;
-    if (!month || !results) return;
-    document
-      .getElementById(`month-${month}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    pendingScrollMonthRef.current = null;
   }, [results]);
 
   const handleJumpMonthChange = (value: string) => {
     setJumpMonth(value);
     if (!value) return;
-
-    if (sort === "date") {
-      document
-        .getElementById(`month-${value}`)
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
-
-    pendingScrollMonthRef.current = value;
-    setSort("date");
+    document
+      .getElementById(`month-${value}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -392,8 +365,6 @@ export default function ResultsList() {
           onTeamChange={setTeam}
           tag={tag}
           onTagChange={setTag}
-          sort={sort}
-          onSortChange={setSort}
           order={order}
           onOrderToggle={() => setOrder((o) => (o === "asc" ? "desc" : "asc"))}
           onRefresh={loadAllResults}
@@ -453,14 +424,6 @@ export default function ResultsList() {
                 ))}
               </div>
             </div>
-          ))}
-        </div>
-      )}
-
-      {results && results.length > 0 && !monthGroups && (
-        <div className="flex flex-col gap-3" onClickCapture={handleListClickCapture}>
-          {results.map((result) => (
-            <ResultCard key={result.id} result={result} />
           ))}
         </div>
       )}
