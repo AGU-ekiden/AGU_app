@@ -7,7 +7,6 @@ import type {
   PracticeResult,
   PracticeTag,
   PracticeTeam,
-  SortOrder,
 } from "@/lib/types";
 import FilterBar from "@/components/FilterBar";
 import ResultCard from "@/components/ResultCard";
@@ -31,7 +30,6 @@ interface SavedListState {
   query: string;
   team: PracticeTeam | "all";
   tag: PracticeTag | "all";
-  order: SortOrder;
   scrollY: number;
 }
 
@@ -39,7 +37,6 @@ const DEFAULT_SAVED_STATE: SavedListState = {
   query: "",
   team: "all",
   tag: "all",
-  order: "desc",
   scrollY: 0,
 };
 
@@ -115,7 +112,6 @@ export default function ResultsList() {
   const [query, setQuery] = useState("");
   const [team, setTeam] = useState<PracticeTeam | "all">("all");
   const [tag, setTag] = useState<PracticeTag | "all">("all");
-  const [order, setOrder] = useState<SortOrder>("desc");
 
   const [jumpMonth, setJumpMonth] = useState("");
   // 詳細画面から戻ってきた直後、最初の1回だけスクロール位置を復元するためのフラグ
@@ -223,7 +219,6 @@ export default function ResultsList() {
     if (saved.query !== undefined) setQuery(saved.query);
     if (saved.team !== undefined) setTeam(saved.team);
     if (saved.tag !== undefined) setTag(saved.tag);
-    if (saved.order !== undefined) setOrder(saved.order);
   }, [loadAllResults]);
 
   // 絞り込み・並び替え条件が変わるたびに保存しておく（詳細画面から
@@ -237,8 +232,8 @@ export default function ResultsList() {
       skipNextPersistRef.current = false;
       return;
     }
-    writeSavedState({ query, team, tag, order });
-  }, [query, team, tag, order]);
+    writeSavedState({ query, team, tag });
+  }, [query, team, tag]);
 
   // スクロール位置も同様に、変更のたびに保存しておく。ただし、戻ってきた
   // 直後の復元が終わるまでと、詳細画面へ遷移した後は保存しない(どちらも
@@ -283,17 +278,16 @@ export default function ResultsList() {
       filtered = filtered.filter((result) => result.tag === tag);
     }
 
-    const dir = order === "asc" ? 1 : -1;
     return [...filtered].sort((a, b) => {
-      // 日付(ファイル名の8桁の日付、無ければ保存日)順。同じ日付の
-      // ファイル同士は保存日時、さらにファイル名で順序を固定する。
-      const byDate = a.practiceDate.localeCompare(b.practiceDate);
-      if (byDate !== 0) return byDate * dir;
-      const byModified = a.modifiedAt.localeCompare(b.modifiedAt);
-      if (byModified !== 0) return byModified * dir;
-      return a.name.localeCompare(b.name, "ja") * dir;
+      // 新しい日付が上(日付はファイル名の8桁の日付、無ければ保存日)。
+      // 同じ日付のファイル同士は保存日時、さらにファイル名で順序を固定する。
+      const byDate = b.practiceDate.localeCompare(a.practiceDate);
+      if (byDate !== 0) return byDate;
+      const byModified = b.modifiedAt.localeCompare(a.modifiedAt);
+      if (byModified !== 0) return byModified;
+      return b.name.localeCompare(a.name, "ja");
     });
-  }, [allResults, query, team, tag, order]);
+  }, [allResults, query, team, tag]);
 
   // データの初回読み込みが完了したタイミングで、一度だけ保存済みの
   // スクロール位置へ復元する（詳細画面から戻ってきた直後の初期表示のみ。
@@ -365,8 +359,6 @@ export default function ResultsList() {
           onTeamChange={setTeam}
           tag={tag}
           onTagChange={setTag}
-          order={order}
-          onOrderToggle={() => setOrder((o) => (o === "asc" ? "desc" : "asc"))}
           onRefresh={loadAllResults}
           isLoading={isLoading}
         />

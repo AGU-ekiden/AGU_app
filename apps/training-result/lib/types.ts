@@ -29,4 +29,3 @@ export interface PracticeResult {
   tag: PracticeTag;
 }
 
-export type SortOrder = "asc" | "desc";

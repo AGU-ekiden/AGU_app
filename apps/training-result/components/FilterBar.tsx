@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowUpDown, RefreshCw, Search } from "lucide-react";
-import type { PracticeTag, PracticeTeam, SortOrder } from "@/lib/types";
+import { RefreshCw, Search } from "lucide-react";
+import type { PracticeTag, PracticeTeam } from "@/lib/types";
 
 interface FilterBarProps {
   query: string;
@@ -10,8 +10,6 @@ interface FilterBarProps {
   onTeamChange: (value: PracticeTeam | "all") => void;
   tag: PracticeTag | "all";
   onTagChange: (value: PracticeTag | "all") => void;
-  order: SortOrder;
-  onOrderToggle: () => void;
   onRefresh: () => void;
   isLoading: boolean;
 }
@@ -29,8 +27,6 @@ export default function FilterBar({
   onTeamChange,
   tag,
   onTagChange,
-  order,
-  onOrderToggle,
   onRefresh,
   isLoading,
 }: FilterBarProps) {
@@ -72,11 +68,6 @@ export default function FilterBar({
           <option value="female">女子</option>
           <option value="camp">合宿</option>
         </select>
-
-        <button type="button" onClick={onOrderToggle} className={buttonClassName}>
-          <ArrowUpDown className="h-4 w-4" />
-          {order === "desc" ? "降順" : "昇順"}
-        </button>
 
         <button
           type="button"
