@@ -19,7 +19,6 @@ window.FEATURES = {
   rollcall: { name: '点呼', icon: '🙋', target: 'stopwatch', hash: 'rollcall', note: '「点呼」タブ' },
   racing_watch: { name: 'レーシングウォッチ', icon: '📷', target: 'tokei', note: 'カメラ同期ストップウォッチ' },
   aotore: { name: '青トレデータフォルダ', icon: '📚', target: 'itonomaki', note: null },
-  blood: { name: '血液検査確認', icon: '🩸', target: 'tiryou-karte', note: null },
   // 血液検査(男子/女子)。gender を持つ機能は、選手ロールでは同じ性別の人にだけ表示される。
   // path はアプリのURL末尾に足すサブパス(女子用ダッシュボードは /ketsueki/joshi/)。
   blood_men: { name: '血液検査（男子）', icon: '🩸', target: 'ketsueki', gender: 'male', note: null },
@@ -71,12 +70,12 @@ window.ROLES = [
     id: 'medical_trainer',
     name: 'メディカルトレーナー',
     icon: '🩺',
-    features: ['medical_karte_input', 'physical_karte_view', 'medical_karte_view', 'injury_report', 'blood', 'training_result'],
+    features: ['medical_karte_input', 'physical_karte_view', 'medical_karte_view', 'injury_report', 'blood_men', 'blood_women', 'training_result'],
   },
   {
     id: 'physical_trainer',
     name: 'フィジカルトレーナー',
     icon: '💊',
-    features: ['physical_karte_input', 'physical_karte_view', 'medical_karte_view', 'injury_report', 'blood', 'training_result'],
+    features: ['physical_karte_input', 'physical_karte_view', 'medical_karte_view', 'injury_report', 'blood_men', 'blood_women', 'training_result'],
   },
 ];
