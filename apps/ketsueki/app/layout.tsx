@@ -23,7 +23,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ja"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* ポータルはこのアプリのbasePath(/ketsueki)の外なので、next/linkではなく素のaタグでフルページ遷移する */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a
+          href="/"
+          className="fixed left-2 top-2 z-50 inline-flex items-center rounded-md px-2 py-1 text-xs font-bold shadow-sm"
+          style={{ background: "var(--brand)", color: "#ffffff" }}
+        >
+          ← ポータル
+        </a>
+        {children}
+      </body>
     </html>
   );
 }
