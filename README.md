@@ -24,6 +24,7 @@ AGU_app/
     │   ├── web/           ← デプロイ対象はこちら(Next.js)
     │   └── notion_sync/   Notion同期用スクリプト(Python、非デプロイ)
     ├── spm-medical-record/ Next.js + Notion API
+    ├── ketsueki/          Next.js + Notion API(血液検査ダッシュボード)
     ├── training-result/   Next.js + Dropbox API
     └── training-log/      Next.js + Strava API + Supabase + Notion API
 ```
@@ -94,6 +95,7 @@ window.ROLES.find(r => r.id === 'staff').features.push('example_feature');
 | 食数管理 (meal_traker) | チーム運営・事務 | `/meal_traker/` |
 | 会員ラベル作成 (label_create) | チーム運営・事務 | `/label_create/` |
 | メディカルカルテ (tiryou-karte) | メディカル | `/tiryou-karte/` |
+| 血液検査ダッシュボード (ketsueki) | メディカル | `/ketsueki/`(男子)・`/ketsueki/joshi/`(女子) |
 | トレーナー知見ライブラリ/青トレデータ (itonomaki) | メディカル | `/itonomaki/` |
 | フィジカルカルテ(SPM) (spm-medical-record) | メディカル | `/spm-medical-record/` |
 | 練習日誌 (training-log) | 計測・トレーニング | 未デプロイ(`apps/training-log/README.md` 参照) |

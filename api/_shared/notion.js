@@ -5,6 +5,9 @@ const NAME_PROPERTY = '氏名';
 const PIN_PROPERTY = '暗証番号';
 const CATEGORY_PROPERTY = '区分';
 const GRADE_PROPERTY = '学年';
+// 血液検査(男子/女子)のボタン出し分け用。部員DBの「性別」列(セレクトまたはテキスト、
+// 値は「男子」「女子」)を読む。列名に「性別」を含んでいれば自動認識する。
+const GENDER_PROPERTY_PATTERN = /性別/;
 
 function notionHeaders() {
   return {
@@ -40,7 +43,16 @@ async function findMemberByName(name) {
     ? categoryProp.select.name
     : '';
 
-  return { pageId: page.id, pinValue, category };
+  let gender = null;
+  for (const [propName, genderProp] of Object.entries(page.properties)) {
+    if (!GENDER_PROPERTY_PATTERN.test(propName)) continue;
+    const text = extractSelectOrText(genderProp);
+    if (/女/.test(text)) gender = 'female';
+    else if (/男/.test(text)) gender = 'male';
+    if (gender) break;
+  }
+
+  return { pageId: page.id, pinValue, category, gender };
 }
 
 function extractSelectOrText(prop) {

@@ -101,6 +101,16 @@ window.APPS = [
     stack: 'Next.js + Notion API',
   },
   {
+    id: 'ketsueki',
+    name: '血液検査ダッシュボード',
+    description: '陸上部の血液検査結果を選手ごと・学年ごとに可視化。男子は /ketsueki/、女子は /ketsueki/joshi/(合言葉が必要)。',
+    category: 'medical',
+    icon: '🩸',
+    repoUrl: `${REPO_TREE}/apps/ketsueki`,
+    liveUrl: '/ketsueki/',
+    stack: 'Next.js + Notion API',
+  },
+  {
     id: 'itonomaki',
     name: 'トレーナー知見ライブラリ(青トレデータ)',
     description: 'フィジカル・メンタル・部位別・種目別・トレーナーの知見をまとめた閲覧用サイト。Notionと同期。',

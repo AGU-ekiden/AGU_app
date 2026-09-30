@@ -3,13 +3,16 @@
   const headerNav = document.getElementById('headerNav');
   const ROLE_STORAGE_KEY = 'agu_portal_role';
   const AUTH_STORAGE_KEY = 'agu_portal_auth';
+  const GENDER_STORAGE_KEY = 'agu_portal_gender';
 
   let view = 'login'; // 'login' | 'pinchange' | 'role' | 'all'
   let currentRoleId = localStorage.getItem(ROLE_STORAGE_KEY);
   let authedName = localStorage.getItem(AUTH_STORAGE_KEY);
+  let currentGender = localStorage.getItem(GENDER_STORAGE_KEY); // 'male' | 'female' | null
   let pendingName = null;
   let pendingPin = null;
   let pendingRole = null;
+  let pendingGender = null;
 
   function escapeHtml(str) {
     return str.replace(/[&<>"']/g, (c) => ({
@@ -44,6 +47,8 @@
   function logout() {
     authedName = null;
     currentRoleId = null;
+    currentGender = null;
+    localStorage.removeItem(GENDER_STORAGE_KEY);
     localStorage.removeItem(AUTH_STORAGE_KEY);
     localStorage.removeItem(ROLE_STORAGE_KEY);
     view = 'login';
@@ -51,9 +56,12 @@
     renderMain();
   }
 
-  function completeLogin(name, roleId) {
+  function completeLogin(name, roleId, gender) {
     authedName = name;
     currentRoleId = roleId;
+    currentGender = gender || null;
+    if (currentGender) localStorage.setItem(GENDER_STORAGE_KEY, currentGender);
+    else localStorage.removeItem(GENDER_STORAGE_KEY);
     localStorage.setItem(AUTH_STORAGE_KEY, name);
     localStorage.setItem(ROLE_STORAGE_KEY, roleId);
     view = 'role';
@@ -149,11 +157,12 @@
           pendingName = name;
           pendingPin = pin;
           pendingRole = data.role;
+          pendingGender = data.gender || null;
           view = 'pinchange';
           renderHeaderNav();
           renderMain();
         } else {
-          completeLogin(name, data.role);
+          completeLogin(name, data.role, data.gender);
         }
       } catch (err) {
         renderAuthError('通信エラーが発生しました。しばらくしてから再度お試しください。');
@@ -220,10 +229,12 @@
         }
         const name = pendingName;
         const roleId = pendingRole;
+        const gender = pendingGender;
         pendingName = null;
         pendingPin = null;
         pendingRole = null;
-        completeLogin(name, roleId);
+        pendingGender = null;
+        completeLogin(name, roleId, gender);
       } catch (err) {
         renderAuthError('通信エラーが発生しました。しばらくしてから再度お試しください。');
       } finally {
@@ -238,6 +249,9 @@
     if (!feature) return '';
     const app = feature.target ? getApp(feature.target) : null;
     const link = feature.target ? resolveAppLink(app) : null;
+    if (link && feature.path && link.kind !== 'repo') {
+      link.url = `${link.url}${feature.path}`;
+    }
     if (link && feature.hash && link.kind !== 'repo') {
       link.url = `${link.url}#${feature.hash}`;
     }
@@ -270,13 +284,21 @@
     `;
   }
 
+  // 選手は自分の性別に合った血液検査ボタンだけを表示する(性別が不明なら両方非表示)。
+  // マネージャー・スタッフなど選手以外は常に両方表示する。
+  function featureVisible(featureKey) {
+    const feature = window.FEATURES[featureKey];
+    if (!feature || !feature.gender || currentRoleId !== 'athlete') return true;
+    return feature.gender === currentGender;
+  }
+
   function renderRoleMenu() {
     const role = window.ROLES.find((r) => r.id === currentRoleId);
     if (!role) { logout(); return; }
 
     main.innerHTML = `
       <section class="feature-list">
-        ${role.features.map(featureItemHtml).join('')}
+        ${role.features.filter(featureVisible).map(featureItemHtml).join('')}
       </section>
     `;
   }

@@ -20,6 +20,10 @@ window.FEATURES = {
   racing_watch: { name: 'レーシングウォッチ', icon: '📷', target: 'tokei', note: 'カメラ同期ストップウォッチ' },
   aotore: { name: '青トレデータフォルダ', icon: '📚', target: 'itonomaki', note: null },
   blood: { name: '血液検査確認', icon: '🩸', target: 'tiryou-karte', note: null },
+  // 血液検査(男子/女子)。gender を持つ機能は、選手ロールでは同じ性別の人にだけ表示される。
+  // path はアプリのURL末尾に足すサブパス(女子用ダッシュボードは /ketsueki/joshi/)。
+  blood_men: { name: '血液検査（男子）', icon: '🩸', target: 'ketsueki', gender: 'male', note: null },
+  blood_women: { name: '血液検査（女子）', icon: '🩸', target: 'ketsueki', path: 'joshi/', gender: 'female', note: '合言葉が必要です' },
   race_result: { name: '試合結果確認', icon: '🏁', target: 'tiryou-karte', note: null },
   ryouhi: { name: '寮費', icon: '🧾', target: 'ryouhi', note: null },
   meal_count: { name: '寮食数計算', icon: '🍚', target: 'meal_traker', note: null },
@@ -40,7 +44,7 @@ window.ROLES = [
     id: 'athlete',
     name: '選手',
     icon: '🏃',
-    features: ['training_log', 'tabata', 'reinforce', 'stretch', 'pace', 'aotore', 'blood', 'race_result', 'training_result'],
+    features: ['training_log', 'tabata', 'reinforce', 'stretch', 'pace', 'aotore', 'blood_men', 'blood_women', 'race_result', 'training_result'],
   },
   {
     id: 'manager',
@@ -48,7 +52,7 @@ window.ROLES = [
     icon: '📋',
     features: [
       'stopwatch_main', 'tabata', 'rollcall', 'reinforce', 'stretch', 'crossing',
-      'pace', 'aotore', 'ryouhi', 'injury_report', 'blood', 'race_result',
+      'pace', 'aotore', 'ryouhi', 'injury_report', 'blood_men', 'blood_women', 'race_result',
       'training_result', 'training_log', 'label', 'racing_watch',
     ],
   },
@@ -59,7 +63,7 @@ window.ROLES = [
     features: [
       'reinforce', 'stopwatch_main', 'rollcall', 'tabata', 'stretch',
       'physical_karte_view', 'medical_karte_view', 'crossing', 'pace', 'aotore',
-      'ryouhi', 'task_manage', 'injury_report', 'blood', 'race_result',
+      'ryouhi', 'task_manage', 'injury_report', 'blood_men', 'blood_women', 'race_result',
       'training_result', 'training_log', 'label', 'racing_watch', 'meal_count', 'keihi',
     ],
   },

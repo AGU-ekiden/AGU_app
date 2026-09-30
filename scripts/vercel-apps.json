@@ -78,6 +78,23 @@
       ]
     },
     {
+      "id": "ketsueki",
+      "projectName": "agu-ketsueki",
+      "rootDirectory": "apps/ketsueki",
+      "framework": "nextjs",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/ketsueki",
+      "envVars": [
+        { "key": "NOTION_TOKEN", "required": true, "note": "Notionインテグレーションのシークレットトークン" },
+        { "key": "NOTION_BLOOD_DATABASE_ID", "required": true, "note": "男子の血液検査DB" },
+        { "key": "NOTION_GAMES_DATABASE_ID", "required": false, "note": "競技結果DB" },
+        { "key": "NOTION_MEMBERS_DATABASE_ID", "required": false, "note": "部員DB(学年の自動計算用・ポータルと同じ値)" },
+        { "key": "NOTION_WA_SCORES_DATABASE_ID", "required": false, "note": "WAスコアDB" },
+        { "key": "NOTION_WOMEN_BLOOD_DATABASE_ID", "required": true, "note": "女子の血液検査DB" },
+        { "key": "WOMEN_DASHBOARD_SECRET", "required": true, "note": "女子ダッシュボードの合言葉" },
+        { "key": "IMPORT_SECRET", "required": true, "note": "CSVインポート用パスコード" }
+      ]
+    },
+    {
       "id": "itonomaki",
       "projectName": "agu-itonomaki",
       "rootDirectory": "apps/itonomaki/web",

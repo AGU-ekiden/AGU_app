@@ -14,6 +14,7 @@
 | 8 | tiryou-karte | `agu-tiryou-karte` | `apps/tiryou-karte` | Next.js 16 | `/tiryou-karte/` |
 | 9 | spm-medical-record | `agu-spm-medical-record` | `apps/spm-medical-record` | Next.js 16 | `/spm-medical-record/` |
 | 10 | itonomaki | `agu-itonomaki` | `apps/itonomaki/web` | Next.js 16 | `/itonomaki/` |
+| 12 | ketsueki | `agu-ketsueki` | `apps/ketsueki` | Next.js 16 | `/ketsueki/` |
 | 11 | training-log | `agu-training-log` | `apps/training-log` | Next.js 16 | `/training-log/`(未デプロイ) |
 
 - 静的アプリ(2〜5): Framework Preset = **Other**、Build Command は空、Output Directory はルート

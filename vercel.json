@@ -35,6 +35,9 @@
     { "source": "/tiryou-karte/", "destination": "https://agu-tiryou-karte-delta.vercel.app/tiryou-karte/" },
     { "source": "/tiryou-karte/(.*)", "destination": "https://agu-tiryou-karte-delta.vercel.app/tiryou-karte/$1" },
 
+    { "source": "/ketsueki/", "destination": "https://agu-ketsueki.vercel.app/ketsueki/" },
+    { "source": "/ketsueki/(.*)", "destination": "https://agu-ketsueki.vercel.app/ketsueki/$1" },
+
     { "source": "/spm-medical-record/", "destination": "https://agu-spm-medical-record-nine.vercel.app/spm-medical-record/" },
     { "source": "/spm-medical-record/(.*)", "destination": "https://agu-spm-medical-record-nine.vercel.app/spm-medical-record/$1" },
 

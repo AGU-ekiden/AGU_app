@@ -51,5 +51,5 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  res.status(200).json({ ok: true, needsPinChange: isPlainPin(member.pinValue), role: roleId });
+  res.status(200).json({ ok: true, needsPinChange: isPlainPin(member.pinValue), role: roleId, gender: member.gender });
 };
