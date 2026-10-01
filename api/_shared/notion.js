@@ -17,22 +17,13 @@ function notionHeaders() {
   };
 }
 
-async function findMemberByName(name) {
-  const res = await fetch(`https://api.notion.com/v1/databases/${process.env.NOTION_MEMBERS_DATABASE_ID}/query`, {
-    method: 'POST',
-    headers: notionHeaders(),
-    body: JSON.stringify({
-      filter: { property: NAME_PROPERTY, title: { equals: name } },
-      page_size: 1,
-    }),
-  });
-  if (!res.ok) {
-    throw new Error(`Notion query failed: ${res.status}`);
-  }
-  const data = await res.json();
-  const page = data.results && data.results[0];
-  if (!page) return null;
+// 氏名の表記ゆれ(「伊藤　雅一」「伊藤雅一」「伊藤 雅一」)を同一視するための正規化。
+// 全角/半角の違い(NFKC)を揃え、空白類をすべて取り除く。
+function normalizeName(name) {
+  return String(name).normalize('NFKC').replace(/\s+/g, '');
+}
 
+function memberFromPage(page) {
   const prop = page.properties[PIN_PROPERTY];
   const pinValue = prop && prop.type === 'rich_text'
     ? prop.rich_text.map((t) => t.plain_text).join('')
@@ -53,6 +44,52 @@ async function findMemberByName(name) {
   }
 
   return { pageId: page.id, pinValue, category, gender };
+}
+
+function pageName(page) {
+  const nameProp = page.properties[NAME_PROPERTY];
+  return nameProp && nameProp.type === 'title' ? nameProp.title.map((t) => t.plain_text).join('') : '';
+}
+
+async function queryMembers(body) {
+  const res = await fetch(`https://api.notion.com/v1/databases/${process.env.NOTION_MEMBERS_DATABASE_ID}/query`, {
+    method: 'POST',
+    headers: notionHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new Error(`Notion query failed: ${res.status}`);
+  }
+  return res.json();
+}
+
+// 入力された氏名に対応する部員を探す。まず入力そのままで完全一致を試し(通常はこれで
+// 1回のクエリで済む)、見つからなければ全員を取得して空白の有無・全角半角の違いを
+// 無視して照合する。同じ正規化名の部員が複数いて特定できない場合は null を返す。
+async function findMemberByName(name) {
+  const exact = await queryMembers({
+    filter: { property: NAME_PROPERTY, title: { equals: name } },
+    page_size: 1,
+  });
+  if (exact.results && exact.results[0]) return memberFromPage(exact.results[0]);
+
+  const target = normalizeName(name);
+  if (!target) return null;
+
+  const matches = [];
+  let cursor;
+  do {
+    const data = await queryMembers({
+      page_size: 100,
+      ...(cursor ? { start_cursor: cursor } : {}),
+    });
+    (data.results || []).forEach((page) => {
+      if (normalizeName(pageName(page)) === target) matches.push(page);
+    });
+    cursor = data.has_more ? data.next_cursor : null;
+  } while (cursor);
+
+  return matches.length === 1 ? memberFromPage(matches[0]) : null;
 }
 
 function extractSelectOrText(prop) {
