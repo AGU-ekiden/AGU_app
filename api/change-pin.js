@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
 
   let member;
   try {
-    member = await findMemberByName(name);
+    member = await findMemberByName(name, currentPin);
   } catch (err) {
     res.status(500).json({ error: '認証処理でエラーが発生しました' });
     return;

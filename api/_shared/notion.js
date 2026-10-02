@@ -65,8 +65,10 @@ async function queryMembers(body) {
 
 // 入力された氏名に対応する部員を探す。まず入力そのままで完全一致を試し(通常はこれで
 // 1回のクエリで済む)、見つからなければ全員を取得して空白の有無・全角半角の違いを
-// 無視して照合する。同じ正規化名の部員が複数いて特定できない場合は null を返す。
-async function findMemberByName(name) {
+// 無視して照合する。同じ正規化名の部員が複数いる場合(同姓同名や、同じ人が表記違いで
+// 二重登録されている場合)は、渡された暗証番号が合う方を採用する(合う人がいなければ
+// 最初の候補を返し、呼び出し側の暗証番号チェックで弾かれる)。
+async function findMemberByName(name, pin) {
   const exact = await queryMembers({
     filter: { property: NAME_PROPERTY, title: { equals: name } },
     page_size: 1,
@@ -89,7 +91,13 @@ async function findMemberByName(name) {
     cursor = data.has_more ? data.next_cursor : null;
   } while (cursor);
 
-  return matches.length === 1 ? memberFromPage(matches[0]) : null;
+  if (matches.length === 0) return null;
+  const candidates = matches.map(memberFromPage);
+  if (pin) {
+    const verified = candidates.find((m) => verifyPin(m.pinValue, pin));
+    if (verified) return verified;
+  }
+  return candidates[0];
 }
 
 function extractSelectOrText(prop) {
