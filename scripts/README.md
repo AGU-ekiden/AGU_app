@@ -16,6 +16,7 @@
 | 10 | itonomaki | `agu-itonomaki` | `apps/itonomaki/web` | Next.js 16 | `/itonomaki/` |
 | 12 | ketsueki | `agu-ketsueki` | `apps/ketsueki` | Next.js 16 | `/ketsueki/` |
 | 11 | training-log | `agu-training-log` | `apps/training-log` | Next.js 16 | `/training-log/`(未デプロイ) |
+| 13 | injury-report | `agu-injury-report` | `apps/injury-report` | Next.js 16 | `/injury-report/`(未デプロイ) |
 
 - 静的アプリ(2〜5): Framework Preset = **Other**、Build Command は空、Output Directory はルート
 - Viteアプリ(6〜7): Framework Preset = **Vite**、Build = `npm run build`、Output = `dist`
@@ -64,7 +65,7 @@ python3 scripts/setup_vercel.py --only ryouhi,label_create
 
 ### 注意点
 
-- **Ignored Build Step を設定すること(1日のデプロイ回数上限に引っかかりやすい問題への対処)** — このリポジトリはモノレポで、全プロジェクトが同じGitHubリポジトリを見ています。何も設定しないと、リポジトリのどこか1箇所に1回pushしただけで**全プロジェクトのビルドが同時に走り**、Vercel Hobbyプランの1日のデプロイ回数上限にすぐ到達します。`scripts/vercel-apps.json` の各アプリに `ignoreBuildStepCommand`(例: `git diff --quiet HEAD^ HEAD -- apps/training-log`)を指定して `setup_vercel.py` を実行すると、そのプロジェクトのRoot Directory配下に変更が無いpushではビルドをスキップするようになります(Vercelダッシュボードなら Settings → Git → Ignored Build Step から手動設定も可能)。`portal`・`tokei`・`stopwatch`・`taskkyoyu`・`ryouhi`・`meal_traker`・`label_create`・`tiryou-karte`・`spm-medical-record`・`training-log` の10プロジェクトには設定済みです。**`itonomaki` のみ未設定**です(後述の注意点を参照)。
+- **Ignored Build Step を設定すること(1日のデプロイ回数上限に引っかかりやすい問題への対処)** — このリポジトリはモノレポで、全プロジェクトが同じGitHubリポジトリを見ています。何も設定しないと、リポジトリのどこか1箇所に1回pushしただけで**全プロジェクトのビルドが同時に走り**、Vercel Hobbyプランの1日のデプロイ回数上限にすぐ到達します。`scripts/vercel-apps.json` の各アプリに `ignoreBuildStepCommand`(例: `git diff --quiet HEAD^ HEAD -- apps/training-log`)を指定して `setup_vercel.py` を実行すると、そのプロジェクトのRoot Directory配下に変更が無いpushではビルドをスキップするようになります(Vercelダッシュボードなら Settings → Git → Ignored Build Step から手動設定も可能)。`portal`・`tokei`・`stopwatch`・`taskkyoyu`・`ryouhi`・`meal_traker`・`label_create`・`tiryou-karte`・`spm-medical-record`・`training-log`・`injury-report` の11プロジェクトには設定済みです。**`itonomaki` のみ未設定**です(後述の注意点を参照)。
   - `ignoreBuildStepCommand` をPowerShellから編集する場合、`Get-Content`/`Set-Content` はUTF-8 BOM付与や日本語の文字化けを起こしやすいので使わないこと。JSONの読み書きは必ずPythonの `json` モジュール(`open(path, encoding="utf-8")` / `json.dump(..., ensure_ascii=False)`)経由で行う。
   - **`itonomaki` は要注意** — `scripts/vercel-apps.json` の `agu-itonomaki` は、2026-09時点で少なくとも1つのVercelチーム(`team_ccjHey89X0swE4O9a3kkELIF`)からは見つからず、`setup_vercel.py` を素で実行すると**同名の空プロジェクトを新規作成しようとする**(実際に本番稼働中のプロジェクトとは別物になり、何の解決にもならない)。本番のitonomakiが実際にどのチーム/アカウント配下にあるか確認できるまでは、`--only` で明示的に対象から除外して運用すること。
 - **Production Branch は `main` に設定すること**(`main` が存在しない状態でプロジェクトを作ってしまうと、「プロジェクトはできているのにデプロイが1回も走らない」状態になる事故が過去にあった)
@@ -164,6 +165,16 @@ STRAVA_REDIRECT_URI                 https://<ポータルのドメイン>/traini
 ```
 
 Strava側の管理画面(https://www.strava.com/settings/api )で「Authorization Callback Domain」にポータルのドメインを登録する必要があります。詳細は `apps/training-log/README.md` 参照。
+
+### injury-report(すべて必須。未デプロイ)
+
+```
+NOTION_TOKEN
+NOTION_MEMBERS_DATABASE_ID          (tiryou-karteと同じ値)
+NOTION_INJURY_REPORT_DATABASE_ID    故障者報告DB(メディカルカルテアプリと同じ場所に新規作成済み)
+```
+
+選手の本人特定は、ポータルのログイン(`localStorage`の`agu_portal_auth`キーに入っている氏名)をそのまま使う。1オリジン化しているので`localStorage`はポータルと全アプリで共有されており、injury-report側で改めてログインさせる必要はない。氏名から部員DBの該当ページを`/api/players?name=...`で引き当てている(ポータルのログインAPI `api/_shared/notion.js` と同じ正規化ロジックを `src/lib/notion.ts` の `normalizeName` に再実装している)。
 
 ### itonomaki(すべて任意。未設定でも閲覧はできる)
 

@@ -32,7 +32,8 @@ window.FEATURES = {
   medical_karte_view: { name: 'メディカルカルテ確認', icon: '🩺', target: 'tiryou-karte', note: null },
   physical_karte_input: { name: 'フィジカルカルテ打ち込み', icon: '💊', target: 'spm-medical-record', note: null },
   physical_karte_view: { name: 'フィジカルカルテ確認', icon: '💊', target: 'tiryou-karte', note: null },
-  injury_report: { name: '故障者報告確認', icon: '🚑', target: null, note: '未構築(今後追加予定)' },
+  injury_report_input: { name: '故障者報告', icon: '🚑', target: 'injury-report', note: 'ログイン中の自分として報告します' },
+  injury_report_view: { name: '故障者報告確認', icon: '🚑', target: 'injury-report', path: 'dashboard/', note: null },
   keihi: { name: '経費精算', icon: '💳', target: 'keihi-seisan', note: null },
   training_result: { name: '試合・TT・練習結果', icon: '📄', target: 'training-result', note: null },
   training_log: { name: '練習日誌', icon: '📝', target: 'training-log', note: null },
@@ -43,7 +44,7 @@ window.ROLES = [
     id: 'athlete',
     name: '選手',
     icon: '🏃',
-    features: ['training_log', 'tabata', 'reinforce', 'stretch', 'pace', 'aotore', 'blood_men', 'blood_women', 'race_result', 'training_result'],
+    features: ['training_log', 'tabata', 'reinforce', 'stretch', 'pace', 'aotore', 'injury_report_input', 'blood_men', 'blood_women', 'race_result', 'training_result'],
   },
   {
     id: 'manager',
@@ -51,7 +52,7 @@ window.ROLES = [
     icon: '📋',
     features: [
       'stopwatch_main', 'tabata', 'rollcall', 'reinforce', 'stretch', 'crossing',
-      'pace', 'aotore', 'ryouhi', 'injury_report', 'blood_men', 'blood_women', 'race_result',
+      'pace', 'aotore', 'ryouhi', 'injury_report_view', 'blood_men', 'blood_women', 'race_result',
       'training_result', 'training_log', 'label', 'racing_watch',
     ],
   },
@@ -62,7 +63,7 @@ window.ROLES = [
     features: [
       'reinforce', 'stopwatch_main', 'rollcall', 'tabata', 'stretch',
       'physical_karte_view', 'medical_karte_view', 'crossing', 'pace', 'aotore',
-      'ryouhi', 'task_manage', 'injury_report', 'blood_men', 'blood_women', 'race_result',
+      'ryouhi', 'task_manage', 'injury_report_view', 'blood_men', 'blood_women', 'race_result',
       'training_result', 'training_log', 'label', 'racing_watch', 'meal_count', 'keihi',
     ],
   },
@@ -70,12 +71,12 @@ window.ROLES = [
     id: 'medical_trainer',
     name: 'メディカルトレーナー',
     icon: '🩺',
-    features: ['medical_karte_input', 'physical_karte_view', 'medical_karte_view', 'injury_report', 'blood_men', 'blood_women', 'training_result'],
+    features: ['medical_karte_input', 'physical_karte_view', 'medical_karte_view', 'injury_report_view', 'blood_men', 'blood_women', 'training_result'],
   },
   {
     id: 'physical_trainer',
     name: 'フィジカルトレーナー',
     icon: '💊',
-    features: ['physical_karte_input', 'physical_karte_view', 'medical_karte_view', 'injury_report', 'blood_men', 'blood_women', 'training_result'],
+    features: ['physical_karte_input', 'physical_karte_view', 'medical_karte_view', 'injury_report_view', 'blood_men', 'blood_women', 'training_result'],
   },
 ];

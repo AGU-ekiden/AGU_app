@@ -145,6 +145,19 @@
         { "key": "STRAVA_REDIRECT_URI", "required": true, "note": "1オリジン化後は https://<ポータルのドメイン>/training-log/api/strava/callback。Strava側のAuthorization Callback Domainにも登録すること" }
       ],
       "note": "未デプロイ。詳細は apps/training-log/README.md 参照。"
+    },
+    {
+      "id": "injury-report",
+      "projectName": "agu-injury-report",
+      "rootDirectory": "apps/injury-report",
+      "framework": "nextjs",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/injury-report",
+      "envVars": [
+        { "key": "NOTION_TOKEN", "required": true, "note": "" },
+        { "key": "NOTION_MEMBERS_DATABASE_ID", "required": true, "note": "部員DB(他アプリと共通の値)" },
+        { "key": "NOTION_INJURY_REPORT_DATABASE_ID", "required": true, "note": "故障者報告DB(新規作成。メディカルカルテアプリと同じ場所)" }
+      ],
+      "note": "未デプロイ。デプロイ後、実URLをリポジトリルートのvercel.jsonのrewritesに反映すること。"
     }
   ]
 }

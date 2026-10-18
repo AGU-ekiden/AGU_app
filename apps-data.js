@@ -161,4 +161,14 @@ window.APPS = [
     liveUrl: null,
     stack: 'Next.js + Strava API + Supabase + Notion API',
   },
+  {
+    id: 'injury-report',
+    name: '故障者報告',
+    description: '毎週金曜日、ポイント練習に参加していない選手が故障状況を報告するアプリ。ステージ(0〜5)で数値化し、あとから推移を評価できるようにする。ポータルのログイン情報から自分の選手を自動判定する。',
+    category: 'medical',
+    icon: '🚑',
+    repoUrl: `${REPO_TREE}/apps/injury-report`,
+    liveUrl: '/injury-report/',
+    stack: 'Next.js + Notion API',
+  },
 ];
