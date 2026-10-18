@@ -31,3 +31,7 @@ cp .env.local.example .env.local
 - 今日時点の故障個所のステージ（0:ノーラン 〜 5:ポイント合流・復帰）
 - 今週の走行距離
 - ポイント合流した日
+
+## デプロイ
+
+ポータル（リポジトリルート）の `vercel.json` の `/injury-report/` rewrite からこのプロジェクトへプロキシされる。ポータル側から見えるURLは `https://<ポータルのドメイン>/injury-report/`。
