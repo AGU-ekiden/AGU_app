@@ -14,7 +14,7 @@
       "projectName": "agu-tokei",
       "rootDirectory": "apps/tokei",
       "framework": null,
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/tokei",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": []
     },
     {
@@ -22,7 +22,7 @@
       "projectName": "agu-stopwatch",
       "rootDirectory": "apps/stopwatch",
       "framework": null,
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/stopwatch",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": []
     },
     {
@@ -30,7 +30,7 @@
       "projectName": "agu-taskkyoyu",
       "rootDirectory": "apps/taskkyoyu",
       "framework": null,
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/taskkyoyu",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": []
     },
     {
@@ -38,7 +38,7 @@
       "projectName": "agu-ryouhi",
       "rootDirectory": "apps/ryouhi",
       "framework": "vite",
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/ryouhi",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": [
         { "key": "VITE_GAS_API_URL", "required": false, "note": "未設定でもダミーデータで動作" },
         { "key": "VITE_USE_DUMMY_DATA", "required": false, "note": "true/false" }
@@ -49,7 +49,7 @@
       "projectName": "agu-meal-traker",
       "rootDirectory": "apps/meal_traker",
       "framework": null,
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/meal_traker",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": []
     },
     {
@@ -57,7 +57,7 @@
       "projectName": "agu-label-create",
       "rootDirectory": "apps/label_create",
       "framework": "vite",
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/label_create",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": []
     },
     {
@@ -65,7 +65,7 @@
       "projectName": "agu-tiryou-karte",
       "rootDirectory": "apps/tiryou-karte",
       "framework": "nextjs",
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/tiryou-karte",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "Notionインテグレーションのシークレットトークン" },
         { "key": "NOTION_MEMBERS_DATABASE_ID", "required": true, "note": "" },
@@ -82,7 +82,7 @@
       "projectName": "agu-ketsueki",
       "rootDirectory": "apps/ketsueki",
       "framework": "nextjs",
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/ketsueki",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "Notionインテグレーションのシークレットトークン" },
         { "key": "NOTION_BLOOD_DATABASE_ID", "required": true, "note": "男子の血液検査DB" },
@@ -116,7 +116,7 @@
       "projectName": "agu-spm-medical-record",
       "rootDirectory": "apps/spm-medical-record",
       "framework": "nextjs",
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/spm-medical-record",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "" },
         { "key": "NOTION_DATABASE_ID", "required": false, "note": "" },
@@ -133,7 +133,7 @@
       "projectName": "agu-training-log",
       "rootDirectory": "apps/training-log",
       "framework": "nextjs",
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/training-log",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "" },
         { "key": "NOTION_TRAINING_LOG_DATABASE_ID", "required": true, "note": "" },
@@ -151,7 +151,7 @@
       "projectName": "agu-injury-report",
       "rootDirectory": "apps/injury-report",
       "framework": "nextjs",
-      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- apps/injury-report",
+      "ignoreBuildStepCommand": "git diff --quiet HEAD^ HEAD -- .",
       "envVars": [
         { "key": "NOTION_TOKEN", "required": true, "note": "" },
         { "key": "NOTION_MEMBERS_DATABASE_ID", "required": true, "note": "部員DB(他アプリと共通の値)" },
