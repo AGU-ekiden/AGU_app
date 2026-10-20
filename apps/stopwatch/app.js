@@ -981,6 +981,17 @@ function addTrainRow(card, direction, dep, arr) {
   card.querySelector('.train-rows').appendChild(node);
 }
 
+// 踏切の電車の初期値(方向, 発, 着)。AtoB=小涌谷→宮ノ下、BtoA=宮ノ下→小涌谷。
+const DEFAULT_TRAINS = [
+  ['BtoA', '6:39', '6:44'],
+  ['BtoA', '6:59', '7:05'],
+  ['BtoA', '7:26', '7:31'],
+  ['AtoB', '6:20', '6:25'],
+  ['AtoB', '6:34', '6:40'],
+  ['AtoB', '7:05', '7:09'],
+  ['AtoB', '7:21', '7:26'],
+];
+
 el.crossingCards.forEach((card) => {
   const recompute = () => computeCrossingCard(card);
   card.querySelector('.crossing-fastest').addEventListener('input', recompute);
@@ -991,9 +1002,8 @@ el.crossingCards.forEach((card) => {
     addTrainRow(card, 'AtoB', '', '');
     recompute();
   });
-  // Both directions share the same observed pair of trains as a starting example.
-  addTrainRow(card, 'AtoB', '7:21', '7:26');
-  addTrainRow(card, 'BtoA', '7:26', '7:31');
+  // 上り・下りとも、同じ時刻表の電車を初期値として入れておく。
+  DEFAULT_TRAINS.forEach(([direction, dep, arr]) => addTrainRow(card, direction, dep, arr));
   computeCrossingCard(card);
 });
 
