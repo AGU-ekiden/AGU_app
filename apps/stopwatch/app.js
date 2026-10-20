@@ -1247,37 +1247,39 @@ const REINFORCE_MENUS = {
     { group: '【15】下後鋸筋', spec: '', speech: '下後鋸筋いきます', voice: 'かこうきょきんいきます', durationSec: null },
   ],
   ループ: [
-    { group: '◎アップ(1)膝立て', spec: '腹横筋の感覚入力', speech: '膝立ていきます、よーいはじめ', voice: 'ひざだていきます、よーいはじめ', durationSec: null },
-    { group: '◎アップ(2)バンザイ', spec: '腹横筋の感覚入力', speech: 'バンザイいきます、よーいはじめ', voice: 'バンザイいきます、よーいはじめ', durationSec: null },
+    { group: '◎アップ(1)膝立て', spec: '10回4カウント(腹横筋の感覚入力)', speech: '膝立ていきます、よーいはじめ', voice: 'ひざだていきます、よーいはじめ', durationSec: null },
+    { group: '◎アップ(2)バンザイ', spec: '10回4カウント(腹横筋の感覚入力)', speech: 'バンザイいきます、よーいはじめ', voice: 'バンザイいきます、よーいはじめ', durationSec: null },
 
-    { group: '【1】スクリューレッグリフトフルレンジ(右上)', spec: '10回', speech: 'スクリューレッグリフトフルレンジ、右上いきます、よーいはじめ', voice: 'スクリューレッグリフトフルレンジ、右上いきます、よーいはじめ', durationSec: null },
-    { group: '【1】スクリューレッグリフトフルレンジ(左上)', spec: '10回', speech: '左上、よーいはじめ', voice: '左上、よーいはじめ', durationSec: null },
+    { group: '【1】スクリューレッグリフトフルレンジ', spec: '10回', speech: 'スクリューレッグリフトフルレンジいきます、よーいはじめ', voice: 'スクリューレッグリフトフルレンジいきます、よーいはじめ', durationSec: null },
+    { group: '【1】スクリューレッグリフトフルレンジ(反対)', spec: '10回', speech: '反対', voice: '反対', durationSec: null },
 
     { group: '【2】Vアップつま先タッチ', spec: '15回', speech: 'Vアップつま先タッチいきます、よーいはじめ', voice: 'Vアップつま先タッチいきます、よーいはじめ', durationSec: null },
 
-    { group: '【3】ニーリングサイドリフト', spec: '左右20回', speech: 'ニーリングサイドリフトいきます、よーいはじめ', voice: 'ニーリングサイドリフトいきます、よーいはじめ', durationSec: null },
-    { group: '【3】ニーリングサイドリフト(反対)', spec: '左右20回', speech: '反対', voice: '反対', durationSec: null },
+    { group: '【3】ニーリングサイドリフト', spec: '20回', speech: 'ニーリングサイドリフトいきます、よーいはじめ', voice: 'ニーリングサイドリフトいきます、よーいはじめ', durationSec: null },
+    { group: '【3】ニーリングサイドリフト(反対)', spec: '20回', speech: '反対', voice: '反対', durationSec: null },
 
-    { group: '【4】ニーリングサイドキック(手を頭に当てて)', spec: '10回', speech: 'ニーリングサイドキック、手を頭に当てていきます、よーいはじめ', voice: 'ニーリングサイドキック、手を頭に当てていきます、よーいはじめ', durationSec: null },
-    { group: '【4】ニーリングサイドキック(手を動かして)', spec: '10回', speech: '続けて、手を動かしていきます、よーいはじめ', voice: '続けて、手を動かしていきます、よーいはじめ', durationSec: null },
+    { group: '【4】ニーリングサイドキック', spec: '20回(手を頭に当てて10回+手を動かして10回)', speech: 'ニーリングサイドキック、手を頭に当てて10回、手を動かして10回、いきます、よーいはじめ', voice: 'ニーリングサイドキック、手を頭に当てて10回、手を動かして10回、いきます、よーいはじめ', durationSec: null },
+    { group: '【4】ニーリングサイドキック(反対)', spec: '20回(手を頭に当てて10回+手を動かして10回)', speech: '反対', voice: '反対', durationSec: null },
 
-    { group: '【5】4の字ツイストボード', spec: '15回(5カウント)', speech: '4の字ツイストボードいきます、よーいはじめ', voice: 'よんの字ツイストボードいきます、よーいはじめ', durationSec: null },
+    { group: '【5】四の字スリップボード', spec: '15回5カウント', speech: '四の字スリップボードいきます、よーいはじめ', voice: 'よんの字スリップボードいきます、よーいはじめ', durationSec: null },
+    { group: '【5】四の字スリップボード(反対)', spec: '15回5カウント', speech: '反対', voice: '反対', durationSec: null },
+    { group: '※交代', spec: '', speech: '交代してください', voice: '交代してください', durationSec: null },
+    { group: '【5】四の字スリップボード(交代後)', spec: '15回5カウント', speech: '四の字スリップボードいきます、よーいはじめ', voice: 'よんの字スリップボードいきます、よーいはじめ', durationSec: null },
+    { group: '【5】四の字スリップボード(交代後・反対)', spec: '15回5カウント', speech: '反対', voice: '反対', durationSec: null },
 
-    { group: '【6】サイドエルボープッシュ', spec: '20回(4カウント)', speech: 'サイドエルボープッシュいきます、よーいはじめ', voice: 'サイドエルボープッシュいきます、よーいはじめ', durationSec: null },
+    { group: '【6】サイドエルボープッシュ', spec: '20回4カウント', speech: 'サイドエルボープッシュいきます、よーいはじめ', voice: 'サイドエルボープッシュいきます、よーいはじめ', durationSec: null },
+    { group: '【6】サイドエルボープッシュ(反対)', spec: '20回4カウント', speech: '反対', voice: '反対', durationSec: null },
 
-    { group: '【7】ショートT(4カウント)', spec: '10回', speech: 'ショートTいきます、よーいはじめ', voice: 'ショートTいきます、よーいはじめ', durationSec: null },
-    { group: '【7】ショートT(1カウント)', spec: '10回', speech: '続けて1カウント、よーいはじめ', voice: '続けて1カウント、よーいはじめ', durationSec: null },
-    { group: '【7】ショートT(キープ)', spec: '10秒', speech: 'キープ、よーいはじめ', voice: 'キープ、よーいはじめ', durationSec: 10 },
+    { group: '【7】ショートT', spec: '10回4カウント+10回1カウント+10秒キープ', speech: 'ショートT、4カウント10回、1カウント10回、キープ10秒、いきます、よーいはじめ', voice: 'ショートT、4カウント10回、1カウント10回、キープ10秒、いきます、よーいはじめ', durationSec: null },
+    { group: '【7】ショートT(反対)', spec: '10回4カウント+10回1カウント+10秒キープ', speech: '反対', voice: '反対', durationSec: null },
 
-    { group: '【8】ショートV', spec: '15回(4カウント)', speech: 'ショートVいきます、よーいはじめ', voice: 'ショートVいきます、よーいはじめ', durationSec: null },
-    { group: '【8】ショートV(反対)', spec: '15回(4カウント)', speech: '反対', voice: '反対', durationSec: null },
+    { group: '【8】ショートV', spec: '15回4カウント', speech: 'ショートVいきます、よーいはじめ', voice: 'ショートVいきます、よーいはじめ', durationSec: null },
+    { group: '【8】ショートV(反対)', spec: '15回4カウント', speech: '反対', voice: '反対', durationSec: null },
 
     { group: '【9】ロングV', spec: '15回', speech: 'ロングVいきます、よーいはじめ', voice: 'ロングVいきます、よーいはじめ', durationSec: null },
     { group: '【9】ロングV(反対)', spec: '15回', speech: '反対', voice: '反対', durationSec: null },
 
-    { group: '【10】ピラーブリッジフロント(腕)', spec: '肘付き・5カウント', speech: 'ピラーブリッジフロント、肘付き、腕からいきます、よーいはじめ', voice: 'ピラーブリッジフロント、肘付き、腕からいきます、よーいはじめ', durationSec: null },
-    { group: '【10】ピラーブリッジフロント(脚)', spec: '肘付き・5カウント', speech: '続けて脚、よーいはじめ', voice: '続けてあし、よーいはじめ', durationSec: null },
-    { group: '【10】ピラーブリッジフロント(対角バランス)', spec: '2周・5カウント', speech: '対角バランス、2周いきます、よーいはじめ', voice: '対角バランス、2周いきます、よーいはじめ', durationSec: null },
+    { group: '【10】ピラーブリッジフロント', spec: '6回5カウント×2(1秒に1カウント)', speech: 'ピラーブリッジフロント、1秒に1カウントでいきます、よーいはじめ', voice: 'ピラーブリッジフロント、1秒に1カウントでいきます、よーいはじめ', durationSec: null },
   ],
   下肢: [
     // ラダー形式(Lv.1→Lv.1反対→Lv.1→Lv.2→…→Lv.4反対)で、
